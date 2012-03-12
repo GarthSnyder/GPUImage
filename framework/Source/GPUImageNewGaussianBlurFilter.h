@@ -1,14 +1,14 @@
 #import "GPUImageTwoPassFilter.h"
 
-@interface GPUImageGaussianBlurFilter : GPUImageTwoPassFilter {
+@interface GPUImageNewGaussianBlurFilter : GPUImageTwoPassFilter {
     GLint horizontalGaussianArrayUniform,
-        horizontalBlurSizeUniform,
+        imageWidthUniform,
         verticalGaussianArrayUniform,
-        verticalBlurSizeUniform;
+        imageHeightUniform;
 }
 
-@property (readwrite, nonatomic) CGFloat blurSize;
+@property (readwrite, nonatomic) CGFloat sigma;
 
-- (void) setGaussianValues;
+- (void) calculateGaussianWeights;
 
 @end
