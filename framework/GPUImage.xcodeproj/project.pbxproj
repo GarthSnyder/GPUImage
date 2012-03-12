@@ -110,6 +110,8 @@
 		BCF1A34C14DDB1EC00852800 /* libGPUImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCF1A33414DDB1EC00852800 /* libGPUImage.a */; };
 		BCF1A35214DDB1EC00852800 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BCF1A35014DDB1EC00852800 /* InfoPlist.strings */; };
 		BCF1A35514DDB1EC00852800 /* GPUImageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BCF1A35414DDB1EC00852800 /* GPUImageTests.m */; };
+		CE090D90150D7EB200FA5518 /* GPUImageNewGaussianBlurFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = CE090D8E150D7EB200FA5518 /* GPUImageNewGaussianBlurFilter.h */; };
+		CE090D91150D7EB200FA5518 /* GPUImageNewGaussianBlurFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = CE090D8F150D7EB200FA5518 /* GPUImageNewGaussianBlurFilter.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -229,6 +231,8 @@
 		BCF1A35114DDB1EC00852800 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		BCF1A35314DDB1EC00852800 /* GPUImageTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GPUImageTests.h; sourceTree = "<group>"; };
 		BCF1A35414DDB1EC00852800 /* GPUImageTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GPUImageTests.m; sourceTree = "<group>"; };
+		CE090D8E150D7EB200FA5518 /* GPUImageNewGaussianBlurFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageNewGaussianBlurFilter.h; path = Source/GPUImageNewGaussianBlurFilter.h; sourceTree = SOURCE_ROOT; };
+		CE090D8F150D7EB200FA5518 /* GPUImageNewGaussianBlurFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageNewGaussianBlurFilter.m; path = Source/GPUImageNewGaussianBlurFilter.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -397,6 +401,8 @@
 				BCC93A0E1501D1BF00958B26 /* GPUImageFastBlurFilter.m */,
 				0D04CB7A14FB2A29001D6733 /* GPUImageGaussianBlurFilter.h */,
 				0D04CB7B14FB2A29001D6733 /* GPUImageGaussianBlurFilter.m */,
+				CE090D8E150D7EB200FA5518 /* GPUImageNewGaussianBlurFilter.h */,
+				CE090D8F150D7EB200FA5518 /* GPUImageNewGaussianBlurFilter.m */,
 				0D9D91AD15011CA200A5BC83 /* GPUImageGaussianSelectiveBlurFilter.h */,
 				0D9D91AE15011CA200A5BC83 /* GPUImageGaussianSelectiveBlurFilter.m */,
 			);
@@ -536,6 +542,7 @@
 				BCB6B8741504234A0041703B /* GPUImageHardLightBlendFilter.h in Headers */,
 				BCB6B8761504234A0041703B /* GPUImageSoftLightBlendFilter.h in Headers */,
 				BCB6B8BB1505BF940041703B /* GPUImageTextureOutput.h in Headers */,
+				CE090D90150D7EB200FA5518 /* GPUImageNewGaussianBlurFilter.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -682,6 +689,7 @@
 				BCB6B8751504234A0041703B /* GPUImageHardLightBlendFilter.m in Sources */,
 				BCB6B8771504234A0041703B /* GPUImageSoftLightBlendFilter.m in Sources */,
 				BCB6B8BC1505BF940041703B /* GPUImageTextureOutput.m in Sources */,
+				CE090D91150D7EB200FA5518 /* GPUImageNewGaussianBlurFilter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
