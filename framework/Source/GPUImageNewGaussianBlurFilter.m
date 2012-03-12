@@ -1,73 +1,45 @@
 #import "GPUImageNewGaussianBlurFilter.h"
 
-// Blur in x (horizontal)
-NSString *const kGPUImageNewGaussianBlurHorizontalVertexShaderString = SHADER_STRING
+NSString *const kGPUImageNewGaussianBlurVertexShaderString = SHADER_STRING
 (
     attribute vec4 position;
     attribute vec4 inputTextureCoordinate;
 
-    const lowp int GAUSSIAN_SAMPLES = 13;
-
-    uniform int texWidth;
-
-    varying highp vec2 neighborCoordinates[GAUSSIAN_SAMPLES];
+    varying highp vec2 texCoord;
 
     void main() {
         gl_Position = position;
-        highp vec2 texPixelStep = vec2(1.0/float(texWidth), 0.0);
-        highp vec2 texLoc = inputTextureCoordinate.xy - texPixelStep * float((GAUSSIAN_SAMPLES - 1)/2);
-        for (int i = 0; i < GAUSSIAN_SAMPLES; i++) {
-            neighborCoordinates[i] = texLoc;
-            texLoc += texPixelStep;
-        }
+        texCoord = inputTextureCoordinate.xy;
     }
 );
 
-// Blur in y (vertical)
-NSString *const kGPUImageNewGaussianBlurVerticalVertexShaderString = SHADER_STRING
-(
-     attribute vec4 position;
-     attribute vec4 inputTextureCoordinate;
-     
-     const lowp int GAUSSIAN_SAMPLES = 13;
-     
-     uniform int texHeight;
-     
-     varying highp vec2 neighborCoordinates[GAUSSIAN_SAMPLES];
-     
-     void main() {
-         gl_Position = position;
-         highp vec2 texPixelStep = vec2(1.0/float(texHeight), 0.0);
-         highp vec2 texLoc = inputTextureCoordinate.xy - texPixelStep * float((GAUSSIAN_SAMPLES - 1)/2);
-         for (int i = 0; i < GAUSSIAN_SAMPLES; i++) {
-             neighborCoordinates[i] = texLoc;
-             texLoc += texPixelStep;
-         }
-     }
-);
-
+// One-dimensional blur, but can be either horizontal or vertical
 NSString *const kGPUImageNewGaussianBlurFragmentShaderString = SHADER_STRING
 (
-     const lowp int GAUSSIAN_SAMPLES = 13;
+    uniform sampler2D inputImageTexture;
+    uniform mediump float gaussianValues[64];
+    uniform highp float xStep;
+    uniform highp float yStep;
+    uniform int windowSize;
  
-     uniform sampler2D inputImageTexture;
-     uniform mediump float gaussianValues[GAUSSIAN_SAMPLES];
-     
-     varying highp vec2 neighborCoordinates[GAUSSIAN_SAMPLES];
-     
-     void main() {
+    varying highp vec2 texCoord;
+
+    void main() {
+        highp vec2 texPixelStep = vec2(xStep, yStep);
+        highp vec2 texLoc = texCoord + texPixelStep * float((windowSize - 1)/2);
         highp vec4 sum = vec4(0.0);
         highp float norm = 0.0;
         highp float gv;
-        
-        for (lowp int i = 0; i < GAUSSIAN_SAMPLES; i++) {
+
+        for (int i = 0; i < windowSize; i++) {
             gv = gaussianValues[i];
-            sum += texture2D(inputImageTexture, neighborCoordinates[i]) * gv;
+            sum += texture2D(inputImageTexture, texLoc) * gv;
             norm += gv;
+            texLoc += texPixelStep;
         }
-        
+
         gl_FragColor = sum/norm;
-     }
+    }
 );
 
 @implementation GPUImageNewGaussianBlurFilter
@@ -80,17 +52,21 @@ NSString *const kGPUImageNewGaussianBlurFragmentShaderString = SHADER_STRING
             secondStageFragmentShaderFromString:(NSString *)secondStageFragmentShaderString {
     
     if (!(self = [super initWithFirstStageVertexShaderFromString: 
-            firstStageVertexShaderString ? firstStageVertexShaderString : kGPUImageNewGaussianBlurHorizontalVertexShaderString
+            firstStageVertexShaderString ? firstStageVertexShaderString : kGPUImageNewGaussianBlurVertexShaderString
         firstStageFragmentShaderFromString:firstStageFragmentShaderString ? firstStageFragmentShaderString : kGPUImageNewGaussianBlurFragmentShaderString
-        secondStageVertexShaderFromString:secondStageVertexShaderString ? secondStageVertexShaderString : kGPUImageNewGaussianBlurVerticalVertexShaderString
+        secondStageVertexShaderFromString:secondStageVertexShaderString ? secondStageVertexShaderString : kGPUImageNewGaussianBlurVertexShaderString
         secondStageFragmentShaderFromString:secondStageFragmentShaderString ? secondStageFragmentShaderString : kGPUImageNewGaussianBlurFragmentShaderString])) {
         return nil;
     }
     
-    imageWidthUniform = [filterProgram uniformIndex:@"texWidth"];
+    horizontalWindowSizeUniform = [filterProgram uniformIndex:@"windowSize"];
+    horizontalXStepUniform = [filterProgram uniformIndex:@"xStep"];
+    horizontalYStepUniform = [filterProgram uniformIndex:@"yStep"];
     horizontalGaussianArrayUniform = [filterProgram uniformIndex:@"gaussianValues"];
     
-    imageHeightUniform = [secondFilterProgram uniformIndex:@"texHeight"];
+    verticalWindowSizeUniform = [secondFilterProgram uniformIndex:@"windowSize"];
+    verticalXStepUniform = [secondFilterProgram uniformIndex:@"xStep"];
+    verticalYStepUniform = [secondFilterProgram uniformIndex:@"yStep"];
     verticalGaussianArrayUniform = [secondFilterProgram uniformIndex:@"gaussianValues"];
     
     self.sigma = 1.0;
@@ -110,15 +86,15 @@ NSString *const kGPUImageNewGaussianBlurFragmentShaderString = SHADER_STRING
 
 - (void) calculateGaussianWeights
 {
-    const GLsizei gaussianLength = 13;
-    int valuesPerSide = (gaussianLength - 1) / 2;
+    const GLsizei windowSize = (((int)(_sigma * 6)) / 2) * 2 + 1;
+    GLfloat gaussians[64];
+    int valuesPerSide = (windowSize - 1) / 2;
     
     // Not really necessary; could let normalization take care of this
+    // But useful for debugging since it makes the exact weights evident
     const float factor = 1/sqrtf(2 * M_PI * _sigma * _sigma); 
     
-    GLfloat gaussians[gaussianLength];
-    
-    for (int i = valuesPerSide; i < sizeof(gaussians)/sizeof(GLfloat); i++) {
+    for (int i = valuesPerSide; i < windowSize; i++) {
  		int n = i - valuesPerSide;
         gaussians[i] = factor * expf(-(n * n)/(2 * _sigma * _sigma));
         if (i > valuesPerSide) {
@@ -127,11 +103,14 @@ NSString *const kGPUImageNewGaussianBlurFragmentShaderString = SHADER_STRING
     }
     
     [GPUImageOpenGLESContext useImageProcessingContext];
+    
     [filterProgram use];
-    glUniform1fv(horizontalGaussianArrayUniform, gaussianLength, gaussians);
+    glUniform1fv(horizontalGaussianArrayUniform, 64, gaussians);
+    glUniform1i(horizontalWindowSizeUniform, windowSize);
     
     [secondFilterProgram use];
-    glUniform1fv(verticalGaussianArrayUniform, gaussianLength, gaussians);
+    glUniform1fv(verticalGaussianArrayUniform, 64, gaussians);
+    glUniform1i(verticalWindowSizeUniform, windowSize);
 }
 
 - (void) setupFilterForSize:(CGSize)filterFrameSize
@@ -139,11 +118,14 @@ NSString *const kGPUImageNewGaussianBlurFragmentShaderString = SHADER_STRING
     [super setupFilterForSize:filterFrameSize];
     
     [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    glUniform1i(imageWidthUniform, filterFrameSize.width);
     
+    [filterProgram use];
+    glUniform1f(horizontalXStepUniform, 1.0/filterFrameSize.width);
+    glUniform1f(horizontalYStepUniform, 1.0/filterFrameSize.height);
+        
     [secondFilterProgram use];
-    glUniform1i(imageHeightUniform, filterFrameSize.height);
+    glUniform1f(verticalXStepUniform, 1.0/filterFrameSize.width);
+    glUniform1f(verticalYStepUniform, 1.0/filterFrameSize.height);
 }
 
 - (void) setSigma:(CGFloat)sigma {
