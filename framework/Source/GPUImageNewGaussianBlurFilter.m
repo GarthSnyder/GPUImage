@@ -17,7 +17,7 @@ NSString *const kGPUImageNewGaussianBlurVertexShaderString = SHADER_STRING
 NSString *const kGPUImageNewGaussianBlurFragmentShaderString = SHADER_STRING
 (
     uniform sampler2D inputImageTexture;
-    uniform mediump float gaussianValues[64];
+    uniform mediump float gaussianValues[24];
     uniform highp float xStep;
     uniform highp float yStep;
     uniform int windowSize;
@@ -87,7 +87,7 @@ NSString *const kGPUImageNewGaussianBlurFragmentShaderString = SHADER_STRING
 - (void) calculateGaussianWeights
 {
     const GLsizei windowSize = (((int)(_sigma * 6)) / 2) * 2 + 1;
-    GLfloat gaussians[64];
+    GLfloat gaussians[24];
     int valuesPerSide = (windowSize - 1) / 2;
     
     // Not really necessary; could let normalization take care of this
@@ -105,7 +105,7 @@ NSString *const kGPUImageNewGaussianBlurFragmentShaderString = SHADER_STRING
     [GPUImageOpenGLESContext useImageProcessingContext];
     
     [filterProgram use];
-    glUniform1fv(horizontalGaussianArrayUniform, 64, gaussians);
+    glUniform1fv(horizontalGaussianArrayUniform, 24, gaussians);
     glUniform1i(horizontalWindowSizeUniform, windowSize);
     
     [secondFilterProgram use];

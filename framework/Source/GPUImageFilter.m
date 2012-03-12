@@ -233,6 +233,7 @@ void dataProviderReleaseCallback (void *info, const void *data, size_t size)
     {
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, filterSourceTexture2);
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 
         glUniform1i(filterInputTextureUniform2, 3);	
     }
