@@ -88,6 +88,7 @@
 	    case GPUIMAGE_SOFTLIGHTBLEND: cell.textLabel.text = @"Soft light blend"; break;
         case GPUIMAGE_KUWAHARA: cell.textLabel.text = @"Kuwahara"; break;
         case GPUIMAGE_VIGNETTE: cell.textLabel.text = @"Vignette"; break;
+        case GPUIMAGE_NEW_GAUSSIAN: cell.textLabel.text = @"New Gaussian Blur"; break;
         case GPUIMAGE_GAUSSIAN: cell.textLabel.text = @"Gaussian Blur"; break;
         case GPUIMAGE_FASTBLUR: cell.textLabel.text = @"Fast Blur"; break;
         case GPUIMAGE_GAUSSIAN_SELECTIVE: cell.textLabel.text = @"Gaussian Selective Blur"; break;
