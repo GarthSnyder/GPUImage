@@ -1,4 +1,4 @@
-#import "GPUImageTwoPassFilter.h"
+#import "GPUImageFilter.h"
 
 @interface GPUImageGaussianBlurFilter : GPUImageTwoPassFilter 
 {

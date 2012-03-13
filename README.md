@@ -354,3 +354,4 @@ Currently, all processing for the color averaging in the last step is done on th
 - Video capture and processing should be done on a background GCD serial queue.
 - I'm sure that there are many optimizations that can be made on the rendering pipeline.
 - The aspect ratio of the input video is not maintained, but stretched to fill the final image.
+

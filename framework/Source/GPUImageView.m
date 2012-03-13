@@ -13,7 +13,7 @@
     GLint backingWidth, backingHeight;
     GLuint displayRenderbuffer, displayFramebuffer;
     
-    GLProgram *displayProgram;
+    GPUImageProgram *displayProgram;
     GLint displayPositionAttribute, displayTextureCoordinateAttribute;
     GLint displayInputTextureUniform;
 }
@@ -74,7 +74,7 @@
     eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];		
 
     [GPUImageOpenGLESContext useImageProcessingContext];
-    displayProgram = [[GLProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImagePassthroughFragmentShaderString];
+    displayProgram = [[GPUImageProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageDisplayFragmentShaderString];
 
     [displayProgram addAttribute:@"position"];
 	[displayProgram addAttribute:@"inputTextureCoordinate"];
