@@ -1,130 +1,104 @@
-//  This is Jeff LaMarche's GLProgram OpenGL shader wrapper class from his OpenGL ES 2.0 book.
-//  A description of this can be found at his page on the topic:
-//  http://iphonedevelopment.blogspot.com/2010/11/opengl-es-20-for-ios-chapter-4.html
-
-
 #import "GLProgram.h"
-// START:typedefs
-#pragma mark Function Pointer Definitions
-typedef void (*GLInfoFunction)(GLuint program, 
-                               GLenum pname, 
-                               GLint* params);
-typedef void (*GLLogFunction) (GLuint program, 
-                               GLsizei bufsize, 
-                               GLsizei* length, 
-                               GLchar* infolog);
-// END:typedefs
-#pragma mark -
-#pragma mark Private Extension Method Declaration
-// START:extension
-@interface GLProgram()
 
-- (BOOL)compileShader:(GLuint *)shader 
-                 type:(GLenum)type 
-               string:(NSString *)shaderString;
-- (NSString *)logForOpenGLObject:(GLuint)object 
-                    infoCallback:(GLInfoFunction)infoFunc 
-                         logFunc:(GLLogFunction)logFunc;
+NSString *const kGPUImageDefaultVertexShader = SHADER_STRING
+(
+    attribute vec4 position;
+    attribute vec4 inputTextureCoordinate;
+
+    varying vec2 textureCoordinate;
+
+    void main()
+    {
+        gl_Position = position;
+        textureCoordinate = inputTextureCoordinate.xy;
+    }
+);
+
+#pragma mark Definition of function pointers
+
+typedef void (*GLInfoFunction)(GLuint program, GLenum pname, GLint* params);
+typedef void (*GLLogFunction) (GLuint program, GLsizei bufsize, GLsizei* length, 
+    GLchar* infolog);
+
+#pragma mark -
+
+@interface GLProgram ()
+{
+    NSMutableDictionary *attributes, *uniforms;
+    GLuint              program, vertShader, fragShader;
+    BOOL                bound;
+}
+
+- (void) unbindAndReleaseShaders;
+- (BOOL)compileShader:(NSString *)shaderString ofType:(GLenum)type name:(GLuint *)shader;
+- (NSString *) logForOpenGLObject:(GLuint)object infoCallback:(GLInfoFunction)infoFunc 
+    logFunc:(GLLogFunction)logFunc;
+- (NSString *) getShaderTextFromFile:(NSString *)filename;
+
 @end
-// END:extension
+
 #pragma mark -
 
 @implementation GLProgram
-// START:init
 
-- (id)initWithVertexShaderString:(NSString *)vShaderString 
-            fragmentShaderString:(NSString *)fShaderString;
+@synthesize vertexShader = _vertexShader;
+@synthesize vertexShaderFilename = _vertexShaderFilename;
+@synthesize fragmentShader = _fragmentShader;
+@synthesize fragmentShaderFilename = _fragmentShaderFilename;
+
+- (GLProgram *)init
 {
-    if ((self = [super init])) 
-    {
-        attributes = [[NSMutableArray alloc] init];
-        uniforms = [[NSMutableArray alloc] init];
-        program = glCreateProgram();
-        
-        if (![self compileShader:&vertShader 
-                            type:GL_VERTEX_SHADER 
-                          string:vShaderString])
-            NSLog(@"Failed to compile vertex shader");
-        
-        // Create and compile fragment shader
-        if (![self compileShader:&fragShader 
-                            type:GL_FRAGMENT_SHADER 
-                          string:fShaderString])
-            NSLog(@"Failed to compile fragment shader");
-        
-        glAttachShader(program, vertShader);
-        glAttachShader(program, fragShader);
+    if (self = [super init]) {
+        self.vertexShader = kGPUImageDefaultVertexShader;
+        attributes = [NSMutableDictionary dictionary];
+        uniforms = [NSMutableDictionary dictionary];
     }
-    
     return self;
 }
 
-- (id)initWithVertexShaderString:(NSString *)vShaderString 
-          fragmentShaderFilename:(NSString *)fShaderFilename;
+- (void) setVertexShader:(NSString *)vsText
 {
-    NSString *fragShaderPathname = [[NSBundle mainBundle] pathForResource:fShaderFilename ofType:@"fsh"];
-    NSString *fragmentShaderString = [NSString stringWithContentsOfFile:fragShaderPathname encoding:NSUTF8StringEncoding error:nil];
-    
-    if ((self = [self initWithVertexShaderString:vShaderString fragmentShaderString:fragmentShaderString])) 
-    {
-    }
-    
-    return self;
+    [self unbindAndReleaseShaders];
+    _vertexShaderFilename = nil;
+    _vertexShader = vsText;
 }
 
-- (id)initWithVertexShaderFilename:(NSString *)vShaderFilename 
-            fragmentShaderFilename:(NSString *)fShaderFilename;
+- (void) setVertexShaderFilename:(NSString *)vsFile
 {
-    NSString *vertShaderPathname = [[NSBundle mainBundle] pathForResource:vShaderFilename ofType:@"vsh"];
-    NSString *vertexShaderString = [NSString stringWithContentsOfFile:vertShaderPathname encoding:NSUTF8StringEncoding error:nil];
-
-    NSString *fragShaderPathname = [[NSBundle mainBundle] pathForResource:fShaderFilename ofType:@"fsh"];
-    NSString *fragmentShaderString = [NSString stringWithContentsOfFile:fragShaderPathname encoding:NSUTF8StringEncoding error:nil];
-    
-    if ((self = [self initWithVertexShaderString:vertexShaderString fragmentShaderString:fragmentShaderString])) 
-    {
-    }
-    
-    return self;
+    [self unbindAndReleaseShaders];
+    _vertexShader = nil;
+    _vertexShaderFilename = vsFile;
 }
-// END:init
-// START:compile
-- (BOOL)compileShader:(GLuint *)shader 
-                 type:(GLenum)type 
-               string:(NSString *)shaderString
+
+- (void) setFragmentShader:(NSString *)fsText
 {
-    GLint status;
-    const GLchar *source;
-    
-    source = 
-      (GLchar *)[shaderString UTF8String];
-    if (!source)
-    {
-        NSLog(@"Failed to load vertex shader");
-        return NO;
-    }
-    
-    *shader = glCreateShader(type);
-    glShaderSource(*shader, 1, &source, NULL);
-    glCompileShader(*shader);
-    
-    glGetShaderiv(*shader, GL_COMPILE_STATUS, &status);
-
-	if (status != GL_TRUE)
-	{
-		GLint logLength;
-		glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &logLength);
-		if (logLength > 0)
-		{
-			GLchar *log = (GLchar *)malloc(logLength);
-			glGetShaderInfoLog(*shader, logLength, &logLength, log);
-			NSLog(@"Shader compile log:\n%s", log);
-			free(log);
-		}
-	}	
-	
-    return status == GL_TRUE;
+    [self unbindAndReleaseShaders];
+    _fragmentShaderFilename = nil;
+    _fragmentShader = fsText;
 }
+
+- (void) setFragmentShaderFilename:(NSString *)fsFile
+{
+    [self unbindAndReleaseShaders];
+    _fragmentShader = nil;
+    _fragmentShaderFilename = fsFile;
+}
+
+- (NSString *) getShaderTextFromFile:(NSString *)filename
+{
+    NSString *foundFile = [[NSBundle mainBundle] pathForResource:filename ofType:@"glsl"];
+    if (!foundFile) {
+        foundFile = [[NSBundle mainBundle] pathForResource:filename ofType:@"vsh"];
+    }
+    if (!foundFile) {
+        foundFile = [[NSBundle mainBundle] pathForResource:filename ofType:@"fsh"];
+    }
+    if (foundFile) {
+        return [NSString stringWithContentsOfFile:foundFile encoding:NSUTF8StringEncoding error:nil];
+    }
+    return nil;
+}
+
 // END:compile
 #pragma mark -
 // START:addattribute
@@ -235,19 +209,80 @@ typedef void (*GLLogFunction) (GLuint program,
 }
 
 #pragma mark -
-// START:dealloc
-- (void)dealloc
+#pragma mark Compilation, binding, and unbinding
+
+- (BOOL) compileShaders
 {
-  
-    if (vertShader)
-        glDeleteShader(vertShader);
-        
-    if (fragShader)
-        glDeleteShader(fragShader);
+    [self unbindAndReleaseShaders];
     
-    if (program)
-        glDeleteProgram(program);
-       
+    NSString *vertexText = _vertexShader ? _vertexShader : 
+        [self getShaderTextFromFile:_vertexShaderFilename];
+    NSString *fragmentText = _fragmentShader ? _fragmentShader : 
+        [self getShaderTextFromFile:_fragmentShaderFilename];
+    
+    if (!vertexText || !fragmentText) {
+        NSLog(@"GLProgram::compileShaders called with missing shader");
+        return NO;
+    }
+
+    if (![self compileShader:vertexText ofType:GL_VERTEX_SHADER name:&vertShader]) {
+        NSLog(@"Failed to compile vertex shader");
+    }
+    if (![self compileShader:fragmentText ofType:GL_FRAGMENT_SHADER name:&fragShader]) {
+        NSLog(@"Failed to compile fragment shader");
+    }
+    
+    glAttachShader(program, vertShader);
+    glAttachShader(program, fragShader);
+    
 }
-// END:dealloc
+
+- (BOOL) compileShader:(NSString *)shaderString ofType:(GLenum)type name:(GLuint *)shader
+{
+    GLint status;
+    const GLchar *source = (GLchar *)[shaderString UTF8String];
+    
+    *shader = glCreateShader(type);
+    glShaderSource(*shader, 1, &source, NULL);
+    glCompileShader(*shader);
+    glGetShaderiv(*shader, GL_COMPILE_STATUS, &status);
+    
+	if (status != GL_TRUE) {
+		GLint logLength;
+		glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &logLength);
+		if (logLength > 0) {
+			GLchar *log = (GLchar *)malloc(logLength);
+			glGetShaderInfoLog(*shader, logLength, &logLength, log);
+			NSLog(@"Shader compile log:\n%s", log);
+			free(log);
+		}
+	}	
+    return status == GL_TRUE;
+}
+
+
+program = glCreateProgram();
+
+- (void) unbindAndReleaseShaders
+{
+    if (program) {
+        glDeleteProgram(program);
+        program = 0;
+    }
+    if (vertShader) {
+        glDeleteShader(vertShader);
+        vertShader = 0;
+    }
+    if (fragShader) {
+        glDeleteShader(fragShader);
+        fragShader = 0;
+    }
+    bound = NO;
+}
+
+- (void) dealloc
+{
+    [self unbindAndReleaseShaders];
+}
+
 @end
