@@ -24,12 +24,3 @@
 
 @end
 
-@protocol GPUImageInput
-- (void)newFrameReadyAtTime:(CMTime)frameTime;
-- (void)setInputTexture:(GLuint)newInputTexture atIndex:(NSInteger)textureIndex;
-- (NSInteger)nextAvailableTextureIndex;
-- (void)setInputSize:(CGSize)newSize;
-- (CGSize)maximumOutputSize;
-- (void)endProcessing;
-- (BOOL)shouldIgnoreUpdatesToThisTarget;
-@end

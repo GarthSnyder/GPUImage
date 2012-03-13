@@ -4,12 +4,12 @@ NSString *const kGPUImageContrastFragmentShaderString = SHADER_STRING
 ( 
  varying highp vec2 textureCoordinate;
  
- uniform sampler2D inputImageTexture;
+ uniform sampler2D inputTexture;
  uniform lowp float contrast;
  
  void main()
  {
-     lowp vec4 textureColor = texture2D(inputImageTexture, textureCoordinate);
+     lowp vec4 textureColor = texture2D(inputTexture, textureCoordinate);
      
      gl_FragColor = vec4(((textureColor.rgb - vec3(0.5)) * contrast + vec3(0.5)), textureColor.w);
  }
@@ -17,35 +17,15 @@ NSString *const kGPUImageContrastFragmentShaderString = SHADER_STRING
 
 @implementation GPUImageContrastFilter
 
-@synthesize contrast = _contrast;
+@dynamic contrast;
 
-#pragma mark -
-#pragma mark Initialization
-
-- (id)init;
+- (id) init;
 {
-    if (!(self = [super initWithFragmentShaderFromString:kGPUImageContrastFragmentShaderString]))
-    {
-		return nil;
+    if (self = [super init]) {
+        self.program.fragmentShader = kGPUImageContrastFragmentShaderString;
+        self.contrast = 1.0;
     }
-    
-    contrastUniform = [filterProgram uniformIndex:@"contrast"];
-    self.contrast = 1.0;
-    
     return self;
 }
 
-#pragma mark -
-#pragma mark Accessors
-
-- (void)setContrast:(CGFloat)newValue;
-{
-    _contrast = newValue;
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    glUniform1f(contrastUniform, _contrast);
-}
-
 @end
-

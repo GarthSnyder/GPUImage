@@ -4,7 +4,7 @@
 {
     GLuint secondFilterOutputTexture;
 
-    GLProgram *secondFilterProgram;
+    GPUImageProgram *secondFilterProgram;
     GLint secondFilterPositionAttribute, secondFilterTextureCoordinateAttribute;
     GLint secondFilterInputTextureUniform, secondFilterInputTextureUniform2;
     

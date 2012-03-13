@@ -1,7 +1,7 @@
 #import "GPUImageMovieWriter.h"
 
 #import "GPUImageOpenGLESContext.h"
-#import "GLProgram.h"
+#import "GPUImageProgram.h"
 #import "GPUImageFilter.h"
 
 NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
@@ -21,7 +21,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 {
     GLuint movieFramebuffer, movieRenderbuffer;
     
-    GLProgram *colorSwizzlingProgram;
+    GPUImageProgram *colorSwizzlingProgram;
     GLint colorSwizzlingPositionAttribute, colorSwizzlingTextureCoordinateAttribute;
     GLint colorSwizzlingInputTextureUniform;
 
@@ -78,11 +78,11 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     
     if ([GPUImageOpenGLESContext supportsFastTextureUpload])
     {
-        colorSwizzlingProgram = [[GLProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImagePassthroughFragmentShaderString];
+        colorSwizzlingProgram = [[GPUImageProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImagePassthroughFragmentShaderString];
     }
     else
     {
-        colorSwizzlingProgram = [[GLProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageColorSwizzlingFragmentShaderString];
+        colorSwizzlingProgram = [[GPUImageProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageColorSwizzlingFragmentShaderString];
     }
     
     [colorSwizzlingProgram addAttribute:@"position"];

@@ -1,90 +1,44 @@
 #import "GPUImageOutput.h"
+#import <UIKit/UIKit.h>
 
-#define STRINGIZE(x) #x
-#define STRINGIZE2(x) STRINGIZE(x)
-#define SHADER_STRING(text) @ STRINGIZE2(text)
-
-extern NSString *const kGPUImageVertexShaderString;
-extern NSString *const kGPUImagePassthroughFragmentShaderString;
-
-struct GPUVector4 {
-    GLfloat one;
-    GLfloat two;
-    GLfloat three;
-    GLfloat four;
-};
-typedef struct GPUVector4 GPUVector4;
-
-struct GPUVector3 {
-    GLfloat one;
-    GLfloat two;
-    GLfloat three;
-};
-typedef struct GPUVector3 GPUVector3;
-
-struct GPUMatrix4x4 {
-    GPUVector4 one;
-    GPUVector4 two;
-    GPUVector4 three;
-    GPUVector4 four;
-};
-typedef struct GPUMatrix4x4 GPUMatrix4x4;
-
-struct GPUMatrix3x3 {
-    GPUVector3 one;
-    GPUVector3 two;
-    GPUVector3 three;
-};
-typedef struct GPUMatrix3x3 GPUMatrix3x3;
-
-@interface GPUImageFilter : GPUImageOutput <GPUImageInput>
+@interface GPUImageFilter : GPUImageGraphElement
 {
-    GLuint filterSourceTexture, filterSourceTexture2;
-
-    GLuint filterFramebuffer;
-
-    GLProgram *filterProgram;
-    GLint filterPositionAttribute, filterTextureCoordinateAttribute;
-    GLint filterInputTextureUniform, filterInputTextureUniform2;
-    GLfloat backgroundColorRed, backgroundColorGreen, backgroundColorBlue, backgroundColorAlpha;
-    
-    BOOL preparedToCaptureImage;
-    
-    CVOpenGLESTextureCacheRef filterTextureCache;
-    CVPixelBufferRef renderTarget;
-    CVOpenGLESTextureRef renderTexture;
-
-    CGSize currentFilterSize;
+    NSMutableArray *programs;
+    NSMutableArray *outputTextures; 
+    BOOL renderbufferRequested;
 }
 
-// Initialization and teardown
-- (id)initWithVertexShaderFromString:(NSString *)vertexShaderString fragmentShaderFromString:(NSString *)fragmentShaderString;
-- (id)initWithFragmentShaderFromString:(NSString *)fragmentShaderString;
-- (id)initWithFragmentShaderFromFile:(NSString *)fragmentShaderFilename;
-- (void)initializeAttributes;
-- (void)setupFilterForSize:(CGSize)filterFrameSize;
+// These property names are conventional. If there are multiple program stages,
+// these textures denote the first input and the very last output.
+// More complex filters may use additional input and output textures if
+// desired; they can also ignore the standard input and output textures
+// with no ill effects if they wish.
 
-- (void)recreateFilterFBO;
+@property (nonatomic) GPUImageTexture *inputTexture;
+@property (nonatomic) GPUImageTexture *outputTexture;
 
-// Managing the display FBOs
-- (CGSize)sizeOfFBO;
-- (void)createFilterFBOofSize:(CGSize)currentFBOSize;
-- (void)destroyFilterFBO;
-- (void)setFilterFBO;
-- (void)setOutputFBO;
+// Override to automatically set up a framework for >1 program in series
++ (int) numberOfFilterPrograms;
 
-// Rendering
-- (void)renderToTextureWithVertices:(const GLfloat *)vertices textureCoordinates:(const GLfloat *)textureCoordinates sourceTexture:(GLuint)sourceTexture;
-- (void)informTargetsAboutNewFrameAtTime:(CMTime)frameTime;
+// Convenience methods for subclasses
+@property (readonly, nonatomic) GPUImageProgram *program;
+@property (readonly, nonatomic) GPUImageProgram *programOne;
+@property (readonly, nonatomic) GPUImageProgram *programTwo;
+@property (readonly, nonatomic) GPUImageProgram *programThree;
 
-// Input parameters
-- (void)setBackgroundColorRed:(GLfloat)redComponent green:(GLfloat)greenComponent blue:(GLfloat)blueComponent alpha:(GLfloat)alphaComponent;
-- (void)setInteger:(GLint)newInteger forUniform:(NSString *)uniformName;
-- (void)setFloat:(GLfloat)newFloat forUniform:(NSString *)uniformName;
-- (void)setSize:(CGSize)newSize forUniform:(NSString *)uniformName;
-- (void)setPoint:(CGPoint)newPoint forUniform:(NSString *)uniformName;
-- (void)setFloatVec3:(GLfloat *)newVec3 forUniform:(NSString *)uniformName;
-- (void)setFloatVec4:(GLfloat *)newVec4 forUniform:(NSString *)uniformName;
-- (void)setFloatArray:(GLfloat *)array length:(GLsizei)count forUniform:(NSString*)uniformName;
+// If you are not using the standard inputTexture, you'll want to override
+// render in your subclass to set the proper size of the output texture.
+// Then call [super render]. The default implementation sets the size
+// from inputTexture if a size has not already been set.
+
+- (BOOL) render;
+
+// Called as part of render; override if you don't want std triangulation
+
+- (void) draw;
+
+// Still image processing convenience methods
+- (UIImage *) outputAsUIImage;
+- (UIImage *) imageByFilteringImage:(UIImage *)imageToFilter;
 
 @end

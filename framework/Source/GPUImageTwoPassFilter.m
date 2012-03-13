@@ -12,7 +12,7 @@
 		return nil;
     }
     
-    secondFilterProgram = [[GLProgram alloc] initWithVertexShaderString:secondStageVertexShaderString fragmentShaderString:secondStageFragmentShaderString];
+    secondFilterProgram = [[GPUImageProgram alloc] initWithVertexShaderString:secondStageVertexShaderString fragmentShaderString:secondStageFragmentShaderString];
     
     [self initializeAttributes];
     
