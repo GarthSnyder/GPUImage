@@ -2,7 +2,7 @@
 #import "GPUImagePicture.h"
 
 @interface GPUImageFilter
-- (GLProgram *)filterProgramAtIndex:(int)n;
+- (GPUImageProgram *)filterProgramAtIndex:(int)n;
 @end
 
 @implementation GPUImageFilter
@@ -24,7 +24,7 @@
         int nFilters = [[self class] numberOfFilterPrograms];
         GPUImageTexture *texture = nil;
         for (int i = 0; i < nFilters; i++) {
-            GLProgram *newProgram = [GLProgram program];
+            GPUImageProgram *newProgram = [GPUImageProgram program];
             if (texture) {
                 newProgram.inputTexture = texture;
             }
@@ -37,23 +37,23 @@
     return self;
 }
 
-- (GLProgram *)filterProgram {
+- (GPUImageProgram *)filterProgram {
     return [self filterProgramAtIndex:0];
 }
 
-- (GLProgram *)filterProgramOne {
+- (GPUImageProgram *)filterProgramOne {
     return [self filterProgramAtIndex:0];
 }
 
-- (GLProgram *)filterProgramTwo {
+- (GPUImageProgram *)filterProgramTwo {
     return [self filterProgramAtIndex:1];
 }
 
-- (GLProgram *)filterProgramThree {
+- (GPUImageProgram *)filterProgramThree {
     return [self filterProgramAtIndex:2];
 }
 
-- (GLProgram *)filterProgramAtIndex:(int)n {
+- (GPUImageProgram *)filterProgramAtIndex:(int)n {
     return [filterPrograms objectAtIndex:n];
 }
 
@@ -82,7 +82,7 @@
     // and draw.
     
     for (int i = 0; i < [filterPrograms count]; i++) {
-        GLProgram *program = [filterPrograms objectAtIndex:i];
+        GPUImageProgram *program = [filterPrograms objectAtIndex:i];
         GPUImageTexture *output = [outputTextures objectAtIndex:i];
         if (program.inputTexture) {
             [output takeUnknownParametersFrom:program.inputTexture];

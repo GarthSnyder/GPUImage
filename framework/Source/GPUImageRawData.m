@@ -1,7 +1,7 @@
 #import "GPUImageRawData.h"
 
 #import "GPUImageOpenGLESContext.h"
-#import "GLProgram.h"
+#import "GPUImageProgram.h"
 #import "GPUImageFilter.h"
 
 NSString *const kGPUImageDataFragmentShaderString = SHADER_STRING
@@ -26,7 +26,7 @@ NSString *const kGPUImageDataFragmentShaderString = SHADER_STRING
 
     GLuint inputTextureForDisplay;
     
-    GLProgram *dataProgram;
+    GPUImageProgram *dataProgram;
     GLint dataPositionAttribute, dataTextureCoordinateAttribute;
     GLint dataInputTextureUniform;
     
@@ -62,7 +62,7 @@ NSString *const kGPUImageDataFragmentShaderString = SHADER_STRING
     _rawBytesForImage = NULL;
 
     [GPUImageOpenGLESContext useImageProcessingContext];
-    dataProgram = [[GLProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageDataFragmentShaderString];
+    dataProgram = [[GPUImageProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageDataFragmentShaderString];
     
     [dataProgram addAttribute:@"position"];
 	[dataProgram addAttribute:@"inputTextureCoordinate"];

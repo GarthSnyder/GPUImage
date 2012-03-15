@@ -18,7 +18,7 @@
 #define SHADER_STRINGIZE2(x) SHADER_STRINGIZE(x)
 #define SHADER_STRING(text) @ SHADER_STRINGIZE2(text)
 
-@interface GLProgram : NSObject
+@interface GPUImageProgram : NSObject
 
 // These are effectively write-only.
 @property (nonatomic) NSString *vertexShader;
@@ -26,7 +26,7 @@
 @property (nonatomic) NSString *fragmentShader;
 @property (nonatomic) NSString *fragmentShaderFilename;
 
-+ (GLProgram *) program;
++ (GPUImageProgram *) program;
 
 // This is the primary interface for setting attrs/uniforms and executing.
 // Activates (uses) the program and flushes all attribute and uniform values.

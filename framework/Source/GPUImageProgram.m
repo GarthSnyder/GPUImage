@@ -1,4 +1,4 @@
-#import "GLProgram.h"
+#import "GPUImageProgram.h"
 
 // Default shaders implement a simple copy operation
 
@@ -32,17 +32,17 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 );
 
 #pragma mark -
-#pragma mark Private GLShader class
+#pragma mark Private GPUImageShader class
 
-@interface GLShader : NSObject
+@interface GPUImageShader : NSObject
 {
     NSString *sourceText;
     NSMutableArray *_attributes;
     NSMutableDictionary *_uniforms;
 }
 
-- (GLShader *) initWithSourceText:(NSString *)shader;
-- (GLShader *) initWithFilename:(NSString *)filename;
+- (GPUImageShader *) initWithSourceText:(NSString *)shader;
+- (GPUImageShader *) initWithFilename:(NSString *)filename;
 
 - (BOOL) compileAsShaderType:(GLenum)type;
 - (void) delete;
@@ -57,14 +57,14 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 @end
 
-@implementation GLShader
+@implementation GPUImageShader
 
 @synthesize shaderHandle = _shaderHandle;
 @synthesize attributes = _attributes;
 
 #pragma mark Initializers
 
-- (GLShader *) initWithSourceText:(NSString *)shader
+- (GPUImageShader *) initWithSourceText:(NSString *)shader
 {
     if (self = [super init]) {
         sourceText = shader;
@@ -73,7 +73,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     return self;
 }
 
-- (GLShader *) initWithFilename:(NSString *)filename;
+- (GPUImageShader *) initWithFilename:(NSString *)filename;
 {
     NSArray *extensions = [NSArray arrayWithObjects:@"", @"glsl", @"vsh", @"fsh", nil];
     NSString *foundFile;
@@ -107,7 +107,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     GLint status;
     const GLchar *source = (GLchar *)[sourceText UTF8String];
     _shaderHandle = glCreateShader(type);
-    glShaderSource(_shaderHandle, 1, &source, NULL);
+    GPUImageShaderSource(_shaderHandle, 1, &source, NULL);
     glCompileShader(_shaderHandle);
     glGetShaderiv(_shaderHandle, GL_COMPILE_STATUS, &status);
 
@@ -141,12 +141,12 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 @end
 
 #pragma mark -
-#pragma mark GLProgram material
+#pragma mark GPUImageProgram material
 
-@interface GLProgram ()
+@interface GPUImageProgram ()
 {
     GLuint programName;
-    GLShader *vertexShader, *fragmentShader;
+    GPUImageShader *vertexShader, *fragmentShader;
 }
 
 - (BOOL) compileShaders;
@@ -156,16 +156,16 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 @end
 
-@implementation GLProgram
+@implementation GPUImageProgram
 
 #pragma mark Initialization and shader specification
 
-+ (GLProgram *)program
++ (GPUImageProgram *)program
 {
-    return [[GLProgram alloc] init];
+    return [[GPUImageProgram alloc] init];
 }
 
-- (GLProgram *)init
+- (GPUImageProgram *)init
 {
     if (self = [super init]) {
         self.vertexShader = kGPUImageDefaultVertexShader;
@@ -175,35 +175,35 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 }
 
 - (void) setVertexShader:(NSString *)vsText {
-    vertexShader = [[GLShader alloc] initWithSourceText:vsText];
+    vertexShader = [[GPUImageShader alloc] initWithSourceText:vsText];
 }
 
 - (void) setVertexShaderFilename:(NSString *)vsFile {
-    vertexShader = [[GLShader alloc] initWithFilename:vsFile];
+    vertexShader = [[GPUImageShader alloc] initWithFilename:vsFile];
 }
 
 - (void) setFragmentShader:(NSString *)fsText {
-    fragmentShader = [[GLShader alloc] initWithSourceText:fsText];
+    fragmentShader = [[GPUImageShader alloc] initWithSourceText:fsText];
 }
 
 - (void) setFragmentShaderFilename:(NSString *)fsFile {
-    fragmentShader = [[GLShader alloc] initWithFilename:fsFile];
+    fragmentShader = [[GPUImageShader alloc] initWithFilename:fsFile];
 }
 
 - (NSString *) vertexShader {
-    NSAssert(NO, @"GLProgram: vertexShader property is write-only.");
+    NSAssert(NO, @"GPUImageProgram: vertexShader property is write-only.");
 }
 
 - (NSString *) vertexShaderFilename {
-    NSAssert(NO, @"GLProgram: vertexShaderFilename property is write-only.");
+    NSAssert(NO, @"GPUImageProgram: vertexShaderFilename property is write-only.");
 }
 
 - (NSString *) fragmentShader {
-    NSAssert(NO, @"GLProgram: fragmentShader property is write-only.");
+    NSAssert(NO, @"GPUImageProgram: fragmentShader property is write-only.");
 }
 
 - (NSString *) fragmentShaderFilename {
-    NSAssert(NO, @"GLProgram: fragmentShaderFilename property is write-only.");
+    NSAssert(NO, @"GPUImageProgram: fragmentShaderFilename property is write-only.");
 }
 
 #pragma mark -
@@ -234,7 +234,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 - (BOOL) compileShaders
 {
     if (!vertexShader || !fragmentShader) {
-        NSLog(@"GLProgram: Need two shaders to compile.");
+        NSLog(@"GPUImageProgram: Need two shaders to compile.");
     }
     return [vertexShader compileAsShaderType:GL_VERTEX_SHADER] &&
         [fragmentShader compileAsShaderType:GL_FRAGMENT_SHADER];
@@ -346,7 +346,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
         [self getShaderTextFromFile:_fragmentShaderFilename];
     
     if (!vertexText || !fragmentText) {
-        NSLog(@"GLProgram::compileShaders called with missing shader");
+        NSLog(@"GPUImageProgram::compileShaders called with missing shader");
         return NO;
     }
 

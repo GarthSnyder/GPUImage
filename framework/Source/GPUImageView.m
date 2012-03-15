@@ -25,7 +25,7 @@ NSString *const kGPUImageDisplayFragmentShaderString = SHADER_STRING
     GLint backingWidth, backingHeight;
     GLuint displayRenderbuffer, displayFramebuffer;
     
-    GLProgram *displayProgram;
+    GPUImageProgram *displayProgram;
     GLint displayPositionAttribute, displayTextureCoordinateAttribute;
     GLint displayInputTextureUniform;
 }
@@ -86,7 +86,7 @@ NSString *const kGPUImageDisplayFragmentShaderString = SHADER_STRING
     eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];		
 
     [GPUImageOpenGLESContext useImageProcessingContext];
-    displayProgram = [[GLProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageDisplayFragmentShaderString];
+    displayProgram = [[GPUImageProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageDisplayFragmentShaderString];
 
     [displayProgram addAttribute:@"position"];
 	[displayProgram addAttribute:@"inputTextureCoordinate"];
