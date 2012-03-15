@@ -9,7 +9,7 @@ typedef struct {
     GLfloat values[9];
 } GPUImageGaussianData;
 
-@interface GLProgram ()
+@interface GPUImageProgram ()
 @property (nonatomic) GPUImageBlurStep blurStep;
 @property (nonatomic) GPUImageGaussianData gaussianValues;
 @end

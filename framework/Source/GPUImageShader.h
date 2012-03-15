@@ -6,10 +6,10 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 
-@interface GLShader : NSObject
+@interface GPUImageShader : NSObject
 
-- (GLShader *) initWithSourceText:(NSString *)shader;
-- (GLShader *) initWithFilename:(NSString *)filename;
+- (GPUImageShader *) initWithSourceText:(NSString *)shader;
+- (GPUImageShader *) initWithFilename:(NSString *)filename;
 
 - (BOOL) compileAsShaderType:(GLenum)type;
 - (void) delete;

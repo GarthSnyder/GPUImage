@@ -1,5 +1,5 @@
 #import "GPUImageGraphElement.h"
-#import "GLProgram.h"
+#import "GPUImageProgram.h"
 #import "GPUImageTexture.h"
 #import <UIKit/UIKit.h>
 
@@ -23,10 +23,10 @@
 + (int) numberOfFilterPrograms;
 
 // Convenience methods for subclasses
-@property (readonly, nonatomic) GLProgram *program;
-@property (readonly, nonatomic) GLProgram *programOne;
-@property (readonly, nonatomic) GLProgram *programTwo;
-@property (readonly, nonatomic) GLProgram *programThree;
+@property (readonly, nonatomic) GPUImageProgram *program;
+@property (readonly, nonatomic) GPUImageProgram *programOne;
+@property (readonly, nonatomic) GPUImageProgram *programTwo;
+@property (readonly, nonatomic) GPUImageProgram *programThree;
 
 // If you are not using the standard inputTexture, you'll want to override
 // render in your subclass to set the proper size of the output texture.

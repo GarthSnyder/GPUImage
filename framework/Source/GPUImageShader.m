@@ -2,16 +2,16 @@
 //  Created by Garth Snyder on 3/13/12.
 //
 
-#import "GLShader.h"
+#import "GPUImageShader.h"
 
-@interface GLShader ()
+@interface GPUImageShader ()
 {
     NSString *sourceText;
     NSMutableDictionary *_attributes, *_uniforms;
 }
 @end
 
-@implementation GLShader
+@implementation GPUImageShader
 
 @synthesize shaderName = _shaderName;
 
@@ -25,8 +25,8 @@
     return [_uniforms allKeys];
 }
 
-- (GLShader *) initWithSourceText:(NSString *)shader;
-- (GLShader *) initWithFilename:(NSString *)filename;
+- (GPUImageShader *) initWithSourceText:(NSString *)shader;
+- (GPUImageShader *) initWithFilename:(NSString *)filename;
 
 - (BOOL) compileAsShaderType:(GLenum)type;
 - (void) delete;
