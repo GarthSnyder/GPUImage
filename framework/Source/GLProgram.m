@@ -1,5 +1,7 @@
 #import "GLProgram.h"
 
+// Default shaders implement a simple copy operation
+
 NSString *const kGPUImageDefaultVertexShader = SHADER_STRING
 (
     attribute vec4 position;
@@ -14,92 +16,196 @@ NSString *const kGPUImageDefaultVertexShader = SHADER_STRING
     }
 );
 
-#pragma mark Definition of function pointers
+NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
+(
+    attribute vec4 position;
+    attribute vec4 inputTextureCoordinate;
 
-typedef void (*GLInfoFunction)(GLuint program, GLenum pname, GLint* params);
-typedef void (*GLLogFunction) (GLuint program, GLsizei bufsize, GLsizei* length, 
-    GLchar* infolog);
+    uniform sampler2D inputTexture;
+ 
+    varying vec2 textureCoordinate;
+
+    void main()
+    {
+        gl_FragColor = vec4(texture2D(inputTexture, textureCoordinate).rgb, 1.0);
+    }
+);
 
 #pragma mark -
+#pragma mark Private GLShader class
 
-@interface GLProgram ()
+@interface GLShader : NSObject
 {
-    NSMutableDictionary *attributes, *uniforms;
-    GLuint              program, vertShader, fragShader;
-    BOOL                bound;
+    NSString *sourceText;
+    NSMutableArray *_attributes;
+    NSMutableDictionary *_uniforms;
 }
 
-- (void) unbindAndReleaseShaders;
-- (BOOL)compileShader:(NSString *)shaderString ofType:(GLenum)type name:(GLuint *)shader;
-- (NSString *) logForOpenGLObject:(GLuint)object infoCallback:(GLInfoFunction)infoFunc 
-    logFunc:(GLLogFunction)logFunc;
-- (NSString *) getShaderTextFromFile:(NSString *)filename;
+- (GLShader *) initWithSourceText:(NSString *)shader;
+- (GLShader *) initWithFilename:(NSString *)filename;
+
+- (BOOL) compileAsShaderType:(GLenum)type;
+- (void) delete;
+
+- (GLint) handleForAttribute:(NSString *)attr;
+
+- (NSString *) logForOpenGLObject:(GLuint)object;
+
+@property (nonatomic, readonly) GLint shaderHandle;
+@property (nonatomic, readonly) NSArray *attributes;
+@property (nonatomic, readonly) NSArray *uniforms;
+
+@end
+
+@implementation GLShader
+
+@synthesize shaderHandle = _shaderHandle;
+@synthesize attributes = _attributes;
+
+#pragma mark Initializers
+
+- (GLShader *) initWithSourceText:(NSString *)shader
+{
+    if (self = [super init]) {
+        sourceText = shader;
+        _shaderHandle = -1;
+    }
+    return self;
+}
+
+- (GLShader *) initWithFilename:(NSString *)filename;
+{
+    NSArray *extensions = [NSArray arrayWithObjects:@"", @"glsl", @"vsh", @"fsh", nil];
+    NSString *foundFile;
+    for (NSString *ext in extensions) {
+        if ((foundFile = [[NSBundle mainBundle] pathForResource:filename ofType:ext])) {
+            return [self initWithSourceText:[NSString stringWithContentsOfFile:foundFile
+                encoding:NSUTF8StringEncoding error:nil]];
+        }
+    }
+    return nil;
+}
+
+- (NSArray *) attributes
+{
+    return _attributes;
+}
+
+- (NSArray *) uniforms 
+{
+    return [_uniforms allKeys];
+}
+
+#pragma mark Compilation and handle managment
+
+- (BOOL) compileAsShaderType:(GLenum)type
+{
+    if (_shaderHandle >= 0) {
+        return YES;
+    }
+    
+    GLint status;
+    const GLchar *source = (GLchar *)[sourceText UTF8String];
+    _shaderHandle = glCreateShader(type);
+    glShaderSource(_shaderHandle, 1, &source, NULL);
+    glCompileShader(_shaderHandle);
+    glGetShaderiv(_shaderHandle, GL_COMPILE_STATUS, &status);
+
+    if (status != GL_TRUE) {
+        GLint logLength;
+        glGetShaderiv(_shaderHandle, GL_INFO_LOG_LENGTH, &logLength);
+        if (logLength > 0) {
+            GLchar *log = (GLchar *)malloc(logLength);
+            glGetShaderInfoLog(_shaderHandle, logLength, &logLength, log);
+            NSLog(@"Shader compile log:\n%s", log);
+            free(log);
+        }
+        [self delete];
+    }	
+    return status == GL_TRUE;
+}
+
+- (void) delete
+{
+    if (_shaderHandle >= 0) {
+        glDeleteShader(_shaderHandle);
+    }
+    _shaderHandle = -1;
+}
+
+- (void) dealloc
+{
+    [self delete];
+}
 
 @end
 
 #pragma mark -
+#pragma mark GLProgram material
+
+@interface GLProgram ()
+{
+    GLuint programName;
+    GLShader *vertexShader, *fragmentShader;
+}
+
+- (BOOL) compileShaders;
+- (void) delete;
+- (NSString *) logForOpenGLObject:(GLuint)object infoCallback:(GLInfoFunction)infoFunc 
+    logFunc:(GLLogFunction)logFunc;
+
+@end
 
 @implementation GLProgram
 
-@synthesize vertexShader = _vertexShader;
-@synthesize vertexShaderFilename = _vertexShaderFilename;
-@synthesize fragmentShader = _fragmentShader;
-@synthesize fragmentShaderFilename = _fragmentShaderFilename;
+#pragma mark Initialization and shader specification
+
++ (GLProgram *)program
+{
+    return [[GLProgram alloc] init];
+}
 
 - (GLProgram *)init
 {
     if (self = [super init]) {
         self.vertexShader = kGPUImageDefaultVertexShader;
-        attributes = [NSMutableDictionary dictionary];
-        uniforms = [NSMutableDictionary dictionary];
+        self.fragmentShader = kGPUImageDefaultFragmentShader;
     }
     return self;
 }
 
-- (void) setVertexShader:(NSString *)vsText
-{
-    [self unbindAndReleaseShaders];
-    _vertexShaderFilename = nil;
-    _vertexShader = vsText;
+- (void) setVertexShader:(NSString *)vsText {
+    vertexShader = [[GLShader alloc] initWithSourceText:vsText];
 }
 
-- (void) setVertexShaderFilename:(NSString *)vsFile
-{
-    [self unbindAndReleaseShaders];
-    _vertexShader = nil;
-    _vertexShaderFilename = vsFile;
+- (void) setVertexShaderFilename:(NSString *)vsFile {
+    vertexShader = [[GLShader alloc] initWithFilename:vsFile];
 }
 
-- (void) setFragmentShader:(NSString *)fsText
-{
-    [self unbindAndReleaseShaders];
-    _fragmentShaderFilename = nil;
-    _fragmentShader = fsText;
+- (void) setFragmentShader:(NSString *)fsText {
+    fragmentShader = [[GLShader alloc] initWithSourceText:fsText];
 }
 
-- (void) setFragmentShaderFilename:(NSString *)fsFile
-{
-    [self unbindAndReleaseShaders];
-    _fragmentShader = nil;
-    _fragmentShaderFilename = fsFile;
+- (void) setFragmentShaderFilename:(NSString *)fsFile {
+    fragmentShader = [[GLShader alloc] initWithFilename:fsFile];
 }
 
-- (NSString *) getShaderTextFromFile:(NSString *)filename
-{
-    NSString *foundFile = [[NSBundle mainBundle] pathForResource:filename ofType:@"glsl"];
-    if (!foundFile) {
-        foundFile = [[NSBundle mainBundle] pathForResource:filename ofType:@"vsh"];
-    }
-    if (!foundFile) {
-        foundFile = [[NSBundle mainBundle] pathForResource:filename ofType:@"fsh"];
-    }
-    if (foundFile) {
-        return [NSString stringWithContentsOfFile:foundFile encoding:NSUTF8StringEncoding error:nil];
-    }
-    return nil;
+- (NSString *) vertexShader {
+    NSAssert(NO, @"GLProgram: vertexShader property is write-only.");
 }
 
-// END:compile
+- (NSString *) vertexShaderFilename {
+    NSAssert(NO, @"GLProgram: vertexShaderFilename property is write-only.");
+}
+
+- (NSString *) fragmentShader {
+    NSAssert(NO, @"GLProgram: fragmentShader property is write-only.");
+}
+
+- (NSString *) fragmentShaderFilename {
+    NSAssert(NO, @"GLProgram: fragmentShaderFilename property is write-only.");
+}
+
 #pragma mark -
 // START:addattribute
 - (void)addAttribute:(NSString *)attributeName
@@ -122,75 +228,95 @@ typedef void (*GLLogFunction) (GLuint program, GLsizei bufsize, GLsizei* length,
 {
     return glGetUniformLocation(program, [uniformName UTF8String]);
 }
-// END:indexmethods
+
 #pragma mark -
-// START:link
-- (BOOL)link
+
+- (BOOL) compileShaders
 {
-    GLint status;
-    
-    glLinkProgram(program);
-    
-    glGetProgramiv(program, GL_LINK_STATUS, &status);
-    if (status == GL_FALSE)
+    if (!vertexShader || !fragmentShader) {
+        NSLog(@"GLProgram: Need two shaders to compile.");
+    }
+    return [vertexShader compileAsShaderType:GL_VERTEX_SHADER] &&
+        [fragmentShader compileAsShaderType:GL_FRAGMENT_SHADER];
+}
+
+- (BOOL) link
+{
+    if (programName) {
+        return YES; // idempotent
+    }
+    if ([self compileShaders] == NO) {
         return NO;
+    }
     
-    if (vertShader)
-        glDeleteShader(vertShader);
-    if (fragShader)
-        glDeleteShader(fragShader);
+    programName = glCreateProgram();
     
+    glAttachShader(programName, vertexShader.shaderName);
+    glAttachShader(programName, fragmentShader.shaderName);
+    
+    glLinkProgram(programName);
+    glValidateProgram(programName);
+    
+    GLint status;
+    glGetProgramiv(programName, GL_LINK_STATUS, &status);
+    if (status == GL_FALSE) {
+        [self delete];
+    }
     return YES;
 }
-// END:link
-// START:use
-- (void)use
+
+- (BOOL) use
 {
-    glUseProgram(program);
+    BOOL status = [self link];
+    if (status == YES) {
+        glUseProgram(programName);
+        status = [self set
+    }
+    return status;
 }
-// END:use
+
 #pragma mark -
-// START:privatelog
-- (NSString *)logForOpenGLObject:(GLuint)object 
-                    infoCallback:(GLInfoFunction)infoFunc 
-                         logFunc:(GLLogFunction)logFunc
+#pragma mark Logging
+
+- (NSString *) logForOpenGLObject:(GLuint)object 
 {
     GLint logLength = 0, charsWritten = 0;
     
-    infoFunc(object, GL_INFO_LOG_LENGTH, &logLength);    
+    glGetProgramiv(object, GL_INFO_LOG_LENGTH, &logLength);    
     if (logLength < 1)
         return nil;
     
     char *logBytes = malloc(logLength);
-    logFunc(object, logLength, &charsWritten, logBytes);
+    glGetProgramInfoLog(object, logLength, &charsWritten, logBytes);
     NSString *log = [[NSString alloc] initWithBytes:logBytes 
                                               length:logLength 
                                             encoding:NSUTF8StringEncoding];
     free(logBytes);
     return log;
 }
-// END:privatelog
-// START:log
-- (NSString *)vertexShaderLog
+
+- (NSString *) vertexShaderLog
 {
-    return [self logForOpenGLObject:vertShader 
-                       infoCallback:(GLInfoFunction)&glGetProgramiv 
-                            logFunc:(GLLogFunction)&glGetProgramInfoLog];
-    
+    return [self logForOpenGLObject:vertShader];
 }
-- (NSString *)fragmentShaderLog
+                  
+- (NSString *) fragmentShaderLog
 {
-    return [self logForOpenGLObject:fragShader 
-                       infoCallback:(GLInfoFunction)&glGetProgramiv 
-                            logFunc:(GLLogFunction)&glGetProgramInfoLog];
+    return [self logForOpenGLObject:fragShader];
 }
-- (NSString *)programLog
+                  
+- (NSString *) programLog
 {
-    return [self logForOpenGLObject:program 
-                       infoCallback:(GLInfoFunction)&glGetProgramiv 
-                            logFunc:(GLLogFunction)&glGetProgramInfoLog];
+    return [self logForOpenGLObject:program]; 
 }
-// END:log
+
+- (NSString *) logs
+{
+    return [NSString stringWithFormat:@"%@: %@\n%@: %@\n%@: %@\n",
+        "Vertex shader log", [self vertexShaderLog], 
+        "Fragment shader log", [self fragmentShaderLog],
+        "Program log", [self programLog]];
+}
 
 - (void)validate;
 {
@@ -212,7 +338,7 @@ typedef void (*GLLogFunction) (GLuint program, GLsizei bufsize, GLsizei* length,
 
 - (BOOL) compileShaders
 {
-    [self unbindAndReleaseShaders];
+    [self deleteComponents];
     
     NSString *vertexText = _vertexShader ? _vertexShader : 
         [self getShaderTextFromFile:_vertexShaderFilename];
@@ -230,58 +356,86 @@ typedef void (*GLLogFunction) (GLuint program, GLsizei bufsize, GLsizei* length,
     if (![self compileShader:fragmentText ofType:GL_FRAGMENT_SHADER name:&fragShader]) {
         NSLog(@"Failed to compile fragment shader");
     }
-    
-    glAttachShader(program, vertShader);
-    glAttachShader(program, fragShader);
-    
 }
 
-- (BOOL) compileShader:(NSString *)shaderString ofType:(GLenum)type name:(GLuint *)shader
+- (void) delete
 {
-    GLint status;
-    const GLchar *source = (GLchar *)[shaderString UTF8String];
-    
-    *shader = glCreateShader(type);
-    glShaderSource(*shader, 1, &source, NULL);
-    glCompileShader(*shader);
-    glGetShaderiv(*shader, GL_COMPILE_STATUS, &status);
-    
-	if (status != GL_TRUE) {
-		GLint logLength;
-		glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &logLength);
-		if (logLength > 0) {
-			GLchar *log = (GLchar *)malloc(logLength);
-			glGetShaderInfoLog(*shader, logLength, &logLength, log);
-			NSLog(@"Shader compile log:\n%s", log);
-			free(log);
-		}
-	}	
-    return status == GL_TRUE;
-}
-
-
-program = glCreateProgram();
-
-- (void) unbindAndReleaseShaders
-{
-    if (program) {
-        glDeleteProgram(program);
-        program = 0;
+    if (programName) {
+        glDeleteProgram(programName);
+        programName = 0;
     }
-    if (vertShader) {
-        glDeleteShader(vertShader);
-        vertShader = 0;
-    }
-    if (fragShader) {
-        glDeleteShader(fragShader);
-        fragShader = 0;
-    }
-    bound = NO;
 }
 
 - (void) dealloc
 {
-    [self unbindAndReleaseShaders];
+    [self delete];
 }
+                  
+                  - (void)setInteger:(GLint)newInteger forUniform:(NSString *)uniformName;
+        {
+            [GPUImageOpenGLESContext useImageProcessingContext];
+            [filterProgram use];
+            GLint uniformIndex = [filterProgram uniformIndex:uniformName];
+            
+            glUniform1i(uniformIndex, newInteger);
+        }
+                  
+                  - (void)setFloat:(GLfloat)newFloat forUniform:(NSString *)uniformName;
+        {
+            [GPUImageOpenGLESContext useImageProcessingContext];
+            [filterProgram use];
+            GLint uniformIndex = [filterProgram uniformIndex:uniformName];
+            
+            glUniform1f(uniformIndex, newFloat);
+        }
+                  
+                  - (void)setSize:(CGSize)newSize forUniform:(NSString *)uniformName;
+        {
+            [GPUImageOpenGLESContext useImageProcessingContext];
+            [filterProgram use];
+            GLint uniformIndex = [filterProgram uniformIndex:uniformName];
+            GLfloat sizeUniform[2];
+            sizeUniform[0] = newSize.width;
+            sizeUniform[1] = newSize.height;
+            
+            glUniform2fv(uniformIndex, 1, sizeUniform);
+        }
+                  
+                  - (void)setPoint:(CGPoint)newPoint forUniform:(NSString *)uniformName;
+        {
+            [GPUImageOpenGLESContext useImageProcessingContext];
+            [filterProgram use];
+            GLint uniformIndex = [filterProgram uniformIndex:uniformName];
+            GLfloat sizeUniform[2];
+            sizeUniform[0] = newPoint.x;
+            sizeUniform[1] = newPoint.y;
+            
+            glUniform2fv(uniformIndex, 1, sizeUniform);
+        }
+                  
+                  - (void)setFloatVec3:(GLfloat *)newVec3 forUniform:(NSString *)uniformName;
+        {
+            GLint uniformIndex = [filterProgram uniformIndex:uniformName];
+            [filterProgram use];
+            
+            glUniform3fv(uniformIndex, 1, newVec3);    
+        }
+                  
+                  - (void)setFloatVec4:(GLfloat *)newVec4 forUniform:(NSString *)uniformName;
+        {
+            GLint uniformIndex = [filterProgram uniformIndex:uniformName];
+            [filterProgram use];
+            
+            glUniform4fv(uniformIndex, 1, newVec4);    
+        }
+                  
+                  - (void)setFloatArray:(GLfloat *)array length:(GLsizei)count forUniform:(NSString*)uniformName {
+                      [GPUImageOpenGLESContext useImageProcessingContext];
+                      [filterProgram use];
+                      GLint uniformIndex = [filterProgram uniformIndex:uniformName];
+                      
+                      glUniform1fv(uniformIndex, count, array);
+                  }
+
 
 @end
