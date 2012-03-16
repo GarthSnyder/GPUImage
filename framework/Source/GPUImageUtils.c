@@ -1,6 +1,6 @@
 // Garth Snyder - 3/14/2012
 
-#import "GPUImageProtocols.h"
+#import "GPUImageTypes.h"
 
 static GPUImageTimestamp currentTimestamp = 0;
 
