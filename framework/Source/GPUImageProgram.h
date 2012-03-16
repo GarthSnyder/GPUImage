@@ -12,11 +12,9 @@
 #import <Foundation/Foundation.h>
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
-#import "GPUImageTexture.h"
 
-#define SHADER_STRINGIZE(x) #x
-#define SHADER_STRINGIZE2(x) SHADER_STRINGIZE(x)
-#define SHADER_STRING(text) @ SHADER_STRINGIZE2(text)
+#import "GPUImageShader.h"
+#import "GPUImageTexture.h"
 
 @interface GPUImageProgram : NSObject
 
