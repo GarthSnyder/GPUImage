@@ -2,7 +2,7 @@
 #import "GPUImagePicture.h"
 
 @interface GPUImageFilter
-- (GPUImageProgram *)filterProgramAtIndex:(int)n;
+- (GPUImageProgram *) filterProgramAtIndex:(int)n;
 @end
 
 @implementation GPUImageFilter
@@ -26,7 +26,7 @@
         for (int i = 0; i < nFilters; i++) {
             GPUImageProgram *newProgram = [GPUImageProgram program];
             if (texture) {
-                newProgram.inputTexture = texture;
+                [newProgram setValue:texture forKey:@"inputTexture"];
             }
             [filterPrograms addObject:newProgram];
             texture = [GPUImageTexture texture];
@@ -65,7 +65,7 @@
 {
     GPUImageTexture *oldOutput = [outputTextures lastObject];
     [outputTextures removeLastObject];
-    [oldOutput underiveFrom:self];  // TODO: Underive from?
+    [oldOutput undoDerivationFrom:self];
     [outputTextures addObject:texture];
     [texture deriveFrom:self];
 }

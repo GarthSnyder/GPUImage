@@ -6,7 +6,7 @@
     GLint intensityUniform;
 }
 
-@property(readwrite, nonatomic) GPUMatrix4x4 colorMatrix;
+@property(readwrite, nonatomic) mat4 colorMatrix;
 @property(readwrite, nonatomic) CGFloat intensity;
 
 @end
