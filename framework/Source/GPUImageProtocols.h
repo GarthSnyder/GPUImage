@@ -23,17 +23,9 @@ extern GPUImageTimestamp GPUImageGetCurrentTimestamp();
 @protocol GPUImageFlow <NSObject>
 
 - (void) deriveFrom:(id <GPUImageFlow>)parent;
+- (void) undoDerivationFrom:(id <GPUImageFlow>)parent;
 - (GPUImageTimestamp) timeLastChanged;
 - (BOOL) update;
-
-@optional
-
-// Give a hint to a parent that we prefer to consume a renderbuffer rather than
-// a texture. Generally of interest only to texture objects that can be a 
-// target of rendering. Can potentially avoid a texture-to-renderbuffer
-// conversion, but it's a very small optimization.
-
-- (void) requestRenderbuffer;
 
 @end
 
