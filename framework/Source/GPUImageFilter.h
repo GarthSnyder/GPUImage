@@ -7,7 +7,6 @@
 {
     NSMutableArray *programs;
     NSMutableArray *outputTextures; 
-    BOOL renderbufferRequested;
 }
 
 // These property names are conventional. If there are multiple program stages,

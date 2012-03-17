@@ -16,8 +16,6 @@
 @interface GPUImageShader : NSObject
 {
     NSString *sourceText;
-    NSMutableArray *_attributes;
-    NSMutableDictionary *_uniforms;
 }
 
 - (GPUImageShader *) initWithSourceText:(NSString *)shader;
@@ -26,13 +24,8 @@
 - (BOOL) compileAsShaderType:(GLenum)type;
 - (void) delete;
 
-- (GLint) handleForAttribute:(NSString *)attr;
-- (GLint) handleForUniform:(NSString *)attr;
-
 - (NSString *) logForOpenGLObject:(GLuint)object;
 
-@property (nonatomic, readonly) GLint shaderHandle;
-@property (nonatomic, readonly) NSArray *attributes;
-@property (nonatomic, readonly) NSArray *uniforms;
+@property (nonatomic, readonly) GLint handle;
 
 @end

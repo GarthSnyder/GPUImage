@@ -2,41 +2,9 @@
 
 #import "GPUImageShader.h"
 
-// Default shaders implement a simple copy operation
-
-NSString *const kGPUImageDefaultVertexShader = SHADER_STRING
-(
-     attribute vec4 position;
-     attribute vec4 inputTextureCoordinate;
-     
-     varying vec2 textureCoordinate;
-     
-     void main()
-     {
-         gl_Position = position;
-         textureCoordinate = inputTextureCoordinate.xy;
-     }
-);
-
-NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
-(
-     attribute vec4 position;
-     attribute vec4 inputTextureCoordinate;
-     
-     uniform sampler2D inputTexture;
-     
-     varying vec2 textureCoordinate;
-     
-     void main()
-     {
-         gl_FragColor = vec4(texture2D(inputTexture, textureCoordinate).rgb, 1.0);
-     }
-);
-
 @implementation GPUImageShader
 
-@synthesize shaderHandle = _shaderHandle;
-@synthesize attributes = _attributes;
+@synthesize handle = _handle;
 
 #pragma mark Initializers
 
@@ -44,7 +12,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 {
     if (self = [super init]) {
         sourceText = shader;
-        _shaderHandle = -1;
+        _handle = -1;
     }
     return self;
 }
@@ -62,37 +30,27 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     return nil;
 }
 
-- (NSArray *) attributes
-{
-return _attributes;
-}
-
-- (NSArray *) uniforms 
-{
-return [_uniforms allKeys];
-}
-
 #pragma mark Compilation and handle managment
 
 - (BOOL) compileAsShaderType:(GLenum)type
 {
-    if (_shaderHandle >= 0) {
+    if (_handle >= 0) {
         return YES;
     }
 
     GLint status;
     const GLchar *source = (GLchar *)[sourceText UTF8String];
-    _shaderHandle = glCreateShader(type);
-    glShaderSource(_shaderHandle, 1, &source, NULL);
-    glCompileShader(_shaderHandle);
-    glGetShaderiv(_shaderHandle, GL_COMPILE_STATUS, &status);
+    _handle = glCreateShader(type);
+    glShaderSource(_handle, 1, &source, NULL);
+    glCompileShader(_handle);
+    glGetShaderiv(_handle, GL_COMPILE_STATUS, &status);
 
     if (status != GL_TRUE) {
         GLint logLength;
-        glGetShaderiv(_shaderHandle, GL_INFO_LOG_LENGTH, &logLength);
+        glGetShaderiv(_handle, GL_INFO_LOG_LENGTH, &logLength);
         if (logLength > 0) {
             GLchar *log = (GLchar *)malloc(logLength);
-            glGetShaderInfoLog(_shaderHandle, logLength, &logLength, log);
+            glGetShaderInfoLog(_handle, logLength, &logLength, log);
             NSLog(@"Shader compile log:\n%s", log);
             free(log);
         }
@@ -103,10 +61,10 @@ return [_uniforms allKeys];
 
 - (void) delete
 {
-    if (_shaderHandle >= 0) {
-        glDeleteShader(_shaderHandle);
+    if (_handle >= 0) {
+        glDeleteShader(_handle);
     }
-    _shaderHandle = -1;
+    _handle = -1;
 }
 
 - (void) dealloc

@@ -17,7 +17,7 @@ NSString *const kGPUImageContrastFragmentShaderString = SHADER_STRING
 
 @implementation GPUImageContrastFilter
 
-@dynamic contrast;
+@synthesize contrast = _contrast;
 
 - (id) init;
 {
@@ -26,6 +26,12 @@ NSString *const kGPUImageContrastFragmentShaderString = SHADER_STRING
         self.contrast = 1.0;
     }
     return self;
+}
+
+- (void) setContrast:(GLfloat)contrast
+{
+    _contrast = contrast;
+    [self.program setValue:[NSNumber numberWithFloat:contrast] forKey:@"contrast"];
 }
 
 @end
