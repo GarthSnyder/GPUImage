@@ -43,7 +43,7 @@ NSString *const kGPUImageGaussianBlurVertexShaderString = SHADER_STRING
 
 NSString *const kGPUImageGaussianBlurFragmentShaderString = SHADER_STRING
 (
-    uniform sampler2D inputImageTexture;
+    uniform sampler2D inputTexture;
 
     const lowp int GAUSSIAN_SAMPLES = 9;
 
@@ -55,7 +55,7 @@ NSString *const kGPUImageGaussianBlurFragmentShaderString = SHADER_STRING
     void main() {
         highp vec4 sum = vec4(0.0);
         for (lowp int i = 0; i < GAUSSIAN_SAMPLES; i++) {
-            sum += texture2D(inputImageTexture, blurCoordinates[i]) * gaussianValues[i];
+            sum += texture2D(inputTexture, blurCoordinates[i]) * gaussianValues[i];
         }
         gl_FragColor = sum;
     }
@@ -89,11 +89,11 @@ NSString *const kGPUImageGaussianBlurFragmentShaderString = SHADER_STRING
     GPUImageBlurStep hStep = { _blurSize, 0.0 };
     GPUImageBlurStep vStep = { 0.0, _blurSize };
     
-    self.programOne.gaussianValues = gaussians;
-    self.programTwo.gaussianValues = gaussians;
+    [self.programOne setValue:UNIFORM(gaussians) forKey:@"gaussianValues"];
+    [self.programTwo setValue:UNIFORM(gaussians) forKey:@"gaussianValues"];
     
-    self.programOne.blurStep = hStep;
-    self.programTwo.blurStep = vStep;
+    [self.programOne setValue:UNIFORM(hStep) forKey:@"blurStep"];
+    [self.programTwo setValue:UNIFORM(vStep) forKey:@"blurStep"];
     
     return [super render];
 }

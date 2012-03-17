@@ -2,13 +2,7 @@
 
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
-
-// A GPUImageTimestamp is a simple, guaranteed-unique, monotonically increasing
-// integer. Used to facilitate flooding of updates through a filter network.
-
-typedef unsigned int GPUImageTimestamp;
-
-extern GPUImageTimestamp GPUImageGetCurrentTimestamp();
+#import "GPUImageTypes.h"
 
 // An object conforming to GPUImageDataFlow is typically a texture object
 // or a filter. The general algorithm for implementing update is to first
@@ -28,20 +22,4 @@ extern GPUImageTimestamp GPUImageGetCurrentTimestamp();
 - (BOOL) update;
 
 @end
-
-// Used by some filters
-
-typedef struct GPUVector4 {
-    GLfloat one;
-    GLfloat two;
-    GLfloat three;
-    GLfloat four;
-} GPUVector4;
-
-typedef struct GPUMatrix4x4 {
-    GPUVector4 one;
-    GPUVector4 two;
-    GPUVector4 three;
-    GPUVector4 four;
-} GPUMatrix4x4;
 

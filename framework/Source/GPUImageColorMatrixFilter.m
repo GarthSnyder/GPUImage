@@ -37,7 +37,7 @@ NSString *const kGPUImageColorMatrixFragmentShaderString = SHADER_STRING
     intensityUniform = [filterProgram uniformIndex:@"intensity"];
     
     self.intensity = 1.f;
-    self.colorMatrix = (GPUMatrix4x4){
+    self.colorMatrix = (mat4){
         {1.f, 0.f, 0.f, 0.f},
         {0.f, 1.f, 0.f, 0.f},
         {0.f, 0.f, 1.f, 0.f},
@@ -58,7 +58,7 @@ NSString *const kGPUImageColorMatrixFragmentShaderString = SHADER_STRING
     glUniform1f(intensityUniform, _intensity);
 }
 
-- (void)setColorMatrix:(GPUMatrix4x4)newColorMatrix;
+- (void)setColorMatrix:(mat4)newColorMatrix;
 {
     _colorMatrix = newColorMatrix;
     [GPUImageOpenGLESContext useImageProcessingContext];

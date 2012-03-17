@@ -16,9 +16,21 @@
 #import "GPUImageShader.h"
 #import "GPUImageTexture.h"
 
-@interface GPUImageProgram : NSObject
+// Shortcut for encoding uniform values as NSValues. Argument must be a 
+// non-literal value.
 
-// These are effectively write-only.
+#define UNIFORM(x) [NSValue valueWithBytes:&(x) objCType:@encode(typeof(x))]
+
+@interface GPUImageProgram : NSObject
+{
+    GLint programHandle;
+    NSMutableDictionary *uniformValues;
+    NSMutableDictionary *knownUniforms;
+    NSMutableArray *dirtyUniforms;
+    GLint nextTextureUnit;
+}
+
+// These are effectively write-only. 
 @property (nonatomic) NSString *vertexShader;
 @property (nonatomic) NSString *vertexShaderFilename;
 @property (nonatomic) NSString *fragmentShader;
@@ -51,5 +63,11 @@
 @property (nonatomic) GPUImageTexture *inputTexture;
 @property (nonatomic) GPUImageTexture *accessoryTexture; // 2nd input
 @property (nonatomic) GPUImageTexture *outputTexture;
+
+// This method is generally used only for determining the handles for vertex
+// attributes for use in drawing. For uniforms, the general GPUImageProgram
+// KVC system should be used (e.g., program.shaderAttr = 3.0).
+
+- (GLint) indexOfAttribute:(NSString *)name;
 
 @end
