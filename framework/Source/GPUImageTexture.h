@@ -1,26 +1,38 @@
-//
-//  GPUImageTexture.h
-//  GPUImage
-//
-//  Created by Lion User on 3/14/12.
-//  Copyright (c) 2012 Brad Larson. All rights reserved.
-//
-
 #import "GPUImageGraphElement.h"
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import "GPUImageBuffer.h"
 
 @interface GPUImageTexture : GPUImageGraphElement
 
-@property (nonatomic) CGSize size;
-//TODO: color model, replication, interpolation
+@property (nonatomic) GLsize size;
+@property (nonatomic) GLenum baseFormat;
+@property (nonatomic) GLenum magnificationFilter;
+@property (nonatomic) GLenum minificationFilter;
+@property (nonatomic) GLenum wrapS;
+@property (nonatomic) GLenum wrapT;
 
-- (BOOL) knowsSize;
+// For setting both filters or both wraps at once
+@property (nonatomic) GLenum filter;
+@property (nonatomic) GLenum wrap;
 
-- (int) bytesPerPixel;
+// Let the texture manage this! Not part of the general API.
+@property (nonatomic) GPUImageBuffer *backingStore;
 
-- textureASUIImage
++ (id) texture;
 
-- takeUnknownParametersFrom
+- (GLint) textureHandle;
+
+- (void) makeRenderbuffer;
+- (BOOL) isRenderbuffer;
+
+- (void) bindAsFramebuffer;
+- (void) generateMipmap;
+
+// Adopts size and base format only, and only if unknown
+- (void) adoptParametersFrom:(GPUImageTexture *)other;
+
+- (UIImage *) convertToUIImage;
 
 @end
+

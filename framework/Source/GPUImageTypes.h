@@ -81,3 +81,8 @@ typedef struct {
     GLboolean z;
     GLboolean a;
 } bvec4;
+
+typedef struct {
+    GLint width;
+    GLint height;
+} GLsize;
