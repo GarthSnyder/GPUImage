@@ -1,4 +1,6 @@
-#import "GPUImageOutput.h"
+#import "GPUImageGraphElement.h"
+#import "GPUImageProgram.h"
+#import "GPUImage.h"
 #import <UIKit/UIKit.h>
 
 @interface GPUImageFilter : GPUImageGraphElement
@@ -13,8 +15,8 @@
 // desired; they can also ignore the standard input and output textures
 // with no ill effects if they wish.
 
-@property (nonatomic) GPUImageTexture *inputTexture;
-@property (nonatomic) GPUImageTexture *outputTexture;
+@property (strong, nonatomic) GPUImage *inputTexture;
+@property (strong, nonatomic) GPUImage *outputTexture;
 
 // Override to automatically set up a framework for >1 program in series
 + (int) numberOfFilterPrograms;

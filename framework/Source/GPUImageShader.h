@@ -24,7 +24,7 @@
 - (BOOL) compileAsShaderType:(GLenum)type;
 - (void) delete;
 
-- (NSString *) logForOpenGLObject:(GLuint)object;
+- (NSString *) log;
 
 @property (nonatomic, readonly) GLint handle;
 

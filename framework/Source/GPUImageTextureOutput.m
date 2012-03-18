@@ -1,6 +1,6 @@
-#import "GPUImageTextureOutput.h"
+#import "GPUImageOutput.h"
 
-@implementation GPUImageTextureOutput
+@implementation GPUImageOutput
 
 @synthesize delegate = _delegate;
 @synthesize texture = _texture;

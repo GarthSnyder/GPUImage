@@ -59,6 +59,23 @@
     return status == GL_TRUE;
 }
 
+- (NSString *) log 
+{
+    GLint logLength = 0, charsWritten = 0;
+    
+    glGetProgramiv(self.handle, GL_INFO_LOG_LENGTH, &logLength);    
+    if (logLength < 1) {
+        return nil;
+    }
+    
+    char *logBytes = malloc(logLength);
+    glGetProgramInfoLog(self.handle, logLength, &charsWritten, logBytes);
+    NSString *log = [[NSString alloc] initWithBytes:logBytes 
+        length:logLength encoding:NSUTF8StringEncoding];
+    free(logBytes);
+    return log;
+}
+
 - (void) delete
 {
     if (_handle >= 0) {

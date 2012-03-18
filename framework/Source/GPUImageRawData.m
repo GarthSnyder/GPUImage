@@ -1,5 +1,4 @@
 #import "GPUImageRawData.h"
-
 #import "GPUImageOpenGLESContext.h"
 #import "GPUImageProgram.h"
 #import "GPUImageFilter.h"
