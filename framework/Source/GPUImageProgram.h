@@ -24,9 +24,7 @@
 @interface GPUImageProgram : NSObject
 {
     GLint programHandle;
-    NSMutableDictionary *uniformValues;
-    NSMutableDictionary *knownUniforms;
-    NSMutableArray *dirtyUniforms;
+    NSMutableDictionary *uniforms;
     GLint nextTextureUnit;
 }
 

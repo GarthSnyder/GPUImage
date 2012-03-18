@@ -9,7 +9,6 @@
     GPUImageTimestamp lastChangeTime;
 }
 
-// Do whatever is needed to make myself current. Return NO on error.
 - (BOOL) render;
 
 @end
