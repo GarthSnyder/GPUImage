@@ -1,60 +1,43 @@
-#import "GPUImageProgram.h"
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import <QuartzCore/QuartzCore.h>
 
-// Base classes
-#import "GPUImageOpenGLESContext.h"
-#import "GPUImageOutput.h"
-#import "GPUImageView.h"
-#import "GPUImageVideoCamera.h"
-#import "GPUImageMovie.h"
-#import "GPUImagePicture.h"
-#import "GPUImageRawData.h"
-#import "GPUImageMovieWriter.h"
-#import "GPUImageFilterPipeline.h"
-#import "GPUImageTextureOutput.h"
-#import "GPUImageFilterGroup.h"
+#import "GPUImageHeaders.h"
 
-// Filters
-#import "GPUImageFilter.h"
-#import "GPUImageRotationFilter.h"
-#import "GPUImagePixellateFilter.h"
-#import "GPUImageSepiaFilter.h"
-#import "GPUImageColorInvertFilter.h"
-#import "GPUImageSaturationFilter.h"
-#import "GPUImageContrastFilter.h"
-#import "GPUImageExposureFilter.h"
-#import "GPUImageBrightnessFilter.h"
-#import "GPUImageSharpenFilter.h"
-#import "GPUImageGammaFilter.h"
-#import "GPUImageSobelEdgeDetectionFilter.h"
-#import "GPUImageSketchFilter.h"
-#import "GPUImageToonFilter.h"
-#import "GPUImageMultiplyBlendFilter.h"
-#import "GPUImageDissolveBlendFilter.h"
-#import "GPUImageKuwaharaFilter.h"
-#import "GPUImageVignetteFilter.h"
-#import "GPUImageGaussianBlurFilter.h"
-#import "GPUImageGaussianSelectiveBlurFilter.h"
-#import "GPUImageOverlayBlendFilter.h"
-#import "GPUImageDarkenBlendFilter.h"
-#import "GPUImageLightenBlendFilter.h"
-#import "GPUImageSwirlFilter.h"
-#import "GPUImageFastBlurFilter.h"
-#import "GPUImageColorBurnBlendFilter.h"
-#import "GPUImageColorDodgeBlendFilter.h"
-#import "GPUImageScreenBlendFilter.h"
-#import "GPUImageExclusionBlendFilter.h"
-#import "GPUImageDifferenceBlendFilter.h"
-#import "GPUImageHardLightBlendFilter.h"
-#import "GPUImageSoftLightBlendFilter.h"
-#import "GPUImageCropFilter.h"
-#import "GPUImageGrayscaleFilter.h"
-#import "GPUImageTransformFilter.h"
-#import "GPUImageChromaKeyBlendFilter.h"
-#import "GPUImageHazeFilter.h"
-#import "GPUImageLuminanceThresholdFilter.h"
-#import "GPUImagePosterizeFilter.h"
-#import "GPUImageBoxBlurFilter.h"
-#import "GPUImageAdaptiveThresholdFilter.h"
-#import "GPUImageUnsharpMaskFilter.h"
-#import "GPUImageBulgeDistortionFilter.h"
-#import "GPUImagePinchDistortionFilter.h"
+@interface GPUImage : GPUImageGraphElement
+
+@property (nonatomic) GLsize size;
+@property (nonatomic) GLenum baseFormat;
+@property (nonatomic) GLenum pixType;
+
+// Setting an associated layer automatically turns on useRenderbuffer.
+// However, you can use a renderbuffer without an associated CAEAGLLayer.
+
+@property (assign, nonatomic) CAEAGLLayer *layer;   // Associated layer, if any
+@property (nonatomic) BOOL useRenderbuffer;
+
+@property (nonatomic) GLenum wrapS;
+@property (nonatomic) GLenum wrapT;
+@property (nonatomic) GLenum magnificationFilter;
+@property (nonatomic) GLenum minificationFilter;
+@property (nonatomic) BOOL generateMipmap;
+
+// For setting both filters or both wraps at once
+@property (nonatomic) GLenum filter;
+@property (nonatomic) GLenum wrap;
+
+// Let the texture manage this! Not part of the general API.
+@property (strong, nonatomic) GPUImageBuffer *backingStore;
+
++ (id) texture;
+
+- (void) bindAsFramebuffer;
+
+// Adopts size and base format only, and only if receiver's are unknown
+- (void) adoptParametersFrom:(GPUImage *)other;
+
+- (GLuint *) getRawContents;
+- (CGImageRef) convertToCGImage;
+- (UIImage *) convertToUIImage;
+
+@end
