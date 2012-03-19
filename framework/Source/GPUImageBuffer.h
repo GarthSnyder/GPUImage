@@ -18,11 +18,25 @@
 @interface GPUImageBuffer : NSObject
 {
     GLuint _handle;
+    GLuint _fboHandle; // Framebuffer object, if one exists
+    GLsize _size;
+    GLenum _format;
 }
 
-@property (nonatomic) GLuint handle;
+@property (readonly, nonatomic) GLuint handle;
+@property (readonly, nonatomic) GLuint fboHandle;
 
-- initWithSize:(GLsize)size baseFormat:(GLenum)format;
+@property (readonly, nonatomic) GLsize size;
+@property (readonly, nonatomic) GLenum format;
+
+- (id) initWithSize:(GLsize)size baseFormat:(GLenum)format;
+
+- (void) bind;
 - (void) bindAsFramebuffer;
+- (void) clearFramebuffer;
+
+// Callers are responsible for freeing these
+- (GLubyte *) rawDataFromFramebuffer;
+- (CGImageRef) CGImageFromFramebuffer;
 
 @end

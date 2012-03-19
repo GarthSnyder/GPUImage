@@ -9,7 +9,10 @@
 @property (nonatomic) GLenum wrapS;
 @property (nonatomic) GLenum wrapT;
 
-- initWithSize:(GLsize)size baseFormat:(GLenum)format depth:(GLenum)depth;
-- (void) bind;
+@property (readonly, nonatomic) BOOL hasMipmap;
+
+- initWithSize:(GLsize)size baseFormat:(GLenum)format pixType:(GLenum)pix;
+
+- (void) generateMipmap;
 
 @end

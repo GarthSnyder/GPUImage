@@ -42,9 +42,9 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 - (BOOL) compileShaders;
 - (void) delete;
-- (void) readSymbols;
-- (NSString *) logForOpenGLObject:(GLuint)object infoCallback:(GLInfoFunction)infoFunc 
-    logFunc:(GLLogFunction)logFunc;
+- (void) setValue:(id)obj forKey:(NSString *)key;
+- (id) valueForKey:(NSString *)key;
+- (void) setUniformValues;
 
 @end
 
@@ -53,7 +53,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 #pragma mark -
 #pragma mark Initialization and shader specification
 
-+ (GPUImageProgram *)program
++ (GPUImageProgram *) program
 {
     return [[GPUImageProgram alloc] init];
 }
@@ -65,6 +65,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
         self.fragmentShader = kGPUImageDefaultFragmentShader;
         programHandle = -1;
         uniforms = [NSMutableDictionary dictionary];
+        attributes = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -87,18 +88,48 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 - (NSString *) vertexShader {
     NSAssert(NO, @"GPUImageProgram: vertexShader property is write-only.");
+    return nil;
 }
 
 - (NSString *) vertexShaderFilename {
     NSAssert(NO, @"GPUImageProgram: vertexShaderFilename property is write-only.");
+    return nil;
 }
 
 - (NSString *) fragmentShader {
     NSAssert(NO, @"GPUImageProgram: fragmentShader property is write-only.");
+    return nil;
 }
 
 - (NSString *) fragmentShaderFilename {
     NSAssert(NO, @"GPUImageProgram: fragmentShaderFilename property is write-only.");
+    return nil;
+}
+
+#pragma mark Pass-alongs for default input and output textures
+
+- (GPUImageTexture *)inputTexture {
+    return [self valueForKey:@"inputTexture"];
+}
+
+- (GPUImageTexture *)outputTexture {
+    return [self valueForKey:@"outputTexture"];
+}
+
+- (GPUImageTexture *)accessoryTexture {
+    return [self valueForKey:@"accessoryTexture"];
+}
+
+- (void) setInputTexture:(GPUImageTexture *)inputTexture {
+    [self setValue:inputTexture forKey:@"inputTexture"];
+}
+
+- (void) setOutputTexture:(GPUImageTexture *)outputTexture {
+    [self setValue:outputTexture forKey:@"outputTexture"];
+}
+
+- (void) setAccessoryTexture:(GPUImageTexture *)accessoryTexture {
+    [self setValue:accessoryTexture forKey:@"accessoryTexture"];
 }
 
 #pragma mark Compilation and linking
@@ -147,6 +178,22 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
         [fragmentShader compileAsShaderType:GL_FRAGMENT_SHADER];
 }
 
+#pragma mark Access to vertex attributes
+
+- (GLint) indexOfAttribute:(NSString *)name
+{
+    NSNumber *index = [attributes objectForKey:name];
+    if (index) {
+        return [index intValue];
+    }
+    if (![self link]) {
+        return -1;
+    }
+    GLint loc = glGetAttribLocation(programHandle, [name UTF8String]);
+    [attributes setObject:[NSNumber numberWithInt:loc] forKey:name];
+    return loc;
+}
+
 #pragma mark Management of uniform values
 
 // Records the value for later use; does not issue any OpenGL commands
@@ -192,17 +239,17 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 #pragma mark -
 #pragma mark Logging
 
-- (NSString *) logForOpenGLObject:(GLuint)object 
+- (NSString *) programLog 
 {
     GLint logLength = 0, charsWritten = 0;
     
-    glGetProgramiv(object, GL_INFO_LOG_LENGTH, &logLength);    
+    glGetProgramiv(programHandle, GL_INFO_LOG_LENGTH, &logLength);    
     if (logLength < 1) {
         return nil;
     }
     
     char *logBytes = malloc(logLength);
-    glGetProgramInfoLog(object, logLength, &charsWritten, logBytes);
+    glGetProgramInfoLog(programHandle, logLength, &charsWritten, logBytes);
     NSString *log = [[NSString alloc] initWithBytes:logBytes 
         length:logLength encoding:NSUTF8StringEncoding];
     free(logBytes);
@@ -211,19 +258,14 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 - (NSString *) vertexShaderLog
 {
-    return [self logForOpenGLObject:vertShader];
+    return [vertexShader log];
 }
                   
 - (NSString *) fragmentShaderLog
 {
-    return [self logForOpenGLObject:fragShader];
+    return [fragmentShader log];
 }
                   
-- (NSString *) programLog
-{
-    return [self logForOpenGLObject:program]; 
-}
-
 - (NSString *) logs
 {
     return [NSString stringWithFormat:@"%@: %@\n%@: %@\n%@: %@\n",

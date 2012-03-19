@@ -15,8 +15,8 @@
 // desired; they can also ignore the standard input and output textures
 // with no ill effects if they wish.
 
-@property (nonatomic) GPUImageTexture *inputTexture;
-@property (nonatomic) GPUImageTexture *outputTexture;
+@property (strong, nonatomic) GPUImageTexture *inputTexture;
+@property (strong, nonatomic) GPUImageTexture *outputTexture;
 
 // Override to automatically set up a framework for >1 program in series
 + (int) numberOfFilterPrograms;

@@ -1,21 +1,13 @@
-//
-//  GPUImageTexture.m
-//  GPUImage
-//
-//  Created by Lion User on 3/14/12.
-//  Copyright (c) 2012 Brad Larson. All rights reserved.
-//
+//  Created by Garth Snyder on 3/14/12.
 
 #import "GPUImageTexture.h"
 #import "GPUImageTextureBuffer.h"
-// #import "GPUImageRenderbuffer.h"
+#import "GPUImageRenderbuffer.h"
 
 @interface GPUImageTexture ()
 {
     BOOL _renderbufferRequested;
 }
-
-- (void) disposeBacking;
 
 @end
 
@@ -23,12 +15,18 @@
 
 @synthesize size = _size;
 @synthesize baseFormat = _baseFormat;
+@synthesize pixType = _pixType;
+
+@synthesize useRenderbuffer = _useRenderbuffer;
+@synthesize generateMipmap = _generateMipmap;
+
 @synthesize magnificationFilter = _magnificationFilter;
 @synthesize minificationFilter = _minificationFilter;
 @synthesize wrapS = _wrapS;
 @synthesize wrapT = _wrapT;
 
 @synthesize backingStore = _backingStore;
+@synthesize layer = _layer;
 
 #pragma mark -
 #pragma mark Basic setup and accessors
@@ -36,6 +34,15 @@
 + (id) texture
 {
     return [[GPUImageTexture alloc] init];
+}
+
+- (id) init
+{
+    if (self = [super init]) {
+        self.filter = GL_NEAREST;
+        self.wrap = GL_CLAMP_TO_EDGE;
+    }
+    return self;
 }
 
 - (GLenum) filter
@@ -64,6 +71,36 @@
     self.wrapT = wrap;
 }
 
+- (void) setUseRenderbuffer:(BOOL)use
+{
+    if (self.useRenderbuffer != use) {
+        self.backingStore = nil;
+        _useRenderbuffer = use;
+        lastChangeTime = 0;
+    }
+}
+
+- (void) setLayer:(CAEAGLLayer *)layer
+{
+    self.useRenderbuffer = YES;
+    _layer = layer;
+}
+
+- (void) setGenerateMipmap:(BOOL)gen
+{
+    if (self.generateMipmap == gen) {
+        return;
+    }
+    if (gen) {
+        NSAssert(!self.useRenderbuffer, @"Renderbuffers cannot have mipmaps");
+        _generateMipmap = gen;
+        if (lastChangeTime > 0) {
+            GPUImageTextureBuffer *buffer = (GPUImageTextureBuffer *)self.backingStore;
+            [buffer generateMipmap];
+        }
+    }
+}
+
 - (void) adoptParametersFrom:(GPUImageTexture *)other
 {
     GLsize newSize = self.size;
@@ -75,19 +112,10 @@
     if (!self.baseFormat) {
         self.baseFormat = other.baseFormat;
     }
-}
-
-- (void) makeRenderbuffer
-{
-    if (!self.isRenderbuffer) {
-        self.backingStore = nil;
-        _renderbufferRequested = YES;
+    
+    if (!self.pixType) {
+        self.pixType = other.pixType;
     }
-}
-     
-- (BOOL) isRenderbuffer
-{
-    return _renderbufferRequested;
 }
 
 #pragma mark -
@@ -97,10 +125,10 @@
 // texture:
 //
 // If our parent is a filter (that is, anything other than another texture),
-// then this texture is a rendering destination. We need do nothing at 
-// rendering time because the drawing has already occurred -- the parent filter
-// called bindAsFramebuffer on us when it was ready to draw, and the backing
-// store was validated at that time.
+// then this texture is a rendering destination. The only thing we need to 
+// worry about at render time is mipmap generation, because the base drawing
+// has already occurred - the parent filter called bindAsFramebuffer on us
+// when it was ready to draw, and the backing store was validated at that time.
 //
 // If our parent is another texture, then this texture's contents are expected
 // to reflect that texture's contents after rendering.
@@ -121,22 +149,38 @@
 - (BOOL) render
 {
     NSAssert([parents count] == 1, @"Textures should have only one parent.");
-    if (![[parents anyObject] isKindOfClass:[GPUImageTexture class]]) {
-        return YES;
-    }
     
-    GPUImageTexture *parent = [parents anyObject];
-    NSAssert(![self parentRequiresConversion:parent],
-        @"Automatic texture size and format conversions are not yet supported.");
-    _backingStore = [parent backingStore];
-    [self setTextureParams];
+    if ([[parents anyObject] isKindOfClass:[GPUImageTexture class]]) {
+        GPUImageTexture *parent = [parents anyObject];
+        NSAssert(![self parentRequiresConversion:parent],
+            @"Automatic texture size and format conversions are not yet supported.");
+        self.backingStore = parent.backingStore;
+        [self setTextureParams];
+    }
+    if (!self.useRenderbuffer && self.generateMipmap) {
+        GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
+        [store generateMipmap];
+    }
+    lastChangeTime = GPUImageGetCurrentTimestamp();
     return YES;
+}
+
+// Is there anything about the parent texture that makes it impossible for us
+// to share the parent's backing texture?
+
+- (BOOL) parentRequiresConversion:(GPUImageTexture *)parent
+{
+    return ((self.useRenderbuffer != parent.useRenderbuffer) 
+        || (self.size.width != parent.size.width) 
+        || (self.size.height != parent.size.height)
+        || (self.baseFormat != parent.baseFormat) 
+        || (!self.useRenderbuffer && (self.pixType != parent.pixType)));
 }
 
 - (void) setTextureParams
 {
-    GPUImageTextureBuffer *store = self.backingStore;
-    if (self.isRenderbuffer || !store) {
+    GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
+    if (self.useRenderbuffer || !store) {
         return;
     }
     [store bind];
@@ -160,115 +204,41 @@
         [self.backingStore bindAsFramebuffer];
         return;
     }
-}
-
-- (void) generateMipmap;
-
-
-- (UIImage *) convertToUIImage;
-
-@end
-
-GL_ALPHA              
-GL_RGB                
-GL_RGBA               
-GL_LUMINANCE          
-GL_LUMINANCE_ALPHA    
-
-
-- (void)initializeOutputTexture;
-{
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    
-    glActiveTexture(GL_TEXTURE0);
-    glGenTextures(1, &outputTexture);
-	glBindTexture(GL_TEXTURE_2D, outputTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// This is necessary for non-power-of-two textures
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-- (void)setFilterFBO;
-{
-    if (!filterFramebuffer)
-    {
-        CGSize currentFBOSize = [self sizeOfFBO];
-        [self createFilterFBOofSize:currentFBOSize];
-        [self setupFilterForSize:currentFBOSize];
+    // We're going to have to create the backing store. Must know at least 
+    // size and base format.
+    NSAssert(self.size.width && self.size.height && self.baseFormat,
+        @"Cannot bindAsFramebuffer without at least size and base format.");
+    if (self.useRenderbuffer) {
+        if (self.layer) {
+            self.backingStore = [[GPUImageRenderbuffer alloc] initWithLayer:self.layer];
+            self.size = self.backingStore.size;
+            self.baseFormat = self.backingStore.format;
+        } else {
+            self.backingStore = [[GPUImageRenderbuffer alloc] initWithSize:self.size
+                baseFormat:self.baseFormat];
+        }
+    } else {
+        if (!self.pixType) {
+            self.pixType = GL_UNSIGNED_BYTE;
+        }
+        self.backingStore = [[GPUImageTextureBuffer alloc] initWithSize:self.size
+            baseFormat:self.baseFormat pixType:self.pixType];
+        [self setTextureParams];
     }
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, filterFramebuffer);
-    
-    CGSize currentFBOSize = [self sizeOfFBO];
-    glViewport(0, 0, (int)currentFBOSize.width, (int)currentFBOSize.height);
+    [self.backingStore bindAsFramebuffer];
 }
 
-- (void)createFilterFBOofSize:(CGSize)currentFBOSize;
+- (GLuint *) getRawContents;
+
+- (CGImageRef) convertToCGImage;
+
+- (UIImage *) convertToUIImage
 {
-    glActiveTexture(GL_TEXTURE1);
-    glGenFramebuffers(1, &filterFramebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, filterFramebuffer);
-    
-    //    NSLog(@"Filter size: %f, %f", currentFBOSize.width, currentFBOSize.height);
-    
-    glBindTexture(GL_TEXTURE_2D, outputTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int)currentFBOSize.width, (int)currentFBOSize.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, outputTexture, 0);
-	
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    
-    NSAssert(status == GL_FRAMEBUFFER_COMPLETE, @"Incomplete filter FBO: %d", status);
-    glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-- (void)destroyFilterFBO;
-{
-    if (filterFramebuffer)
-	{
-		glDeleteFramebuffers(1, &filterFramebuffer);
-		filterFramebuffer = 0;
-	}	
-}
-
-void dataProviderReleaseCallback(void *info, const void *data, size_t size)
-{
-    free((void *)data);
-}
-
-
-
-- (UIImage *) imageFromCurrentlyProcessedOutput;
-{
-    [self setOutputFBO];
-    
-    CGSize currentFBOSize = [self sizeOfFBO];
-    
-    NSUInteger totalBytesForImage = (int)currentFBOSize.width * (int)currentFBOSize.height * 4;
-    GLubyte *rawImagePixels = (GLubyte *)malloc(totalBytesForImage);
-    glReadPixels(0, 0, (int)currentFBOSize.width, (int)currentFBOSize.height, GL_RGBA, GL_UNSIGNED_BYTE, rawImagePixels);
-    
-    CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, rawImagePixels, totalBytesForImage, dataProviderReleaseCallback);
-    CGColorSpaceRef defaultRGBColorSpace = CGColorSpaceCreateDeviceRGB();
-    
-    CGImageRef cgImageFromBytes = CGImageCreate((int)currentFBOSize.width, (int)currentFBOSize.height, 8, 32, 4 * (int)currentFBOSize.width, defaultRGBColorSpace, kCGBitmapByteOrderDefault, dataProvider, NULL, NO, kCGRenderingIntentDefault);
-    UIImage *finalImage = [UIImage imageWithCGImage:cgImageFromBytes scale:1.0 orientation:UIImageOrientationLeft];
-    
-    CGImageRelease(cgImageFromBytes);
-    CGDataProviderRelease(dataProvider);
-    CGColorSpaceRelease(defaultRGBColorSpace);
-    //    free(rawImagePixels);
-    
+    CGImageRef cgRef = [self.backingStore CGImageFromFramebuffer];
+    UIImage *finalImage = [UIImage imageWithCGImage:cgRef scale:1.0
+        orientation:UIImageOrientationLeft];
+    CGImageRelease(cgRef);
     return finalImage;
 }
-
-
-- clear
-
-glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-glClear(GL_COLOR_BUFFER_BIT);
-
 
 @end
