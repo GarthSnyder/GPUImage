@@ -1,7 +1,7 @@
-#import "GPUImageGraphElement.h"
+#import "GPUImageElement.h"
 #import "GPUImageOpenGLESContext.h"
 
-@implementation GPUImageGraphElement
+@implementation GPUImageElement
 
 - (id) init
 {
@@ -50,7 +50,7 @@
 
 - (BOOL) render
 {
-    NSAssert(NO, "GPUImageGraphElement subclasses must implement -render");
+    NSAssert(NO, "GPUImageElement subclasses must implement -render");
     return NO;
 }
 

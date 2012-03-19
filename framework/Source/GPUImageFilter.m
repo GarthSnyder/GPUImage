@@ -2,7 +2,7 @@
 #import "GPUImagePicture.h"
 
 @interface GPUImageFilter
-- (GPUImageProgram *)filterProgramAtIndex:(int)n;
+- (GPUImageProgram *) filterProgramAtIndex:(int)n;
 @end
 
 @implementation GPUImageFilter
@@ -75,7 +75,7 @@
 
 - (BOOL) render
 {
-    // This is called via the update method in GPUImageGraphElement, and is
+    // This is called via the update method in GPUImageElement, and is
     // ultimately instigated by whoever downstream from us is pulling our
     // product textures. By this point, all of our parent objects have been
     // made current, so we just need to set up our rendering environment

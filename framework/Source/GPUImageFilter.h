@@ -1,9 +1,9 @@
-#import "GPUImageGraphElement.h"
+#import "GPUImageElement.h"
 #import "GPUImageProgram.h"
 #import "GPUImage.h"
 #import <UIKit/UIKit.h>
 
-@interface GPUImageFilter : GPUImageGraphElement
+@interface GPUImageFilter : GPUImageElement
 {
     NSMutableArray *programs;
     NSMutableArray *outputTextures; 
