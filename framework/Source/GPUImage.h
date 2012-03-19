@@ -4,7 +4,7 @@
 
 #import "GPUImageHeaders.h"
 
-@interface GPUImage : GPUImageGraphElement
+@interface GPUImage : GPUImageElement
 
 @property (nonatomic) GLsize size;
 @property (nonatomic) GLenum baseFormat;

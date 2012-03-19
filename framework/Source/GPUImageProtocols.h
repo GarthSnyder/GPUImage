@@ -4,14 +4,19 @@
 #import <OpenGLES/ES2/glext.h>
 #import "GPUImageTypes.h"
 
-// An object conforming to GPUImageDataFlow is typically a texture object
-// or a filter. The general algorithm for implementing update is to first
-// update all your parents. If after that any parent has timeLastChanged 
-// greater than yours, you must rerender (defined as "do whatever is necessary
-// to make yourself current"). After rerendering, set your own timeLastChanged.
-// Do not update timeLastChanged unless you actually render.
+// An object conforming to GPUImageFlow can participate in GPUImage's 
+// rendering tree. The flow is bottom-up.
 //
-// update should return YES if the update was successful, NO otherwise. If 
+// To update itself, an object first calls -update on all the objects from
+// which it derives. It then compares its modification timestamp with the
+// timestamps of those ancestors. If any ancestor was updated more recently,
+// the object must rerender itself. ("Render" is defined as "doing whatever
+// is necessary to make yourself current" and need not involve actual
+// drawing or even any OpenGL changes.)
+//
+// An object should not update its timeLastChanged unless it actually renders.
+//
+// -update should return YES if the update was successful, NO otherwise. If 
 // any parent returns NO in response to update, abort immediately and return NO.
 
 @protocol GPUImageFlow <NSObject>
@@ -22,4 +27,3 @@
 - (BOOL) update;
 
 @end
-
