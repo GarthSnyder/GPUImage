@@ -154,6 +154,8 @@
 		BCF1A35514DDB1EC00852800 /* GPUImageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BCF1A35414DDB1EC00852800 /* GPUImageTests.m */; };
 		CE72156315169911005A2227 /* GPUImageRenderbuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = CE72156115169911005A2227 /* GPUImageRenderbuffer.h */; };
 		CE72156415169911005A2227 /* GPUImageRenderbuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE72156215169911005A2227 /* GPUImageRenderbuffer.m */; };
+		CECA027115172DEA00B4689C /* GPUImageMultiFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = CECA026F15172DEA00B4689C /* GPUImageMultiFilter.h */; };
+		CECA027215172DEA00B4689C /* GPUImageMultiFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = CECA027015172DEA00B4689C /* GPUImageMultiFilter.m */; };
 		CEE1F7CE1511944100385B6C /* GPUImageUtils.c in Sources */ = {isa = PBXBuildFile; fileRef = CEE1F7CD1511944100385B6C /* GPUImageUtils.c */; };
 		CEE1F7D115119A0200385B6C /* GPUImage.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE1F7CF15119A0200385B6C /* GPUImage.h */; };
 		CEE1F7D215119A0200385B6C /* GPUImage.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE1F7D015119A0200385B6C /* GPUImage.m */; };
@@ -346,6 +348,8 @@
 		BCF1A35414DDB1EC00852800 /* GPUImageTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GPUImageTests.m; sourceTree = "<group>"; };
 		CE72156115169911005A2227 /* GPUImageRenderbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageRenderbuffer.h; path = Source/GPUImageRenderbuffer.h; sourceTree = SOURCE_ROOT; };
 		CE72156215169911005A2227 /* GPUImageRenderbuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageRenderbuffer.m; path = Source/GPUImageRenderbuffer.m; sourceTree = SOURCE_ROOT; };
+		CECA026F15172DEA00B4689C /* GPUImageMultiFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageMultiFilter.h; path = Source/GPUImageMultiFilter.h; sourceTree = SOURCE_ROOT; };
+		CECA027015172DEA00B4689C /* GPUImageMultiFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageMultiFilter.m; path = Source/GPUImageMultiFilter.m; sourceTree = SOURCE_ROOT; };
 		CEE1F7CB1511932700385B6C /* GPUImageProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GPUImageProtocols.h; path = Source/GPUImageProtocols.h; sourceTree = SOURCE_ROOT; };
 		CEE1F7CD1511944100385B6C /* GPUImageUtils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GPUImageUtils.c; path = Source/GPUImageUtils.c; sourceTree = SOURCE_ROOT; };
 		CEE1F7CF15119A0200385B6C /* GPUImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImage.h; path = Source/GPUImage.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -512,6 +516,8 @@
 			children = (
 				BC245DC814DDBED7009FE7EB /* GPUImageFilter.h */,
 				BC245DC914DDBED7009FE7EB /* GPUImageFilter.m */,
+				CECA026F15172DEA00B4689C /* GPUImageMultiFilter.h */,
+				CECA027015172DEA00B4689C /* GPUImageMultiFilter.m */,
 				BCC93A1C1501E42E00958B26 /* GPUImageTwoPassFilter.h */,
 				BCC93A1D1501E42F00958B26 /* GPUImageTwoPassFilter.m */,
 				BCC1E5B6151E83700006EFA5 /* GPUImageFilterGroup.h */,
@@ -754,6 +760,7 @@
 				CEE1F84215159B2B00385B6C /* GPUImageBuffer.h in Headers */,
 				CEE1F84615159CAF00385B6C /* GPUImageTextureBuffer.h in Headers */,
 				CE72156315169911005A2227 /* GPUImageRenderbuffer.h in Headers */,
+				CECA027115172DEA00B4689C /* GPUImageMultiFilter.h in Headers */,
 				CEE1F7F31512BDA800385B6C /* GPUImageShaderSymbol.h in Headers */,
 				BCB6B9041507CA8D0041703B /* GPUImageCropFilter.h in Headers */,
 				83AE9F981540DFE500F7FC13 /* GPUImageSubtractBlendFilter.h in Headers */,
@@ -938,6 +945,7 @@
 				CEE1F84315159B2B00385B6C /* GPUImageBuffer.m in Sources */,
 				CEE1F84715159CAF00385B6C /* GPUImageTextureBuffer.m in Sources */,
 				CE72156415169911005A2227 /* GPUImageRenderbuffer.m in Sources */,
+				CECA027215172DEA00B4689C /* GPUImageMultiFilter.m in Sources */,
 				CEE1F7F41512BDA800385B6C /* GPUImageShaderSymbol.m in Sources */,
 				BCB6B9051507CA8D0041703B /* GPUImageCropFilter.m in Sources */,
 				83AE9F991540DFE500F7FC13 /* GPUImageSubtractBlendFilter.m in Sources */,

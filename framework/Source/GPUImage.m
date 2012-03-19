@@ -105,17 +105,8 @@
 #pragma mark -
 #pragma mark Rendering and buffer management
 
-// Rendering/updating can mean several different things in the context of a 
-// texture:
-//
-// If our parent is a filter (that is, anything other than another texture),
-// then this texture is a rendering destination. The only thing we need to 
-// worry about at render time is mipmap generation, because the base drawing
-// has already occurred - the parent filter called bindAsFramebuffer on us
-// when it was ready to draw, and the backing store was validated at that time.
-//
-// If our parent is another texture, then this texture's contents are expected
-// to reflect that texture's contents after rendering.
+// We only know how to deal with parents who are themselves GPUImages. Our
+// contents are expected to reflect theirs after rendering.
 //
 // If our size and color model are compatible with the parent texture's settings,
 // we can simply share that texture's backing store and set ancillary params
@@ -123,22 +114,17 @@
 // parent will reset them when it next gets drawn into.)
 //
 // If our parent is a texture of incompatible size or backing store, then we
-// need to do a conversion. This is currently unimplemented but would be 
-// straightforward to add.
-//
-// The GPUImageFlow protocol allows multiple parents, but textures should only
-// have one parent. What would it mean to reflect two other textures or be
-// the end product of multiple filters?
+// need to do a conversion.
 
 - (BOOL) render
 {
-    if ([parent isKindOfClass:[GPUImage class]]) {
-        GPUImage *gpuParent = parent;
-        NSAssert(![self parentRequiresConversion:gpuParent],
-            @"Automatic texture size and format conversions are not yet supported.");
-        self.backingStore = parent.backingStore;
-        [self setTextureParams];
-    }
+    NSAssert([parent isKindOfClass:[GPUImage class]], 
+        @"Sorry, GPUImage::render doesn't know how do deal with non-GPUImage parents.");
+    GPUImage *gpuParent = parent;
+    NSAssert(![self parentRequiresConversion:gpuParent],
+        @"Automatic texture size and format conversions are not yet implemented.");
+    self.backingStore = parent.backingStore;
+    [self setTextureParams];
     if (!self.useRenderbuffer && self.generateMipmap) {
         GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
         [store generateMipmap]; // Optimized out if already done
