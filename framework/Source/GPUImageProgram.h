@@ -14,7 +14,7 @@
 #import <OpenGLES/ES2/glext.h>
 
 #import "GPUImageShader.h"
-#import "GPUImageTexture.h"
+#import "GPUImage.h"
 
 // Shortcut for encoding uniform values as NSValues. Argument must be a 
 // non-literal value.
@@ -56,9 +56,9 @@
 // accepted by the compiler without additional configuration. In point of fact,
 // all property refs are handled dynamically based on the actual shaders.
 
-@property (nonatomic) GPUImageTexture *inputTexture;
-@property (nonatomic) GPUImageTexture *accessoryTexture; // 2nd input
-@property (nonatomic) GPUImageTexture *outputTexture;
+@property (nonatomic) GPUImage *inputTexture;
+@property (nonatomic) GPUImage *accessoryTexture; // 2nd input
+@property (nonatomic) GPUImage *outputTexture;
 
 // This method is generally used only for determining the handles for vertex
 // attributes for use in drawing. For uniforms, the general GPUImageProgram

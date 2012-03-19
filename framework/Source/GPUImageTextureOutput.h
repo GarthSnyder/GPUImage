@@ -1,15 +1,15 @@
 #import <Foundation/Foundation.h>
 #import "GPUImageOpenGLESContext.h"
 
-@protocol GPUImageTextureOutputDelegate;
+@protocol GPUImageOutputDelegate;
 
-@interface GPUImageTextureOutput : NSObject <GPUImageInput>
+@interface GPUImageOutput : NSObject <GPUImageInput>
 
-@property(readwrite, unsafe_unretained, nonatomic) id<GPUImageTextureOutputDelegate> delegate;
+@property(readwrite, unsafe_unretained, nonatomic) id<GPUImageOutputDelegate> delegate;
 @property(readonly) GLint texture;
 
 @end
 
-@protocol GPUImageTextureOutputDelegate
-- (void)newFrameReadyFromTextureOutput:(GPUImageTextureOutput *)callbackTextureOutput;
+@protocol GPUImageOutputDelegate
+- (void)newFrameReadyFromTextureOutput:(GPUImageOutput *)callbackTextureOutput;
 @end

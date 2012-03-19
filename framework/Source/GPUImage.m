@@ -1,17 +1,17 @@
 //  Created by Garth Snyder on 3/14/12.
 
-#import "GPUImageTexture.h"
+#import "GPUImage.h"
 #import "GPUImageTextureBuffer.h"
 #import "GPUImageRenderbuffer.h"
 
-@interface GPUImageTexture ()
+@interface GPUImage ()
 {
     BOOL _renderbufferRequested;
 }
 
 @end
 
-@implementation GPUImageTexture
+@implementation GPUImage
 
 @synthesize size = _size;
 @synthesize baseFormat = _baseFormat;
@@ -33,7 +33,7 @@
 
 + (id) texture
 {
-    return [[GPUImageTexture alloc] init];
+    return [[GPUImage alloc] init];
 }
 
 - (id) init
@@ -48,7 +48,7 @@
 - (GLenum) filter
 {
     NSAssert(self.magnificationFilter == self.minificationFilter, 
-        @"GPUImageTexture::filter called when filters have inconsistent values");
+        @"GPUImage::filter called when filters have inconsistent values");
     return self.magnificationFilter;
 }
 
@@ -61,7 +61,7 @@
 - (GLenum) wrap
 {
     NSAssert(self.wrapS == self.wrapT, 
-        @"GPUImageTexture::wrap called when S and T wraps have inconsistent values");
+        @"GPUImage::wrap called when S and T wraps have inconsistent values");
     return self.wrapS;
 }
 
@@ -101,7 +101,7 @@
     }
 }
 
-- (void) adoptParametersFrom:(GPUImageTexture *)other
+- (void) adoptParametersFrom:(GPUImage *)other
 {
     GLsize newSize = self.size;
     if (!newSize.width || !newSize.height) {
@@ -150,8 +150,8 @@
 {
     NSAssert([parents count] == 1, @"Textures should have only one parent.");
     
-    if ([[parents anyObject] isKindOfClass:[GPUImageTexture class]]) {
-        GPUImageTexture *parent = [parents anyObject];
+    if ([[parents anyObject] isKindOfClass:[GPUImage class]]) {
+        GPUImage *parent = [parents anyObject];
         NSAssert(![self parentRequiresConversion:parent],
             @"Automatic texture size and format conversions are not yet supported.");
         self.backingStore = parent.backingStore;
@@ -168,7 +168,7 @@
 // Is there anything about the parent texture that makes it impossible for us
 // to share the parent's backing texture?
 
-- (BOOL) parentRequiresConversion:(GPUImageTexture *)parent
+- (BOOL) parentRequiresConversion:(GPUImage *)parent
 {
     return ((self.useRenderbuffer != parent.useRenderbuffer) 
         || (self.size.width != parent.size.width) 

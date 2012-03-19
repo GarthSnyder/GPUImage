@@ -6,7 +6,7 @@
 
 @interface GPUImageView () 
 {
-    GPUImageTexture *parent;
+    GPUImage *parent;
     GPUImageTimestamp lastTimeChanged;
 }
 - (void) commonInit;
@@ -48,8 +48,8 @@
 - (void) deriveFrom:(id <GPUImageFlow>)newParent
 {
     NSAssert(!parent, @"GPUImageView can have only one parent; underive first.");
-    NSAssert([newParent isKindOfClass:[GPUImageTexture class]], 
-        @"GPUImageView can only deriveFrom a GPUImageTexture object");
+    NSAssert([newParent isKindOfClass:[GPUImage class]], 
+        @"GPUImageView can only deriveFrom a GPUImage object");
     parent = newParent;
     lastTimeChanged = 0;
     parent.layer = (CAEAGLLayer *)self.layer;
