@@ -1,5 +1,8 @@
 //  Created by Garth Snyder on 3/15/12.
 
+#import <OpenGLES/ES2/gl.h>
+#import <OpenGLES/ES2/glext.h>
+
 // A GPUImageTimestamp is a simple, guaranteed-unique, monotonically increasing
 // integer. Used to facilitate flooding of updates through a filter network.
 

@@ -25,6 +25,7 @@
 {
     GLint programHandle;
     NSMutableDictionary *uniforms;
+    NSMutableDictionary *attributes;
     GLint nextTextureUnit;
 }
 
@@ -41,11 +42,8 @@
 
 - (BOOL) use;
 
-// These utility methods are for clients that want to access the program at
-// the lower OpenGL ES level, but they are not needed for typical use.
-
+// Available, but not needed for typical use.
 - (BOOL) link;
-- (BOOL) validate;
 
 - (NSString *) logs;
 - (NSString *) vertexShaderLog;

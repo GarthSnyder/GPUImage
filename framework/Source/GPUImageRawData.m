@@ -1,5 +1,4 @@
 #import "GPUImageRawData.h"
-
 #import "GPUImageOpenGLESContext.h"
 #import "GPUImageProgram.h"
 #import "GPUImageFilter.h"
@@ -101,50 +100,6 @@ NSString *const kGPUImageDataFragmentShaderString = SHADER_STRING
 
 #pragma mark -
 #pragma mark Frame rendering
-
-- (void)createDataFBO;
-{
-    glActiveTexture(GL_TEXTURE1);
-    glGenFramebuffers(1, &dataFramebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, dataFramebuffer);
-
-    glGenRenderbuffers(1, &dataRenderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, dataRenderbuffer);
-
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8_OES, (int)imageSize.width, (int)imageSize.height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, dataRenderbuffer);	
-	
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    
-    NSAssert(status == GL_FRAMEBUFFER_COMPLETE, @"Incomplete filter FBO: %d", status);
-}
-
-- (void)destroyDataFBO;
-{
-    if (dataFramebuffer)
-	{
-		glDeleteFramebuffers(1, &dataFramebuffer);
-		dataFramebuffer = 0;
-	}	
-
-    if (dataRenderbuffer)
-	{
-		glDeleteRenderbuffers(1, &dataRenderbuffer);
-		dataRenderbuffer = 0;
-	}	
-}
-
-- (void)setFilterFBO;
-{
-    if (!dataFramebuffer)
-    {
-        [self createDataFBO];
-    }
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, dataFramebuffer);
-    
-    glViewport(0, 0, (int)imageSize.width, (int)imageSize.height);
-}
 
 #pragma mark -
 #pragma mark Data access

@@ -4,242 +4,82 @@
 #import "GPUImageOpenGLESContext.h"
 #import "GPUImageFilter.h"
 
-NSString *const kGPUImageDisplayFragmentShaderString = SHADER_STRING
-(
- varying highp vec2 textureCoordinate;
- 
- uniform sampler2D inputImageTexture;
- 
- void main()
- {
-     gl_FragColor = texture2D(inputImageTexture, textureCoordinate);
- }
-);
-
-#pragma mark -
-#pragma mark Private methods and instance variables
-
 @interface GPUImageView () 
 {
-    GLuint inputTextureForDisplay;
-    GLint backingWidth, backingHeight;
-    GLuint displayRenderbuffer, displayFramebuffer;
-    
-    GPUImageProgram *displayProgram;
-    GLint displayPositionAttribute, displayTextureCoordinateAttribute;
-    GLint displayInputTextureUniform;
+    GPUImageTexture *parent;
+    GPUImageTimestamp lastTimeChanged;
 }
-
-// Initialization and teardown
-- (void)commonInit;
-
-// Managing the display FBOs
-- (void)createDisplayFramebuffer;
-- (void)destroyDisplayFramebuffer;
-
+- (void) commonInit;
 @end
 
 @implementation GPUImageView
 
-#pragma mark -
-#pragma mark Initialization and teardown
-
-+ (Class)layerClass 
++ (Class) layerClass 
 {
 	return [CAEAGLLayer class];
 }
 
-- (id)initWithFrame:(CGRect)frame
+- (id) initWithFrame:(CGRect)frame
 {
-    if (!(self = [super initWithFrame:frame]))
-    {
-		return nil;
+    if (self = [super initWithFrame:frame]) {
+        [self commonInit];
     }
-    
-    [self commonInit];
-    
     return self;
 }
 
--(id)initWithCoder:(NSCoder *)coder
+- (id) initWithCoder:(NSCoder *)coder
 {
-	if (!(self = [super initWithCoder:coder])) 
-    {
-        return nil;
-	}
-
-    [self commonInit];
-
+	if (self = [super initWithCoder:coder]) {
+        [self commonInit];
+    }
 	return self;
 }
 
-- (void)commonInit;
+- (void) commonInit;
 {
-    // Set scaling to account for Retina display	
-    if ([self respondsToSelector:@selector(setContentScaleFactor:)])
-    {
-        self.contentScaleFactor = [[UIScreen mainScreen] scale];
-    }
-
     CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;    
+    [GPUImageOpenGLESContext useImageProcessingContext];
     eaglLayer.opaque = YES;
-    eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];		
-
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    displayProgram = [[GPUImageProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageDisplayFragmentShaderString];
-
-    [displayProgram addAttribute:@"position"];
-	[displayProgram addAttribute:@"inputTextureCoordinate"];
-    
-    if (![displayProgram link])
-	{
-		NSString *progLog = [displayProgram programLog];
-		NSLog(@"Program link log: %@", progLog); 
-		NSString *fragLog = [displayProgram fragmentShaderLog];
-		NSLog(@"Fragment shader compile log: %@", fragLog);
-		NSString *vertLog = [displayProgram vertexShaderLog];
-		NSLog(@"Vertex shader compile log: %@", vertLog);
-		displayProgram = nil;
-        NSAssert(NO, @"Filter shader link failed");
-	}
-    
-    displayPositionAttribute = [displayProgram attributeIndex:@"position"];
-    displayTextureCoordinateAttribute = [displayProgram attributeIndex:@"inputTextureCoordinate"];
-    displayInputTextureUniform = [displayProgram uniformIndex:@"inputImageTexture"]; // This does assume a name of "inputTexture" for the fragment shader
-    
-    [displayProgram use];    
-	glEnableVertexAttribArray(displayPositionAttribute);
-	glEnableVertexAttribArray(displayTextureCoordinateAttribute);
-
-
+    eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, 
+        kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];		
 }
 
-- (void)dealloc
+- (void) deriveFrom:(id <GPUImageFlow>)newParent
 {
-    [self destroyDisplayFramebuffer];
+    NSAssert(!parent, @"GPUImageView can have only one parent; underive first.");
+    NSAssert([newParent isKindOfClass:[GPUImageTexture class]], 
+        @"GPUImageView can only deriveFrom a GPUImageTexture object");
+    parent = newParent;
+    lastTimeChanged = 0;
+    parent.layer = (CAEAGLLayer *)self.layer;
 }
 
-#pragma mark -
-#pragma mark Managing the display FBOs
-
-- (void)createDisplayFramebuffer;
+- (void) undoDerivationFrom:(id <GPUImageFlow>)oldParent
 {
-	glGenFramebuffers(1, &displayFramebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, displayFramebuffer);
-	
-	glGenRenderbuffers(1, &displayRenderbuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, displayRenderbuffer);
-	
-	[[[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] context] renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer*)self.layer];
-	
-	glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &backingWidth);
-	glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &backingHeight);
-//	NSLog(@"Backing width: %d, height: %d", backingWidth, backingHeight);
-
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, displayRenderbuffer);
-	
-    GLuint framebufferCreationStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    NSAssert(framebufferCreationStatus == GL_FRAMEBUFFER_COMPLETE, @"Failure with display framebuffer generation");
+    NSAssert(parent == oldParent, @"GPUImageView: attempt to unparent an object not my parent");
+    parent = nil;
+    lastTimeChanged = 0;
 }
 
-- (void)destroyDisplayFramebuffer;
+- (GPUImageTimestamp) timeLastChanged
 {
-    if (displayFramebuffer)
-	{
-		glDeleteFramebuffers(1, &displayFramebuffer);
-		displayFramebuffer = 0;
-	}
-	
-	if (displayRenderbuffer)
-	{
-		glDeleteRenderbuffers(1, &displayRenderbuffer);
-		displayRenderbuffer = 0;
-	}
+    return lastTimeChanged;
 }
 
-- (void)setDisplayFramebuffer;
+- (BOOL) update
 {
-    if (!displayFramebuffer)
-    {
-        [self createDisplayFramebuffer];
+    if (!parent || ![parent update]) {
+        return NO;
     }
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, displayFramebuffer);
-    
-    glViewport(0, 0, backingWidth, backingHeight);
-}
-
-- (void)presentFramebuffer;
-{
-    glBindRenderbuffer(GL_RENDERBUFFER, displayRenderbuffer);
-    [[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] presentBufferForDisplay];
-}
-
-#pragma mark -
-#pragma mark GPUInput protocol
-
-- (void)newFrameReady;
-{
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [self setDisplayFramebuffer];
-    
-    [displayProgram use];
-    
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    static const GLfloat squareVertices[] = {
-        -1.0f, -1.0f,
-        1.0f, -1.0f,
-        -1.0f,  1.0f,
-        1.0f,  1.0f,
-    };
-    
-    static const GLfloat textureCoordinates[] = {
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-    };
-
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, inputTextureForDisplay);
-	glUniform1i(displayInputTextureUniform, 4);	
-    
-    glVertexAttribPointer(displayPositionAttribute, 2, GL_FLOAT, 0, 0, squareVertices);
-	glVertexAttribPointer(displayTextureCoordinateAttribute, 2, GL_FLOAT, 0, 0, textureCoordinates);
-    
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    [self presentFramebuffer];
-}
-
-- (NSInteger)nextAvailableTextureIndex;
-{
-    return 0;
-}
-
-- (void)setInputTexture:(GLuint)newInputTexture atIndex:(NSInteger)textureIndex;
-{
-    inputTextureForDisplay = newInputTexture;
-}
-
-- (void)setInputSize:(CGSize)newSize;
-{
-}
-
-
-- (CGSize)maximumOutputSize;
-{
-    if ([self respondsToSelector:@selector(setContentScaleFactor:)])
-    {
-        CGSize pointSize = self.bounds.size;
-        return CGSizeMake(self.contentScaleFactor * pointSize.width, self.contentScaleFactor * pointSize.height);
+    if (self.timeLastChanged < parent.timeLastChanged) {
+        [GPUImageOpenGLESContext useImageProcessingContext];
+        [parent.backingStore bind];
+        [[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] 
+            presentBufferForDisplay];
+        lastTimeChanged = GPUImageGetCurrentTimestamp();
     }
-    else
-    {
-        return self.bounds.size;
-    }
+    return YES;
 }
 
 @end

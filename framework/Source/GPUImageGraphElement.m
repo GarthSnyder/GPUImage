@@ -1,4 +1,5 @@
 #import "GPUImageGraphElement.h"
+#import "GPUImageOpenGLESContext.h"
 
 @implementation GPUImageGraphElement
 
@@ -41,6 +42,7 @@
     }
     
     if (self.timeLastChanged < mostRecentParentUpdate) {
+        [GPUImageOpenGLESContext useImageProcessingContext];
         [self render];
     }
     return YES;

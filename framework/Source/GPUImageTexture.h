@@ -1,38 +1,44 @@
-#import "GPUImageGraphElement.h"
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import <QuartzCore/QuartzCore.h>
+
+#import "GPUImageGraphElement.h"
 #import "GPUImageBuffer.h"
 
 @interface GPUImageTexture : GPUImageGraphElement
 
 @property (nonatomic) GLsize size;
 @property (nonatomic) GLenum baseFormat;
-@property (nonatomic) GLenum magnificationFilter;
-@property (nonatomic) GLenum minificationFilter;
+@property (nonatomic) GLenum pixType;
+
+// Setting an associated layer automatically turns on useRenderbuffer.
+// However, you can use a renderbuffer without an associated CAEAGLLayer.
+
+@property (assign, nonatomic) CAEAGLLayer *layer;   // Associated layer, if any
+@property (nonatomic) BOOL useRenderbuffer;
+
 @property (nonatomic) GLenum wrapS;
 @property (nonatomic) GLenum wrapT;
+@property (nonatomic) GLenum magnificationFilter;
+@property (nonatomic) GLenum minificationFilter;
+@property (nonatomic) BOOL generateMipmap;
 
 // For setting both filters or both wraps at once
 @property (nonatomic) GLenum filter;
 @property (nonatomic) GLenum wrap;
 
 // Let the texture manage this! Not part of the general API.
-@property (nonatomic) GPUImageBuffer *backingStore;
+@property (strong, nonatomic) GPUImageBuffer *backingStore;
 
 + (id) texture;
 
-- (GLint) textureHandle;
-
-- (void) makeRenderbuffer;
-- (BOOL) isRenderbuffer;
-
 - (void) bindAsFramebuffer;
-- (void) generateMipmap;
 
 // Adopts size and base format only, and only if unknown
 - (void) adoptParametersFrom:(GPUImageTexture *)other;
 
+- (GLuint *) getRawContents;
+- (CGImageRef) convertToCGImage;
 - (UIImage *) convertToUIImage;
 
 @end
-
