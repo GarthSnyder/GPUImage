@@ -286,7 +286,7 @@
 		CE72156215169911005A2227 /* GPUImageRenderbuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageRenderbuffer.m; path = Source/GPUImageRenderbuffer.m; sourceTree = SOURCE_ROOT; };
 		CEE1F7CB1511932700385B6C /* GPUImageProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GPUImageProtocols.h; path = Source/GPUImageProtocols.h; sourceTree = SOURCE_ROOT; };
 		CEE1F7CD1511944100385B6C /* GPUImageUtils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GPUImageUtils.c; path = Source/GPUImageUtils.c; sourceTree = SOURCE_ROOT; };
-		CEE1F7CF15119A0200385B6C /* GPUImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImage.h; path = Source/GPUImage.h; sourceTree = SOURCE_ROOT; };
+		CEE1F7CF15119A0200385B6C /* GPUImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImage.h; path = Source/GPUImage.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CEE1F7D015119A0200385B6C /* GPUImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImage.m; path = Source/GPUImage.m; sourceTree = SOURCE_ROOT; };
 		CEE1F7E91512BA1C00385B6C /* GPUImageProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageProgram.h; path = Source/GPUImageProgram.h; sourceTree = SOURCE_ROOT; };
 		CEE1F7EA1512BA1C00385B6C /* GPUImageProgram.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageProgram.m; path = Source/GPUImageProgram.m; sourceTree = SOURCE_ROOT; };

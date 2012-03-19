@@ -1,13 +1,6 @@
-//  Created by Garth Snyder on 3/14/12.
-
 #import "GPUImage.h"
 #import "GPUImageTextureBuffer.h"
 #import "GPUImageRenderbuffer.h"
-
-@interface GPUImage ()
-{
-    BOOL _renderbufferRequested;
-}
 
 @end
 
@@ -98,16 +91,12 @@
 
 - (void) adoptParametersFrom:(GPUImage *)other
 {
-    GLsize newSize = self.size;
-    if (!newSize.width || !newSize.height) {
-        newSize = other.size;
-        self.size = newSize;
+    if (!self.size.width || !self.size.height) {
+        self.size = other.size;
     }
-    
     if (!self.baseFormat) {
         self.baseFormat = other.baseFormat;
     }
-    
     if (!self.pixType) {
         self.pixType = other.pixType;
     }
@@ -143,41 +132,42 @@
 
 - (BOOL) render
 {
-    NSAssert([parents count] == 1, @"Textures should have only one parent.");
-    
-    if ([[parents anyObject] isKindOfClass:[GPUImage class]]) {
-        GPUImage *parent = [parents anyObject];
-        NSAssert(![self parentRequiresConversion:parent],
+    if ([parent isKindOfClass:[GPUImage class]]) {
+        GPUImage *gpuParent = parent;
+        NSAssert(![self parentRequiresConversion:gpuParent],
             @"Automatic texture size and format conversions are not yet supported.");
         self.backingStore = parent.backingStore;
         [self setTextureParams];
     }
     if (!self.useRenderbuffer && self.generateMipmap) {
         GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
-        [store generateMipmap];
+        [store generateMipmap]; // Optimized out if already done
     }
     timeLastChanged = GPUImageGetCurrentTimestamp();
     return YES;
 }
 
-// Is there anything about the parent texture that makes it impossible for us
+// Is there anything about the parent GPUImage that makes it impossible for us
 // to share the parent's backing texture?
 
-- (BOOL) parentRequiresConversion:(GPUImage *)parent
+- (BOOL) parentRequiresConversion:(GPUImage *)gp
 {
-    return ((self.useRenderbuffer != parent.useRenderbuffer) 
-        || (self.size.width != parent.size.width) 
-        || (self.size.height != parent.size.height)
-        || (self.baseFormat != parent.baseFormat) 
-        || (!self.useRenderbuffer && (self.pixType != parent.pixType)));
+    return ((self.useRenderbuffer != gp.useRenderbuffer) 
+        || (self.size.width != gp.size.width) 
+        || (self.size.height != gp.size.height)
+        || (self.baseFormat != gp.baseFormat) 
+        || (!self.useRenderbuffer && (self.pixType != gp.pixType)));
 }
+
+// Propagate configuration parameters for textures through to the OpenGL
+// wrapper layer.
 
 - (void) setTextureParams
 {
-    GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
-    if (self.useRenderbuffer || !store) {
+    if (self.useRenderbuffer || !self.backingStore) {
         return;
     }
+    GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
     [store bind];
     if (self.magFilter > 0) {
         store.magFilter = self.magFilter;
@@ -200,8 +190,8 @@
         return;
     }
     // We're going to have to create the backing store. Must know at least 
-    // size and base format.
-    NSAssert(self.size.width && self.size.height && self.baseFormat,
+    // size and base format, or for layer-based renderbuffers, the layer id.
+    NSAssert(self.layer || (self.size.width && self.size.height && self.baseFormat),
         @"Cannot bindAsFramebuffer without at least size and base format.");
     if (self.useRenderbuffer) {
         if (self.layer) {
@@ -223,9 +213,15 @@
     [self.backingStore bindAsFramebuffer];
 }
 
-- (GLuint *) getRawContents;
+- (GLuint *) getRawContents
+{
+    return [self.backingStore rawDataFromFramebuffer];
+}
 
-- (CGImageRef) getCGImage;
+- (CGImageRef) getCGImage
+{
+    return [self.backingStore CGImageFromFramebuffer];
+}
 
 - (UIImage *) getUIImage
 {
