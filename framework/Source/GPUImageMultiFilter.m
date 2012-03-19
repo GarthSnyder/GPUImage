@@ -130,14 +130,6 @@
     return [self.outputTexture textureAsUIImage];
 }
 
-- (void)endProcessing 
-{
-    for (id<GPUImageInput> currentTarget in targets)
-    {
-        [currentTarget endProcessing];
-    }
-}
-
 #pragma mark -
 #pragma mark Attribute and uniform processing
 
