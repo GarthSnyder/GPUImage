@@ -34,7 +34,7 @@
 
 - (void) bindAsFramebuffer;
 
-// Adopts size and base format only, and only if unknown
+// Adopts size and base format only, and only if receiver's are unknown
 - (void) adoptParametersFrom:(GPUImageTexture *)other;
 
 - (GLuint *) getRawContents;
