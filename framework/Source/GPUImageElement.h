@@ -3,7 +3,7 @@
 // Simple, inheritable implementation of GPUImageFlow protocol.
 // See GPUImageProtocols.h for details.
 
-@interface GPUImageGraphElement : NSObject <GPUImageFlow>
+@interface GPUImageElement : NSObject <GPUImageFlow>
 {
     NSMutableSet *parents;
     GPUImageTimestamp lastChangeTime;
