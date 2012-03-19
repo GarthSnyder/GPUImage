@@ -10,7 +10,7 @@
 
 #import <UIKit/UIKit.h>
 #import <OpenGLES/ES2/gl.h>
-#import "GPUImageTexture.h"
+#import "GPUImage.h"
 
 @interface GPUImageTextureUnit : NSObject
 
@@ -19,6 +19,6 @@
 @property (nonatomic) GLint currentTextureHandle;
 @property (nonatomic) GLenum textureUnitID;
 
-- (void) bindTexture:(GPUImageTexture *)texture;
+- (void) bindTexture:(GPUImage *)texture;
 
 @end

@@ -34,7 +34,7 @@ static NSMutableDictionary *textureUnits;
     return self;
 }
 
-- (void) bindTexture:(GPUImageTexture *)texture
+- (void) bindTexture:(GPUImage *)texture
 {
     glActiveTexture(self.textureUnitID);
     glBindTexture(GL_TEXTURE_2D, texture.textureHandle);

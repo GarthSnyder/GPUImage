@@ -71,7 +71,7 @@
 
 - (void) setOESValue
 {
-    if ([_value isKindOfClass:[GPUImageTexture class]]) {
+    if ([_value isKindOfClass:[GPUImage class]]) {
         [self setOESTextureValue];
         return;
     }
@@ -81,7 +81,7 @@
     }
     
     NSAssert1([_value isKindOfClass:[NSValue class]], 
-        @"Value of uniform '%@' is neither NSValue nor GPUImageTexture.", _name);
+        @"Value of uniform '%@' is neither NSValue nor GPUImage.", _name);
     NSAssert1([self valueTypeMatchesOESType], 
         @"Value provided for uniform '%@' appears to be of wrong type.", _name);
 
@@ -159,7 +159,7 @@
 
 - (void) setOESTextureValue
 {
-    GPUImageTexture *texture = _value;
+    GPUImage *texture = _value;
     NSAssert1(_type == GL_SAMPLER_2D, 
         @"Uniform '%@' has texture value but type != GL_SAMPLER_2D", _name);
     if (_textureUnit.currentTextureHandle != texture.textureHandle) {

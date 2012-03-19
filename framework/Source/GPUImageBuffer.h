@@ -1,12 +1,12 @@
 //  Created by Garth Snyder on 3/17/12
 //
 //  Thin overlay for OpenGL ES texture and renderbuffer objects. The
-//  GPUImageTexture class handles these objects from a functional and 
+//  GPUImage class handles these objects from a functional and 
 //  logical perspective. This wrapper ensures sharability of the underlying
 //  buffers and proper garbage collection when no one refers to them 
 //  any longer.
 //
-//  A GPUImageTexture may or may not have an underlying buffer, depending
+//  A GPUImage may or may not have an underlying buffer, depending
 //  on its current state. But a GPUImageBuffer always corresponds to a 
 //  single, real OpenGL buffer.
 

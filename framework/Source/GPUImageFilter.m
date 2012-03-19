@@ -22,14 +22,14 @@
     if (self = [super init]) {
         filterPrograms = [NSMutableArray array];
         int nFilters = [[self class] numberOfFilterPrograms];
-        GPUImageTexture *texture = nil;
+        GPUImage *texture = nil;
         for (int i = 0; i < nFilters; i++) {
             GPUImageProgram *newProgram = [GPUImageProgram program];
             if (texture) {
                 [newProgram setValue:texture forKey:@"inputTexture"];
             }
             [filterPrograms addObject:newProgram];
-            texture = [GPUImageTexture texture];
+            texture = [GPUImage texture];
             [outputTextures addObject:texture];
         }
         [[outputTextures lastObject] deriveFrom:self];
@@ -57,13 +57,13 @@
     return [filterPrograms objectAtIndex:n];
 }
 
-- (GPUImageTexture *)outputTexture {
+- (GPUImage *)outputTexture {
     return [outputTextures lastObject];
 }
 
-- (void) setOutputTexture:(GPUImageTexture *)texture 
+- (void) setOutputTexture:(GPUImage *)texture 
 {
-    GPUImageTexture *oldOutput = [outputTextures lastObject];
+    GPUImage *oldOutput = [outputTextures lastObject];
     [outputTextures removeLastObject];
     [oldOutput undoDerivationFrom:self];
     [outputTextures addObject:texture];
@@ -83,7 +83,7 @@
     
     for (int i = 0; i < [filterPrograms count]; i++) {
         GPUImageProgram *program = [filterPrograms objectAtIndex:i];
-        GPUImageTexture *output = [outputTextures objectAtIndex:i];
+        GPUImage *output = [outputTextures objectAtIndex:i];
         if (program.inputTexture) {
             [output takeUnknownParametersFrom:program.inputTexture];
         }

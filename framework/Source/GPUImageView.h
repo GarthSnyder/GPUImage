@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 #import "GPUImageProtocols.h"
-#import "GPUImageTexture.h"
+#import "GPUImage.h"
 
 @interface GPUImageView : UIView <GPUImageFlow>
 
