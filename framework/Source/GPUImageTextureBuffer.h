@@ -4,8 +4,8 @@
 
 @interface GPUImageTextureBuffer : GPUImageBuffer
 
-@property (nonatomic) GLenum magnificationFilter;
-@property (nonatomic) GLenum minificationFilter;
+@property (nonatomic) GLenum magFilter;
+@property (nonatomic) GLenum minFilter;
 @property (nonatomic) GLenum wrapS;
 @property (nonatomic) GLenum wrapT;
 

@@ -10,8 +10,8 @@
 
 @implementation GPUImageTextureBuffer
 
-@synthesize magnificationFilter = _magnificationFilter;
-@synthesize minificationFilter = _minificationFilter;
+@synthesize magFilter = _magFilter;
+@synthesize minFilter = _minFilter;
 @synthesize wrapS = _wrapS;
 @synthesize wrapT = _wrapT;
 
@@ -37,19 +37,19 @@ static GLint lastBoundTexture = -1;
     return [self initWithSize:size baseFormat:type pixType:GL_UNSIGNED_INT];
 }
 
-- (void) setMagnificationFilter:(GLenum)filt
+- (void) setmagFilter:(GLenum)filt
 {
-    if (filt != _magnificationFilter) {
-        _magnificationFilter = filt;
+    if (filt != _magFilter) {
+        _magFilter = filt;
         [self bind];
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filt);
     }
 }
 
-- (void) setMinificationFilter:(GLenum)filt
+- (void) setminFilter:(GLenum)filt
 {
-    if (filt != _minificationFilter) {
-        _minificationFilter = filt;
+    if (filt != _minFilter) {
+        _minFilter = filt;
         [self bind];
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filt);
     }

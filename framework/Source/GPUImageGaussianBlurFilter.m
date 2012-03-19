@@ -80,7 +80,7 @@ NSString *const kGPUImageGaussianBlurFragmentShaderString = SHADER_STRING
 - (void) setBlurSize:(CGFloat)blurSize
 {
     _blurSize = blurSize;
-    lastChangeTime = 0;
+    timeLastChanged = 0;
 }
 
 - (BOOL) render 

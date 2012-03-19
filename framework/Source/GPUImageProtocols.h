@@ -18,11 +18,16 @@
 //
 // -update should return YES if the update was successful, NO otherwise. If 
 // any parent returns NO in response to update, abort immediately and return NO.
+//
+// Note: this base protocol is intentionally agnostic about how many ancestors
+// an element may have. Basic texture objects will have only one and 
+// should enforce this limit. Objects such as filters may expand their 
+// interpretation of -deriveFrom to allow multiple ancestors, or they may
+// collect ancestor information implicitly.
 
 @protocol GPUImageFlow <NSObject>
 
-- (void) deriveFrom:(id <GPUImageFlow>)parent;
-- (void) undoDerivationFrom:(id <GPUImageFlow>)parent;
+- (void) deriveFrom:(id <GPUImageFlow>)parent; // Pass nil to undo
 - (GPUImageTimestamp) timeLastChanged;
 - (BOOL) update;
 

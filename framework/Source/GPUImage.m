@@ -20,8 +20,8 @@
 @synthesize useRenderbuffer = _useRenderbuffer;
 @synthesize generateMipmap = _generateMipmap;
 
-@synthesize magnificationFilter = _magnificationFilter;
-@synthesize minificationFilter = _minificationFilter;
+@synthesize magFilter = _magFilter;
+@synthesize minFilter = _minFilter;
 @synthesize wrapS = _wrapS;
 @synthesize wrapT = _wrapT;
 
@@ -30,11 +30,6 @@
 
 #pragma mark -
 #pragma mark Basic setup and accessors
-
-+ (id) texture
-{
-    return [[GPUImage alloc] init];
-}
 
 - (id) init
 {
@@ -47,15 +42,15 @@
 
 - (GLenum) filter
 {
-    NSAssert(self.magnificationFilter == self.minificationFilter, 
+    NSAssert(self.magFilter == self.minFilter, 
         @"GPUImage::filter called when filters have inconsistent values");
-    return self.magnificationFilter;
+    return self.magFilter;
 }
 
 - (void) setFilter:(GLenum)filter
 {
-    self.magnificationFilter = filter;
-    self.minificationFilter = filter;
+    self.magFilter = filter;
+    self.minFilter = filter;
 }
 
 - (GLenum) wrap
@@ -76,7 +71,7 @@
     if (self.useRenderbuffer != use) {
         self.backingStore = nil;
         _useRenderbuffer = use;
-        lastChangeTime = 0;
+        timeLastChanged = 0;
     }
 }
 
@@ -94,7 +89,7 @@
     if (gen) {
         NSAssert(!self.useRenderbuffer, @"Renderbuffers cannot have mipmaps");
         _generateMipmap = gen;
-        if (lastChangeTime > 0) {
+        if (timeLastChanged > 0) {
             GPUImageTextureBuffer *buffer = (GPUImageTextureBuffer *)self.backingStore;
             [buffer generateMipmap];
         }
@@ -161,7 +156,7 @@
         GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
         [store generateMipmap];
     }
-    lastChangeTime = GPUImageGetCurrentTimestamp();
+    timeLastChanged = GPUImageGetCurrentTimestamp();
     return YES;
 }
 
@@ -184,11 +179,11 @@
         return;
     }
     [store bind];
-    if (self.magnificationFilter > 0) {
-        store.magnificationFilter = self.magnificationFilter;
+    if (self.magFilter > 0) {
+        store.magFilter = self.magFilter;
     }
-    if (self.minificationFilter > 0) {
-        store.minificationFilter = self.minificationFilter;
+    if (self.minFilter > 0) {
+        store.minFilter = self.minFilter;
     }
     if (self.wrapS > 0) {
         store.wrapS = self.wrapS;
@@ -230,9 +225,9 @@
 
 - (GLuint *) getRawContents;
 
-- (CGImageRef) convertToCGImage;
+- (CGImageRef) getCGImage;
 
-- (UIImage *) convertToUIImage
+- (UIImage *) getUIImage
 {
     CGImageRef cgRef = [self.backingStore CGImageFromFramebuffer];
     UIImage *finalImage = [UIImage imageWithCGImage:cgRef scale:1.0
