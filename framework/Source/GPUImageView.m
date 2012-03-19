@@ -57,7 +57,7 @@
 
 - (void) undoDerivationFrom:(id <GPUImageFlow>)oldParent
 {
-    NSAssert(parent == oldParent, @"GPUImageView: attempt to unparent an object not my parent");
+    NSAssert(parent == oldParent, @"GPUImageView: attempt to unparent an object that is not my parent");
     parent = nil;
     lastTimeChanged = 0;
 }
