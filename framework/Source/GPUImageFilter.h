@@ -4,36 +4,19 @@
 #import <UIKit/UIKit.h>
 
 // A GPUImageFilter is a GPUImage that uses an OpenGL program to transform
-// its input image.
+// its input image. 
+//
+// By convention, the OpenGL uniform for the input texture should be
+// named inputTexture. The vertex attribute for position should be 
+// named "position" and the input texture coordinate, "inputTextureCoordinate".
+//
+// It's possible to use different names with a few lines of overridden code, 
+// but conforming to these conventions will generally make things clearer.
 
 @interface GPUImageFilter : GPUImage
 {
-    NSMutableArray *programs;
-    NSMutableArray *outputTextures; 
+    GPUImageProgram *program;
 }
-
-// These property names are conventional. If there are multiple program stages,
-// these textures denote the first input and the very last output.
-// More complex filters may use additional input and output textures if
-// desired; they can also ignore the standard input and output textures
-// with no ill effects if they wish.
-
-@property (strong, nonatomic) GPUImage *inputTexture;
-@property (strong, nonatomic) GPUImage *outputTexture;
-
-// Override to automatically set up a framework for >1 program in series
-+ (int) numberOfFilterPrograms;
-
-// Convenience methods for subclasses
-@property (readonly, nonatomic) GPUImageProgram *program;
-@property (readonly, nonatomic) GPUImageProgram *programOne;
-@property (readonly, nonatomic) GPUImageProgram *programTwo;
-@property (readonly, nonatomic) GPUImageProgram *programThree;
-
-// If you are not using the standard inputTexture, you'll want to override
-// render in your subclass to set the proper size of the output texture.
-// Then call [super render]. The default implementation sets the size
-// from inputTexture if a size has not already been set.
 
 - (BOOL) render;
 
