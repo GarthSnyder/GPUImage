@@ -43,7 +43,7 @@
 
 @property (nonatomic) BOOL generateMipmap;
 
-// Let the texture manage this! Not part of the general API.
+// Generally NOT necessary to access this directly
 @property (strong, nonatomic) GPUImageBuffer *backingStore;
 
 - (void) bindAsFramebuffer;
