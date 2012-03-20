@@ -21,37 +21,9 @@
     if (![program use] || ![self bindAsFramebuffer]) {
         return NO;
     }
-    [self draw];
+    [self drawWithProgram:program];
     self.timeLastChanged = GPUImageGetCurrentTimestamp();
     return YES;
-}
-
-- (void) draw
-{
-    static const GLfloat squareVertices[] = {
-        -1.0, -1.0,
-         1.0, -1.0,
-        -1.0,  1.0,
-         1.0,  1.0,
-    };
-    
-    static const GLfloat squareTextureCoordinates[] = {
-         0.0,  0.0,
-         1.0,  0.0,
-         0.0,  1.0,
-         1.0,  1.0,
-    };
-    
-    GLint position = [program indexOfAttribute:@"position"];
-    GLint itc = [program indexOfAttribute:@"inputTextureCoordinate"];
-    
-    glVertexAttribPointer(position, 2, GL_FLOAT, 0, 0, squareVertices);
-    glEnableVertexAttribArray(position);
-    
-    glVertexAttribPointer(itc, 2, GL_FLOAT, 0, 0, squareTextureCoordinates);
-    glEnableVertexAttribArray(itc);
-    
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);    
 }
 
 #pragma mark -
@@ -62,8 +34,9 @@
     GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithImage:imageToFilter];
     [self deriveFrom:stillImageSource];
     [self update];
+    UIImage *product = [self getUIImage];
     [self deriveFrom:nil];
-    return [self getUIImage];
+    return product;
 }
 
 #pragma mark -
