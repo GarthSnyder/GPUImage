@@ -62,8 +62,9 @@
     GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithImage:imageToFilter];
     [self deriveFrom:stillImageSource];
     [self update];
+    UIImage *product = [self getUIImage];
     [self deriveFrom:nil];
-    return [self getUIImage];
+    return product;
 }
 
 @end
