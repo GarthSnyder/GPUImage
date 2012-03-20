@@ -1,8 +1,5 @@
-#import <UIKit/UIKit.h>
-#import <Foundation/Foundation.h>
-#import <QuartzCore/QuartzCore.h>
-
-#import "GPUImageHeaders.h"
+#import "GPUImageProtocols.h"
+#import "GPUImageBase.h"
 
 // A GPUImage is an element that knows how to render itself into a framebuffer,
 // and which owns that framebuffer and its associated backing store.
@@ -22,38 +19,12 @@
 // 3) A GPUImage also has, or can produce on demand, an associated 
 //    framebuffer.
 
-@interface GPUImage : GPUImageElement
+@interface GPUImage : GPUImageBase <GPUImageFlow>
+{
+    id <GPUImageFlow> parent;
+    GPUImageTimestamp timeLastChanged;
+}
 
-@property (nonatomic) GLsize size;
-@property (nonatomic) GLenum baseFormat;
-@property (nonatomic) GLenum pixType;
-
-// Setting an associated layer automatically turns on useRenderbuffer.
-// However, you can use a renderbuffer without an associated CAEAGLLayer.
-
-@property (assign, nonatomic) CAEAGLLayer *layer;   // Associated layer, if any
-@property (nonatomic) BOOL useRenderbuffer;
-
-@property (nonatomic) GLenum wrapS, wrapT;          // Texture edge handling
-@property (nonatomic) GLenum magFilter, minFilter;  // Linear, nearest, etc.
-
-// Convenience properties for setting both filters or both wraps at once
-@property (nonatomic) GLenum wrap;
-@property (nonatomic) GLenum filter;
-
-@property (nonatomic) BOOL generateMipmap;
-
-// Generally NOT necessary to access this directly
-@property (strong, nonatomic) GPUImageBuffer *backingStore;
-
-- (void) bindAsFramebuffer;
-
-// Adopts size and base format only, and only if receiver's are unknown
-- (void) adoptParametersFrom:(GPUImage *)other;
-
-// Methods for getting image data out of OpenGL
-- (GLuint *) getRawContents;
-- (CGImageRef) getCGImage;
-- (UIImage *) getUIImage;
+- (BOOL) render;
 
 @end
