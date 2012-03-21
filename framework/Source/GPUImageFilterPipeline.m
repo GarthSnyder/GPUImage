@@ -108,10 +108,6 @@
     return self;
 }
 
-- (void) addFilter:(GPUImageFilter *)filter {
-    [self.filters addObject:filter];
-}
-
 #pragma mark -
 #pragma mark GPUImageFlow protocol
 
