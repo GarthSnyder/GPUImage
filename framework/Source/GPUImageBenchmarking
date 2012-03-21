@@ -1,0 +1,22 @@
+    CFAbsoluteTime startTime = CFAbsoluteTimeGetCurrent();
+        if (_runBenchmark)
+        {
+            CFAbsoluteTime currentFrameTime = (CFAbsoluteTimeGetCurrent() - startTime);
+            totalFrameTimeDuringCapture += currentFrameTime;
+            numberOfFramesCaptured++;
+            NSLog(@"Average frame time : %f ms", 1000.0 * (totalFrameTimeDuringCapture / numberOfFramesCaptured));
+            NSLog(@"Current frame time : %f ms", 1000.0 * currentFrameTime);
+        }
+
+// Benchmarking
+- (CGFloat) averageFrameDurationDuringCapture;
+
+#pragma mark -
+#pragma mark Benchmarking
+
+- (CGFloat)averageFrameDurationDuringCapture;
+{
+    NSLog(@"Number of frames: %d", numberOfFramesCaptured);
+    return (totalFrameTimeDuringCapture / (CGFloat)numberOfFramesCaptured) * 1000.0;
+}
+

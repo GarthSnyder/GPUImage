@@ -1,16 +1,11 @@
 #import <UIKit/UIKit.h>
-#import "GPUImageOutput.h"
+#import "GPUImageBase.h"
 
-@interface GPUImagePicture : GPUImageOutput
-{
-    UIImage *imageSource;    
-}
+@interface GPUImagePicture : GPUImageBase <GPUImageFlow>
 
-// Initialization and teardown
-- (id)initWithImage:(UIImage *)newImageSource;
-- (id)initWithImage:(UIImage *)newImageSource smoothlyScaleOutput:(BOOL)smoothlyScaleOutput;
+- (id) initWithImage:(UIImage *)img;
 
-// Image rendering
-- (void)processImage;
+// May be changed at any time
+@property (nonatomic) UIImage *image;
 
 @end

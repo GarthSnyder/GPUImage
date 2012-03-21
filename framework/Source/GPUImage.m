@@ -63,10 +63,10 @@
 - (BOOL) parentRequiresConversion:(GPUImage *)gp
 {
     return ((self.useRenderbuffer != gp.useRenderbuffer) 
-            || (self.size.width != gp.size.width) 
-            || (self.size.height != gp.size.height)
-            || (self.baseFormat != gp.baseFormat) 
-            || (!self.useRenderbuffer && (self.pixType != gp.pixType)));
+        || (self.size.width != gp.size.width) 
+        || (self.size.height != gp.size.height)
+        || (self.baseFormat != gp.baseFormat) 
+        || (!self.useRenderbuffer && (self.pixType != gp.pixType)));
 }
 
 @end

@@ -10,8 +10,10 @@
 @property (nonatomic) GLenum wrapT;
 
 @property (readonly, nonatomic) BOOL hasMipmap;
+@property (readonly, nonatomic) GLenum pixType;
 
 - initWithSize:(GLsize)size baseFormat:(GLenum)format pixType:(GLenum)pix;
+- initWithTexture:(GLint)texHandle size:(GLsize)size format:(GLenum)fmt;
 
 - (void) generateMipmap;
 

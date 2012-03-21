@@ -1,84 +1,92 @@
 #import "GPUImagePicture.h"
 
+@interface GPUImagePicture
+{
+    GPUImageTimestamp timeLastChanged;
+}
+@end
+
 @implementation GPUImagePicture
+
+@synthesize image = _image;
 
 #pragma mark -
 #pragma mark Initialization and teardown
 
-- (id)initWithImage:(UIImage *)newImageSource;
+- (id) initWithImage:(UIImage *)img;
 {
-    if (!(self = [self initWithImage:newImageSource smoothlyScaleOutput:NO]))
-    {
-		return nil;
+    if (self = [super init]) {
+		self.image = img;
     }
-    
     return self;
 }
 
-- (id)initWithImage:(UIImage *)newImageSource smoothlyScaleOutput:(BOOL)smoothlyScaleOutput;
+- (void) setImage:(UIImage *)image
 {
-    if (!(self = [super init]))
-    {
-		return nil;
+    if (image != _image) {
+        _image = image;
+        timeLastChanged = 0;
     }
+}
 
-    self.shouldSmoothlyScaleOutput = smoothlyScaleOutput;
-    imageSource = newImageSource;
+#pragma mark -
+#pragma mark GPUImageFlow protocol
 
-    [GPUImageOpenGLESContext useImageProcessingContext];
+- (void) deriveFrom:(id <GPUImageFlow>)parent
+{
+    NSAssert(NO, @"Use pic.image = foo to set the input image for a GPUImagePicture.");
+}
+
+- (BOOL) update
+{
+    if (timeLastChanged > 0) {  // Only render once
+        return YES;
+    }
 
     CGSize pointSizeOfImage = [imageSource size];
     CGFloat scaleOfImage = [imageSource scale];
-    CGSize pixelSizeOfImage = CGSizeMake(scaleOfImage * pointSizeOfImage.width, scaleOfImage * pointSizeOfImage.height);
-
-    if (self.shouldSmoothlyScaleOutput)
-    {
-        // In order to use mipmaps, you need to provide power-of-two textures, so convert to the next largest power of two and stretch to fill
-        CGFloat powerClosestToWidth = ceil(log2(pixelSizeOfImage.width));
-        CGFloat powerClosestToHeight = ceil(log2(pixelSizeOfImage.height));
-        
-        pixelSizeOfImage = CGSizeMake(pow(2.0, powerClosestToWidth), pow(2.0, powerClosestToHeight));
+    GLsize pixelSizeOfImage = {scaleOfImage * pointSizeOfImage.width + 0.1, 
+        scaleOfImage * pointSizeOfImage.height + 0.1);
+    if (self.generateMipmap) {
+        // In order to use auto-generated mipmaps, you need to provide
+        // power-of-two textures, so convert to the next largest power of
+        // two and stretch to fill.
+        NSUInteger powerClosestToWidth = ceil(log2(pixelSizeOfImage.width)) + 0.1;
+        NSUInteger powerClosestToHeight = ceil(log2(pixelSizeOfImage.height)) + 0.1;
+        pixelSizeOfImage.width = 1 << powerClosestToWidth;
+        pixelSizeOfImage.height = 1 << powerClosestToHeight;
     }
-
-    GLubyte *imageData = (GLubyte *) calloc(1, (int)pixelSizeOfImage.width * (int)pixelSizeOfImage.height * 4);
+    
+    GLubyte *imageData = (GLubyte *) calloc(pixelSizeOfImage.width *
+        pixelSizeOfImage.height * 4);
     CGColorSpaceRef genericRGBColorspace = CGColorSpaceCreateDeviceRGB();    
-    CGContextRef imageContext = CGBitmapContextCreate(imageData, (int)pixelSizeOfImage.width, (int)pixelSizeOfImage.height, 8, (int)pixelSizeOfImage.width * 4, genericRGBColorspace,  kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-    CGContextDrawImage(imageContext, CGRectMake(0.0, 0.0, pixelSizeOfImage.width, pixelSizeOfImage.height), [newImageSource CGImage]);
+    CGContextRef imageContext = CGBitmapContextCreate(imageData, 
+        pixelSizeOfImage.width, pixelSizeOfImage.height, 8, 
+        pixelSizeOfImage.width * 4, genericRGBColorspace,  
+        kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    CGContextDrawImage(imageContext, CGRectMake(0.0, 0.0, pixelSizeOfImage.width, 
+        pixelSizeOfImage.height), [newImageSource CGImage]);
     CGContextRelease(imageContext);
     CGColorSpaceRelease(genericRGBColorspace);
-
-    glBindTexture(GL_TEXTURE_2D, outputTexture);
-    if (self.shouldSmoothlyScaleOutput)
-    {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    }
-    // Using BGRA extension to pull in video frame data directly
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int)pixelSizeOfImage.width, (int)pixelSizeOfImage.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, imageData);
     
-    if (self.shouldSmoothlyScaleOutput)
-    {
+    self.useRenderbuffer = NO;
+    self.size = pixelSizeOfImage;
+    self.pixType = GL_UNSIGNED_BYTE;
+    self.baseFormat = GL_RGBA;
+
+    [GPUImageOpenGLESContext useImageProcessingContext];
+    [self createBackingStore]; // Binds
+	// Using BGRA extension to pull in video frame data directly
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixelSizeOfImage.width, 
+        pixelSizeOfImage.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, imageData);
+
+    if (self.generateMipmap) {
         glGenerateMipmap(GL_TEXTURE_2D);
     }
 
     free(imageData);
-    
-    return self;
-}
-
-#pragma mark -
-#pragma mark Image rendering
-
-- (void)processImage;
-{
-    CGSize pointSizeOfImage = [imageSource size];
-    CGFloat scaleOfImage = [imageSource scale];
-    CGSize pixelSizeOfImage = CGSizeMake(scaleOfImage * pointSizeOfImage.width, scaleOfImage * pointSizeOfImage.height);
-    
-    for (id<GPUImageInput> currentTarget in targets)
-    {
-        [currentTarget setInputSize:pixelSizeOfImage];
-        [currentTarget newFrameReady];
-    }    
+    timeLastChanged = GPUImageGetCurrentTimestamp();
+    return YES;
 }
 
 @end
