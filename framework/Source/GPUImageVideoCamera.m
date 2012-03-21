@@ -1,6 +1,6 @@
 
 #import "GPUImageVideoCamera.h"
-#import "GPUImageMovieWriter.h"
+#import "GPUImageTextureBuffer.h"
 
 #pragma mark -
 #pragma mark Private methods and instance variables
@@ -10,6 +10,7 @@
 	AVCaptureDeviceInput *videoInput;
 	AVCaptureDeviceInput *audioInput;
 	AVCaptureVideoDataOutput *videoOutput;
+    GPUImageTimestamp timeLastChanged;
 	AVCaptureAudioDataOutput *audioOutput;
     NSDate *startingCaptureTime;
     
@@ -27,49 +28,37 @@
 #pragma mark -
 #pragma mark Initialization and teardown
 
-- (id)init;
+- (id) init;
 {
-    if (!(self = [self initWithSessionPreset:AVCaptureSessionPreset640x480 cameraPosition:AVCaptureDevicePositionBack]))
-    {
-		return nil;
-    }
-    
-    return self;
+    return [self initWithSessionPreset:AVCaptureSessionPreset640x480 
+        cameraPosition:AVCaptureDevicePositionBack];
 }
 
-- (id)initWithSessionPreset:(NSString *)sessionPreset cameraPosition:(AVCaptureDevicePosition)cameraPosition; 
+- (id) initWithSessionPreset:(NSString *)sessionPreset 
+    cameraPosition:(AVCaptureDevicePosition)cameraPosition; 
 {
-	if (!(self = [super init]))
-    {
+	if (!(self = [super init])) {
 		return nil;
     }
     
-	audioProcessingQueue = dispatch_queue_create("com.sunsetlakesoftware.GPUImage.processingQueue", NULL);
+    self.baseFormat = GL_RGBA;
     
-    
-    _runBenchmark = NO;
-    
-    if ([GPUImageOpenGLESContext supportsFastTextureUpload])
-    {
-        [GPUImageOpenGLESContext useImageProcessingContext];
-        CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)[[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] context], NULL, &coreVideoTextureCache);
-        if (err) 
-        {
-            NSAssert(NO, @"Error at CVOpenGLESTextureCacheCreate %d");
-        }
-        
-        // Need to remove the initially created texture
-        [self deleteOutputTexture];
+    [GPUImageOpenGLESContext useImageProcessingContext];
+    if ([GPUImageOpenGLESContext supportsFastTextureUpload]) {
+        CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, 
+            (__bridge void *)[[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext]
+            context], NULL, &coreVideoTextureCache);
+        NSAssert(!err, @"Error at CVOpenGLESTextureCacheCreate %d");
     }
-    
-	// Grab the back-facing or front-facing camera
-    _inputCamera = nil;
+
+	// Grab the back-facing camera
+	AVCaptureDevice *backFacingCamera = nil;
 	NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
 	for (AVCaptureDevice *device in devices) 
 	{
 		if ([device position] == cameraPosition)
 		{
-			_inputCamera = device;
+			backFacingCamera = device;
 		}
 	}
     
@@ -77,7 +66,7 @@
 	_captureSession = [[AVCaptureSession alloc] init];
 	
     [_captureSession beginConfiguration];
-    
+
 	// Add the video input	
 	NSError *error = nil;
 	videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:_inputCamera error:&error];
@@ -89,10 +78,13 @@
 	// Add the video frame output	
 	videoOutput = [[AVCaptureVideoDataOutput alloc] init];
 	[videoOutput setAlwaysDiscardsLateVideoFrames:YES];
-    
+
 	[videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
     //	dispatch_queue_t videoQueue = dispatch_queue_create("com.sunsetlakesoftware.colortracking.videoqueue", NULL);
     //	[videoOutput setSampleBufferDelegate:self queue:videoQueue];
+
+   
+	if ([_captureSession canAddOutput:videoOutput]) {
     
 	//[videoOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
 	//this should be on the same queue as the audio
@@ -100,25 +92,21 @@
 	if ([_captureSession canAddOutput:videoOutput])
 	{
 		[_captureSession addOutput:videoOutput];
-	}
-	else
-	{
+	} else {
 		NSLog(@"Couldn't add video output");
 	}
     
     [_captureSession setSessionPreset:sessionPreset];
     
     [_captureSession commitConfiguration];
-    
-    //    inputTextureSize
-    
+
 	return self;
 }
 
-- (void)dealloc 
+- (void) dealloc 
 {
     [self stopCameraCapture];
-    //    [videoOutput setSampleBufferDelegate:nil queue:dispatch_get_main_queue()];    
+//    [videoOutput setSampleBufferDelegate:nil queue:dispatch_get_main_queue()];    
     
     [self removeInputsAndOutputs];
     
@@ -209,123 +197,61 @@
     }
 }
 
-- (AVCaptureDevicePosition)getCameraPosition 
-{
-    return [[videoInput device] position];
-}
+#pragma mark -
+#pragma mark AVCaptureVideoDataOutputSampleBufferDelegate
 
-- (void)processVideoSampleBuffer:(CMSampleBufferRef)sampleBuffer;
+- (void)captureOutput:(AVCaptureOutput *)captureOutput 
+    didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer 
+    fromConnection:(AVCaptureConnection *)connection
 {
-    CFAbsoluteTime startTime = CFAbsoluteTimeGetCurrent();
     CVImageBufferRef cameraFrame = CMSampleBufferGetImageBuffer(sampleBuffer);
-    int bufferWidth = CVPixelBufferGetWidth(cameraFrame);
-    int bufferHeight = CVPixelBufferGetHeight(cameraFrame);
     
-	CMTime currentTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+    GLsize buffSize;
+    buffSize.width = CVPixelBufferGetWidth(cameraFrame);
+    buffSize.height = CVPixelBufferGetHeight(cameraFrame);
+    self.size = buffSize;
+    
+    [GPUImageOpenGLESContext useImageProcessingContext];
+    CVPixelBufferLockBaseAddress(cameraFrame, 0);
     
     if ([GPUImageOpenGLESContext supportsFastTextureUpload])
     {
-        CVPixelBufferLockBaseAddress(cameraFrame, 0);
-        
-        [GPUImageOpenGLESContext useImageProcessingContext];
         CVOpenGLESTextureRef texture = NULL;
-        CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, coreVideoTextureCache, cameraFrame, NULL, GL_TEXTURE_2D, GL_RGBA, bufferWidth, bufferHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0, &texture);
-        
+        CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
+            coreVideoTextureCache, cameraFrame, NULL, GL_TEXTURE_2D, GL_RGBA, 
+            buffSize.width, buffSize.height, GL_BGRA, GL_UNSIGNED_BYTE, 0, &texture);
+                
         if (!texture || err) {
             NSLog(@"Camera CVOpenGLESTextureCacheCreateTextureFromImage failed (error: %d)", err);
             return;
         }
         
-        outputTexture = CVOpenGLESTextureGetName(texture);
-        //        glBindTexture(CVOpenGLESTextureGetTarget(texture), outputTexture);
-        glBindTexture(GL_TEXTURE_2D, outputTexture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        for (id<GPUImageInput> currentTarget in targets)
-        {
-            if (currentTarget != self.targetToIgnoreForUpdates)
-            {
-                [currentTarget setInputSize:CGSizeMake(bufferWidth, bufferHeight)];
-                
-                NSInteger indexOfObject = [targets indexOfObject:currentTarget];
-                [currentTarget setInputTexture:outputTexture atIndex:[[targetTextureIndices objectAtIndex:indexOfObject] integerValue]];
-                
-                [currentTarget newFrameReadyAtTime:currentTime];
-            }
-            else
-            {
-                NSInteger indexOfObject = [targets indexOfObject:currentTarget];
-                [currentTarget setInputTexture:outputTexture atIndex:[[targetTextureIndices objectAtIndex:indexOfObject] integerValue]];
-            }
-        }
-        
-        CVPixelBufferUnlockBaseAddress(cameraFrame, 0);
+        GLint outputTexture = CVOpenGLESTextureGetName(texture);
+        self.backingStore = [[GPUImageTextureBuffer alloc] initWithTexture:outputTexture
+            size:buffSize format:GL_RGBA];
+        [self setTextureParameters];
         
         // Flush the CVOpenGLESTexture cache and release the texture
         CVOpenGLESTextureCacheFlush(coreVideoTextureCache, 0);
         CFRelease(texture);
-        outputTexture = 0;
-        
-        if (_runBenchmark)
-        {
-            CFAbsoluteTime currentFrameTime = (CFAbsoluteTimeGetCurrent() - startTime);
-            totalFrameTimeDuringCapture += currentFrameTime;
-            numberOfFramesCaptured++;
-            NSLog(@"Average frame time : %f ms", 1000.0 * (totalFrameTimeDuringCapture / numberOfFramesCaptured));
-            NSLog(@"Current frame time : %f ms", 1000.0 * currentFrameTime);
-        }
     }
-    else
+    else  
     {
-        // Upload to texture
-        CVPixelBufferLockBaseAddress(cameraFrame, 0);
-        
-        glBindTexture(GL_TEXTURE_2D, outputTexture);
-        
-        //        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferWidth, bufferHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(cameraFrame));
-        
+        if (!self.backingStore) {
+            [self createBackingStore];
+        }
+        [self.backingStore bind];
         // Using BGRA extension to pull in video frame data directly
-        // The use of bytesPerRow / 4 accounts for a display glitch present in preview video frames when using the photo preset on the camera
-        size_t bytesPerRow = CVPixelBufferGetBytesPerRow(cameraFrame);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bytesPerRow / 4, bufferHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(cameraFrame));
-        
-        for (id<GPUImageInput> currentTarget in targets)
-        {
-            if (currentTarget != self.targetToIgnoreForUpdates)
-            {
-                [currentTarget setInputSize:CGSizeMake(bufferWidth, bufferHeight)];
-                [currentTarget newFrameReadyAtTime:currentTime];
-            }
-        }
-        
-        CVPixelBufferUnlockBaseAddress(cameraFrame, 0);
-        
-        if (_runBenchmark)
-        {
-            CFAbsoluteTime currentFrameTime = (CFAbsoluteTimeGetCurrent() - startTime);
-            totalFrameTimeDuringCapture += currentFrameTime;
-            numberOfFramesCaptured++;
-            //        NSLog(@"Average frame time : %f ms", 1000.0 * (totalFrameTimeDuringCapture / numberOfFramesCaptured));
-            //        NSLog(@"Current frame time : %f ms", 1000.0 * currentFrameTime);
-        }
-    }  
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, buffSize.width, buffSize.height, 0, 
+            GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(cameraFrame));
+    }    
+    CVPixelBufferUnlockBaseAddress(cameraFrame, 0);
+    timeLastChanged = GPUImageGetCurrentTimestamp();
 }
 
 - (void)processAudioSampleBuffer:(CMSampleBufferRef)sampleBuffer;
 {
     [self.audioEncodingTarget processAudioBuffer:sampleBuffer]; 
-}
-
-#pragma mark -
-#pragma mark Benchmarking
-
-- (CGFloat)averageFrameDurationDuringCapture;
-{
-    NSLog(@"Number of frames: %d", numberOfFramesCaptured);
-    return (totalFrameTimeDuringCapture / (CGFloat)numberOfFramesCaptured) * 1000.0;
 }
 
 #pragma mark -

@@ -29,9 +29,6 @@
 
 @property (nonatomic) BOOL generateMipmap;
 
-// Generally NOT necessary to access this directly
-@property (strong, nonatomic) GPUImageBuffer *backingStore;
-
 - (void) bindAsFramebuffer;
 - (void) drawWithProgram:(GPUImageProgram *)prog;
 
@@ -42,5 +39,12 @@
 - (GLuint *) getRawContents;
 - (CGImageRef) getCGImage;
 - (UIImage *) getUIImage;
+
+// Generally NOT necessary to access these directly
+
+@property (strong, nonatomic) GPUImageBuffer *backingStore;
+
+- (void) createBackingStore;
+- (void) releaseBackingStore;
 
 @end

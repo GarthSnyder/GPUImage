@@ -13,10 +13,8 @@
 - (id) initWithConfigurationFile:(NSURL *)configuration;
 
 // Filter array accessors are no longer needed because you can freely 
-// add and remove filters directly in the filters array. But for
-// convenience...
-
-- (void) addFilter:(GPUImageFilter *)newFilter;
+// add and remove filters directly in the filters array. For example,
+// [pipeline.filters addObject:newFilter].
 
 - (UIImage *) imageByFilteringImage:(UIImage *)imageToFilter;
 

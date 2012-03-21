@@ -16,6 +16,7 @@
 @synthesize wrapT = _wrapT;
 
 @synthesize hasMipmap = _hasMipmap;
+@synthesize pixType = _pixType;
 
 static GLint lastBoundTexture = -1;
 
@@ -28,6 +29,7 @@ static GLint lastBoundTexture = -1;
             format, pix, NULL);
         _size = size;
         _format = format;
+        _pixType = pix;
     }
     return self;
 }
@@ -37,7 +39,18 @@ static GLint lastBoundTexture = -1;
     return [self initWithSize:size baseFormat:type pixType:GL_UNSIGNED_INT];
 }
 
-- (void) setmagFilter:(GLenum)filt
+- initWithTexture:(GLint)texHandle size:(GLsize)size format:(GLenum)fmt
+{
+    if (self = [super init]) {
+        _handle = texHandle;
+        _size = size;
+        _format = fmt;
+        _pixType = GL_UNSIGNED_BYTE;
+    }
+    return self;
+}
+
+- (void) setMagFilter:(GLenum)filt
 {
     if (filt != _magFilter) {
         _magFilter = filt;
@@ -46,7 +59,7 @@ static GLint lastBoundTexture = -1;
     }
 }
 
-- (void) setminFilter:(GLenum)filt
+- (void) setMinFilter:(GLenum)filt
 {
     if (filt != _minFilter) {
         _minFilter = filt;

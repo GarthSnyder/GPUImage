@@ -2,6 +2,11 @@
 #import "GPUImageTextureBuffer.h"
 #import "GPUImageRenderbuffer.h"
 
+@interface GPUImageBase
+- (void) createBackingStore;
+- (void) setTextureParameters;
+@end
+
 @implementation GPUImageBase
 
 @synthesize size = _size;
@@ -25,8 +30,9 @@
 - (id) init
 {
     if (self = [super init]) {
-        self.filter = GL_NEAREST;
+        self.filter = GL_LINEAR;
         self.wrap = GL_CLAMP_TO_EDGE;
+        self.pixType = GL_UNSIGNED_BYTE;
     }
     return self;
 }
@@ -60,16 +66,42 @@
 - (void) setUseRenderbuffer:(BOOL)use
 {
     if (self.useRenderbuffer != use) {
-        self.backingStore = nil;
         _useRenderbuffer = use;
-        timeLastChanged = 0;
+        [self releaseBackingStore];
     }
 }
 
 - (void) setLayer:(CAEAGLLayer *)layer
 {
-    self.useRenderbuffer = YES;
-    _layer = layer;
+    if (_layer != layer) {
+        _useRenderbuffer = YES;
+        _layer = layer;
+        [self releaseBackingStore];
+    }
+}
+
+- (void) setSize:(GLsize)newSize
+{
+    if ((newSize.width != self.size.width) || (newSize.height != self.size.height)) {
+        _size = newSize;
+        [self releaseBackingStore];
+    }
+}
+
+- (void) setBaseFormat:(GLenum)fmt
+{
+    if (_baseFormat != fmt) {
+        _baseFormat = fmt;
+        [self releaseBackingStore];
+    }
+}
+
+- (void) setPixType:(GLenum)pix
+{
+    if (_pixType != pix) {
+        _pixType = pix;
+        [self releaseBackingStore];
+    }
 }
 
 - (void) setGenerateMipmap:(BOOL)gen
@@ -100,6 +132,42 @@
     }
 }
 
+#pragma mark -
+#pragma mark Interactions with backing store
+
+// Must know at least size and base format, or for layer-based renderbuffers,
+// the layer id.
+
+- (void) createBackingStore
+{
+    NSAssert(self.layer || (self.size.width && self.size.height && self.baseFormat),
+             @"Cannot bindAsFramebuffer without at least size and base format.");
+    if (self.useRenderbuffer) {
+        if (self.layer) {
+            self.backingStore = [[GPUImageRenderbuffer alloc] initWithLayer:self.layer];
+            self.size = self.backingStore.size;
+            self.baseFormat = self.backingStore.format;
+        } else {
+            self.backingStore = [[GPUImageRenderbuffer alloc] initWithSize:self.size
+                                                                baseFormat:self.baseFormat];
+        }
+    } else {
+        if (!self.pixType) {
+            self.pixType = GL_UNSIGNED_BYTE;
+        }
+        self.backingStore = [[GPUImageTextureBuffer alloc] initWithSize:self.size
+                                                             baseFormat:self.baseFormat pixType:self.pixType];
+        [self setTextureParams];
+    }
+    timeLastChanged = 0;
+}
+
+- (void) releaseBackingStore
+{
+    _backingStore = nil;
+    timeLastChanged = 0;
+}
+
 // Propagate configuration parameters for textures through to the OpenGL
 // wrapper layer.
 
@@ -126,30 +194,8 @@
 
 - (void) bindAsFramebuffer
 {
-    if (self.backingStore) {
-        [self.backingStore bindAsFramebuffer];
-        return;
-    }
-    // We're going to have to create the backing store. Must know at least 
-    // size and base format, or for layer-based renderbuffers, the layer id.
-    NSAssert(self.layer || (self.size.width && self.size.height && self.baseFormat),
-        @"Cannot bindAsFramebuffer without at least size and base format.");
-    if (self.useRenderbuffer) {
-        if (self.layer) {
-            self.backingStore = [[GPUImageRenderbuffer alloc] initWithLayer:self.layer];
-            self.size = self.backingStore.size;
-            self.baseFormat = self.backingStore.format;
-        } else {
-            self.backingStore = [[GPUImageRenderbuffer alloc] initWithSize:self.size
-                baseFormat:self.baseFormat];
-        }
-    } else {
-        if (!self.pixType) {
-            self.pixType = GL_UNSIGNED_BYTE;
-        }
-        self.backingStore = [[GPUImageTextureBuffer alloc] initWithSize:self.size
-            baseFormat:self.baseFormat pixType:self.pixType];
-        [self setTextureParams];
+    if (!self.backingStore) {
+        [self createBackingStore];
     }
     [self.backingStore bindAsFramebuffer];
 }
