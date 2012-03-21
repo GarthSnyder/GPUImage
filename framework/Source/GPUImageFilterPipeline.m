@@ -1,37 +1,48 @@
 #import "GPUImageFilterPipeline.h"
 
 @interface GPUImageFilterPipeline ()
+{
+    NSUInteger arrayHash;
+}
+- (BOOL) parseConfiguration:(NSDictionary *)configuration;
+- (void) setupFilters;
+@end
 
-- (BOOL) _parseConfiguration:(NSDictionary *)configuration;
-- (void) _refreshFilters;
-
+@interface nsArray (QuickContentsHash)
+- (NSUInteger) quickContentsHash;
 @end
 
 @implementation GPUImageFilterPipeline
 
-@synthesize filters = _filters, input = _input, output = _output;
+@synthesize filters = _filters;
 
 #pragma mark Config file init
 
-- (id) initWithConfiguration:(NSDictionary*) configuration input:(GPUImageOutput*)input output:(id <GPUImageInput>)output {
-    self = [super init];
-    if (self) {
-        self.input = input;
-        self.output = output;
-        if (![self _parseConfiguration:configuration]) {
-            NSLog(@"Sorry, a parsing error occurred.");
-            abort();
-        }
-        [self _refreshFilters];
+- (id) init
+{
+    if (self = [super init]) {
+        self.filters = [NSMutableArray array];
     }
     return self;
 }
 
-- (id) initWithConfigurationFile:(NSURL*) configuration input:(GPUImageOutput*)input output:(id <GPUImageInput>)output {
-    return [self initWithConfiguration:[NSDictionary dictionaryWithContentsOfURL:configuration] input:input output:output];
+- (id) initWithConfiguration:(NSDictionary*) configuration 
+{
+    if (self = [super init]) {
+        if (![self _parseConfiguration:configuration]) {
+            NSLog(@"Sorry, a parsing error occurred.");
+            abort();
+        }
+    }
+    return self;
 }
 
-- (BOOL) _parseConfiguration:(NSDictionary *)configuration {
+- (id) initWithConfigurationFile:(NSURL *)configuration {
+    return [self initWithConfiguration:[NSDictionary dictionaryWithContentsOfURL:configuration]];
+}
+
+- (BOOL) parseConfiguration:(NSDictionary *)configuration
+{
     NSArray *filters = [configuration objectForKey:@"Filters"];
     if (!filters) return NO;
     
@@ -83,72 +94,84 @@
         }
         [orderedFilters addObject:genericFilter];
     }
-    self.filters = orderedFilters;
-    
+    self.filters = orderedFilters;    
     return YES;
 }
 
 #pragma mark Regular init
 
-- (id) initWithOrderedFilters:(NSArray*) filters input:(GPUImageOutput*)input output:(id <GPUImageInput>)output {
-    self = [super init];
-    if (self) {
-        self.input = input;
-        self.output = output;
+- (id) initWithOrderedFilters:(NSArray *) filters 
+{
+    if (self = [super init]) {
         self.filters = [NSMutableArray arrayWithArray:filters];
-        [self _refreshFilters];
     }
     return self;
 }
 
-- (void) addFilter:(GPUImageFilter*)filter atIndex:(NSUInteger)insertIndex {
-    [self.filters insertObject:filter atIndex:insertIndex];
-    [self _refreshFilters];
-}
-
-- (void) addFilter:(GPUImageFilter*)filter {
+- (void) addFilter:(GPUImageFilter *)filter {
     [self.filters addObject:filter];
-    [self _refreshFilters];
 }
 
-- (void) replaceFilterAtIndex:(NSUInteger)index withFilter:(GPUImageFilter*)filter {
-    [self.filters replaceObjectAtIndex:index withObject:filter];
-    [self _refreshFilters];
+#pragma mark -
+#pragma mark GPUImageFlow protocol
+
+- (void) deriveFrom:(id <GPUImageFlow>)newParent;
+{
+    NSAssert([parent isKindOfClass:[GPUImageBase class]],
+        @"Input to a GPUImageFilterPipeline must be a subclass of GPUImageBase.");
+    parent = newParent
+    timeLastChanged = 0;
 }
 
-- (void) removeFilterAtIndex:(NSUInteger)index {
-    [self.filters removeObjectAtIndex:index];
-    [self _refreshFilters];
-}
+// The filters in the pipeline are in fact an independent GPUImageFlow
+// object subgraph. The GPUImageFilterPipeline patches this subgraph into
+// its parent graph by acting as both the head (when specifying an external
+// source as input to the pipeline through [pipeline deriveFrom:]) and the tail
+// (when absorbing the output of the pipeline and forwarding it downstream).
+//
+// To implement this dual role, all we have to do is make sure our pipeline
+// is properly wired up and then temporarily tack ourselves on as the tail 
+// of the pipeline during -update.
 
-- (void) removeAllFilters {
-    [self.filters removeAllObjects];
-    [self _refreshFilters];
-}
-
-- (void) replaceAllFilters:(NSArray*) newFilters {
-    self.filters = [NSMutableArray arrayWithArray:newFilters];
-    [self _refreshFilters];
-}
-
-- (void) _refreshFilters {
-    
-    id prevFilter = self.input;
-    GPUImageFilter *theFilter = nil;
-    
-    for (int i = 0; i < [self.filters count]; i++) {
-        theFilter = [self.filters objectAtIndex:i];
-        [prevFilter removeAllTargets];
-        [prevFilter addTarget:theFilter];
-        prevFilter = theFilter;
+- (BOOL) update
+{
+    if (!parent || ![parent update]) {
+        return NO;
     }
-    
-    [prevFilter removeAllTargets];
-    [prevFilter addTarget:self.output];
+    [self setupFilters];
+    id <GPUImageFlow> trueParent = parent;
+    parent = [self.filters lastObject];
+    BOOL result = [super update];
+    parent = trueParent;
+    return result;
 }
 
-- (UIImage *) currentFilteredFrame {
-    return [(GPUImageFilter*)[_filters lastObject] imageFromCurrentlyProcessedOutput];
+- (void) setupFilters
+{
+    // Make a quick determination as to whether the array has changed
+    NSUInteger newHash = [self.filters quickContentsHash];
+    if (arrayHash && (newHash == arrayHash)) {
+        return;
+    }
+    arrayHash = newHash;
+    id <GPUImageFlow> previous = parent;
+    for (id <GPUImageFlow> filter in self.filters) {
+        [filter deriveFrom:previous];
+        previous = filter;
+    }
+}
+
+@end
+
+@implementation NSArray (QuickContentsHash)
+
+- (NSUInteger) quickContentsHash
+{
+    NSUInteger hashValue = 0;
+    for (id object in self) {
+        hashValue ^= (NSUInteger)object;
+    }
+    return hashValue;
 }
 
 @end
