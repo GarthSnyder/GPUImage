@@ -1,5 +1,3 @@
-//  Created by Garth Snyder on 3/17/12.
-
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import "GPUImageTextureUnit.h"

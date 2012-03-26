@@ -1,5 +1,3 @@
-//  Created by Garth Snyder on 3/17/12.
-//
 //  This is a super-simple class that tracks which textures are assigned to
 //  which texture units. Unlike uniform value assignments, texture unit
 //  bindings do not stick to OpenGL programs, so knowing whether a binding

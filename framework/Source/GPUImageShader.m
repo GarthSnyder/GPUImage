@@ -1,5 +1,3 @@
-// Started by Garth Snyder on 3/13/12.
-
 #import "GPUImageShader.h"
 
 @implementation GPUImageShader
@@ -46,14 +44,7 @@
     glGetShaderiv(_handle, GL_COMPILE_STATUS, &status);
 
     if (status != GL_TRUE) {
-        GLint logLength;
-        glGetShaderiv(_handle, GL_INFO_LOG_LENGTH, &logLength);
-        if (logLength > 0) {
-            GLchar *log = (GLchar *)malloc(logLength);
-            glGetShaderInfoLog(_handle, logLength, &logLength, log);
-            NSLog(@"Shader compile log:\n%s", log);
-            free(log);
-        }
+        NSLog(@"Shader compile log:\n%@", [self log]);
         [self delete];
     }	
     return status == GL_TRUE;

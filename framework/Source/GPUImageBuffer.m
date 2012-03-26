@@ -1,5 +1,3 @@
-//  Created by Garth snyder on 3/17/12.
-
 #import "GPUImageBuffer.h"
 
 static GLuint lastBoundFramebuffer = 0;
