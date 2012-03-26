@@ -2,17 +2,16 @@
 
 NSString *const kGPUImageBrightnessFragmentShaderString = SHADER_STRING
 (
- varying highp vec2 textureCoordinate;
- 
- uniform sampler2D inputImageTexture;
- uniform lowp float brightness;
- 
- void main()
- {
-     lowp vec4 textureColor = texture2D(inputImageTexture, textureCoordinate);
+     varying highp vec2 textureCoordinate;
      
-     gl_FragColor = vec4((textureColor.rgb + vec3(brightness)), textureColor.w);
- }
+     uniform sampler2D inputImageTexture;
+     uniform lowp float brightness;
+     
+     void main()
+     {
+         lowp vec4 textureColor = texture2D(inputImageTexture, textureCoordinate);
+         gl_FragColor = vec4((textureColor.rgb + vec3(brightness)), textureColor.w);
+     }
 );
 
 @implementation GPUImageBrightnessFilter

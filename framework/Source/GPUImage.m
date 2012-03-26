@@ -1,8 +1,12 @@
 #import "GPUImage.h"
 
+@implementation GPUImage ()
+- (BOOL) parentRequiresConversion;
+@end
+
 @implementation GPUImage
 
-- (void) deriveFrom:(id <GPUImageFlow>)newParent
+- (void) deriveFrom:(GPUImageProvider)newParent
 {
     if (parent != newParent) {
         parent = newParent;
@@ -42,14 +46,12 @@
 
 - (BOOL) render
 {
-    NSAssert([parent isKindOfClass:[GPUImageBase class]], 
-         @"Sorry, GPUImage::render doesn't know how do deal with non-GPUImageBase parents.");
-    GPUImageBase *gpuParent = parent;
-    NSAssert(![self parentRequiresConversion:gpuParent],
+    NSAssert([parent backingStore], @"Parent has no backing store; should never happen.");
+    NSAssert(![self parentRequiresConversion],
          @"Automatic texture size and format conversions are not yet implemented.");
-    self.backingStore = parent.backingStore;
+    _backingStore = parent.backingStore;
     [self setTextureParams];
-    if (!self.useRenderbuffer && self.generateMipmap) {
+    if (!self.usesRenderbuffer && self.generatesMipmap) {
         GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
         [store generateMipmap]; // Optimized out if already done
     }
@@ -57,16 +59,31 @@
     return YES;
 }
 
-// Is there anything about the parent GPUImage that makes it impossible for us
-// to share the parent's backing texture?
+// Is there anything about the parent object that makes it impossible for us
+// to share its backing texture?
 
-- (BOOL) parentRequiresConversion:(GPUImage *)gp
+- (BOOL) parentRequiresConversion
 {
-    return ((self.useRenderbuffer != gp.useRenderbuffer) 
-        || (self.size.width != gp.size.width) 
-        || (self.size.height != gp.size.height)
-        || (self.baseFormat != gp.baseFormat) 
-        || (!self.useRenderbuffer && (self.pixType != gp.pixType)));
+    GPUImageBuffer *pbs = parent.backingStore;
+    
+    if ((self.size.width != pbs.size.width) 
+        || (self.size.height != pbs.size.height)
+        || (self.baseFormat != pbs.format))
+    {
+        return YES;
+    }
+    if (self.usesRenderbuffer) {
+        return ![pbs isKindOfClass:[GPUImageRenderbuffer class]];
+    } else {
+        if (![pbs isKindOfClass:[GPUImageTextureBuffer class]]) {
+            return YES;
+        }
+        GPUImageTextureBuffer *ptb = pbs;
+        if (self.pixType != ptb.pixType) {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 @end

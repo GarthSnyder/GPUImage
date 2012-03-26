@@ -13,77 +13,21 @@ extern GPUImageTimestamp GPUImageGetCurrentTimestamp();
 // Composite types that are valid as uniforms. (Arrays of these types are
 // also valid.)
 
-typedef struct {
-    GLfloat x;
-    GLfloat y;
-} vec2;
+typedef GLfloat vec2[2];
+typedef GLfloat vec3[3];
+typedef GLfloat vec4[4];
 
-typedef struct {
-    vec2 a;
-    vec2 b;
-} mat2;
+typedef vec2 mat2[2];
+typedef vec3 mat3[3];
+typedef vec4 mat4[4];
 
-typedef struct {
-    GLfloat x;
-    GLfloat y;
-    GLfloat z;
-} vec3;
+typedef GLint ivec2[2];
+typedef GLint ivec3[3];
+typedef GLint ivec4[4];
 
-typedef struct {
-    vec3 a;
-    vec3 b;
-    vec3 c;
-} mat3;
-
-typedef struct {
-    GLfloat x;
-    GLfloat y;
-    GLfloat z;
-    GLfloat a;
-} vec4;
-
-typedef struct {
-    vec4 a;
-    vec4 b;
-    vec4 c;
-    vec4 d;
-} mat4;
-
-typedef struct {
-    GLint x;
-    GLint y;
-} ivec2;
-
-typedef struct {
-    GLint x;
-    GLint y;
-    GLint z;
-} ivec3;
-
-typedef struct {
-    GLint x;
-    GLint y;
-    GLint z;
-    GLint a;
-} ivec4;
-
-typedef struct {
-    GLboolean x;
-    GLboolean y;
-} bvec2;
-
-typedef struct {
-    GLboolean x;
-    GLboolean y;
-    GLboolean z;
-} bvec3;
-
-typedef struct {
-    GLboolean x;
-    GLboolean y;
-    GLboolean z;
-    GLboolean a;
-} bvec4;
+typedef GLboolean bvec2[2];
+typedef GLboolean bvec3[3];
+typedef GLboolean bvec4[4];
 
 typedef struct {
     GLint width;

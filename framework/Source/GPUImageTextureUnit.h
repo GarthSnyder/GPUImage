@@ -19,6 +19,6 @@
 @property (nonatomic) GLint currentTextureHandle;
 @property (nonatomic) GLenum textureUnitID;
 
-- (void) bindTexture:(GPUImage *)texture;
+- (void) bindTexture:(GPUImageTextureBuffer *)texture;
 
 @end

@@ -21,7 +21,7 @@
 
 @interface GPUImage : GPUImageBase <GPUImageFlow>
 {
-    id <GPUImageFlow> parent;
+    GPUImageProvider parent;
     GPUImageTimestamp timeLastChanged;
 }
 

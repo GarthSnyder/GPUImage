@@ -71,7 +71,7 @@
 
 - (void) setOESValue
 {
-    if ([_value isKindOfClass:[GPUImage class]]) {
+    if ([_value conformsToProtocol:@protocol(GPUImageBackingStoreProvider)]) {
         [self setOESTextureValue];
         return;
     }
@@ -81,7 +81,7 @@
     }
     
     NSAssert1([_value isKindOfClass:[NSValue class]], 
-        @"Value of uniform '%@' is neither NSValue nor GPUImage.", _name);
+        @"Value of uniform '%@' is neither NSValue nor texture provider.", _name);
     NSAssert1([self valueTypeMatchesOESType], 
         @"Value provided for uniform '%@' appears to be of wrong type.", _name);
 
@@ -159,10 +159,13 @@
 
 - (void) setOESTextureValue
 {
-    GPUImage *texture = _value;
+    id <GPUImageBackingStoreProvider> tBuff = _value;
+    GPUImageTextureBuffer *texture = tBuff.backingStore;
     NSAssert1(_type == GL_SAMPLER_2D, 
         @"Uniform '%@' has texture value but type != GL_SAMPLER_2D", _name);
-    if (_textureUnit.currentTextureHandle != texture.textureHandle) {
+    NSAssert1([texture isKindOfClass:[GPUImageTextureBuffer class]], 
+        @"Value of uniform '%@' is not convertible to a texture buffer", _name);
+    if (_textureUnit.currentTextureHandle != texture.handle) {
         [_textureUnit bindTexture:texture];
         glUniform1i(_index, _textureUnit.textureUnitID);
     }
