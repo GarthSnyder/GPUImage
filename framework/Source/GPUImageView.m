@@ -55,7 +55,7 @@
     }
 }
 
-- (void) deriveFrom:(GPUImageProvider)newParent
+- (void) deriveFrom:(GPUImageSource)newParent
 {
     if (parent != newParent) {
         parent = newParent;

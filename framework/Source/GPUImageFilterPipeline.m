@@ -111,7 +111,7 @@
 #pragma mark -
 #pragma mark GPUImageUpdating protocol
 
-- (void) deriveFrom:(GPUImageProvider)newParent;
+- (void) deriveFrom:(GPUImageSource)newParent;
 {
     if (parent != newParent) {
         parent = newParent
@@ -150,8 +150,8 @@
         return;
     }
     arrayHash = newHash;
-    GPUImageProvider previous = parent;
-    for (GPUImageProvider filter in self.filters) {
+    GPUImageSource previous = parent;
+    for (GPUImageSource filter in self.filters) {
         [filter deriveFrom:previous];
         previous = filter;
     }

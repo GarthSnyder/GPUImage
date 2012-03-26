@@ -10,7 +10,7 @@
 // unless they need to be. 
 //
 // For sampler uniforms, you can use any object that conforms to the 
-// GPUImageProvider protocol as a value. GPUImage automatically 
+// GPUImageSource protocol as a value. GPUImage automatically 
 // manages handles and texture units.
 //
 // Unlike uniforms, vertex attributes are not handled through the KVC system.
@@ -61,9 +61,9 @@
 // accepted by the compiler without additional configuration. In point of fact,
 // all property refs are handled dynamically based on the actual shaders.
 
-@property (nonatomic) id <GPUImageProvider> inputTexture;
-@property (nonatomic) id <GPUImageProvider> accessoryTexture; // 2nd input
-@property (nonatomic) id <GPUImageProvider> outputTexture;
+@property (nonatomic) id <GPUImageSource> inputTexture;
+@property (nonatomic) id <GPUImageSource> accessoryTexture; // 2nd input
+@property (nonatomic) id <GPUImageSource> outputTexture;
 
 // This method is used only for determining the handles for vertex
 // attributes for use in drawing. For uniforms, the general GPUImageProgram

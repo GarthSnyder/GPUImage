@@ -1,12 +1,22 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
+#import <CoreMedia/CoreMedia.h>
 #import "GPUImageOpenGLESContext.h"
-#import "GPUImageOutput.h"
+#import "GPUImageBase.h"
 
-@interface GPUImageMovie : GPUImageOutput
+@class GPUImageMovie;
 
-@property(readwrite, retain) NSURL *url;
-@property(readwrite, nonatomic) BOOL runBenchmark;
+@protocol GPUImageMovieDelegate
+- movieDidDecodeNewFrame:(GPUImageMovie *)movie;
+@end
+
+@interface GPUImageMovie : GPUImageBase <GPUImageUpdating> 
+{
+  CVPixelBufferRef _currentBuffer;
+}
+
+@property (nonatomic, assign) id <GPUImageMovieDelegate> delegate;
+@property (readwrite, retain) NSURL *url;
 
 // Initialization and teardown
 - (id)initWithURL:(NSURL *)url;

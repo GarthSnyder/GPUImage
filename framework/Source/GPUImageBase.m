@@ -122,7 +122,7 @@
     }
 }
 
-- (void) adoptParametersFrom:(id <GPUImageProvider>)other
+- (void) adoptParametersFrom:(id <GPUImageSource>)other
 {
     GPUImageBuffer *obs = other.backingStore;
     
@@ -141,7 +141,8 @@
 #pragma mark Interactions with backing store
 
 // Must know at least size and base format, or for layer-based renderbuffers,
-// the layer id.
+// the layer id. This call always creates a new backing store, even if one
+// already exists.
 
 - (void) createBackingStore
 {
