@@ -5,25 +5,25 @@
 #import "GPUImageTypes.h"
 #import "GPUimageBuffer.h"
 
-// The GPUImageBackingStoreProvider protocol lets an object vend its
+// The GPUImageProvider protocol lets an object vend its
 // GPUImageBuffer object, which wraps its renderbuffer or texture buffer
 // and FBO. The caller may adjust scalar attributes of the buffer (e.g.,
 // texture edge treatment params), but should not change the contents. This
 // convention allows efficient sharing of texture buffers, since buffers
 // can often be treated as logically separate even if they share an OpenGL
-// bufffer.
+// buffer.
 //
 // All objects that participate in a filter graph should implement 
-// GPUImageFlow, but terminal objects (that is, objects that are image
-// consumers only) need not implement GPUImageBackingStoreProvider.
+// GPUImageUpdating, but terminal objects (that is, objects that are image
+// consumers only) need not implement GPUImageProvider.
 
-@protocol GPUImageBackingStoreProvider <NSObject>
+@protocol GPUImageProvider <NSObject>
 
 - (GPUImageBuffer *) backingStore;
 
 @end
 
-// An object conforming to GPUImageFlow can participate in GPUImage's 
+// An object conforming to GPUImageUpdating can participate in GPUImage's 
 // rendering tree. The flow is bottom-up.
 //
 // To update itself, an object first calls -update on all the objects from
@@ -44,9 +44,9 @@
 // interpretation of -deriveFrom to allow multiple ancestors, or they may
 // collect ancestor information implicitly.
 
-@protocol GPUImageFlow <NSObject>
+@protocol GPUImageUpdating <NSObject>
 
-typedef id <GPUImageFlow, GPUImageBackingStoreProvider> GPUImageProvider;
+typedef id <GPUImageUpdating, GPUImageProvider> GPUImageProvider;
 
 - (void) deriveFrom:(GPUImageProvider)parent; // Pass nil to undo
 - (GPUImageTimestamp) timeLastChanged;

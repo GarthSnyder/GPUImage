@@ -109,7 +109,7 @@
 }
 
 #pragma mark -
-#pragma mark GPUImageFlow protocol
+#pragma mark GPUImageUpdating protocol
 
 - (void) deriveFrom:(GPUImageProvider)newParent;
 {
@@ -119,7 +119,7 @@
     }
 }
 
-// The filters in the pipeline are in fact an independent GPUImageFlow
+// The filters in the pipeline are in fact an independent GPUImageUpdating
 // object subgraph. The GPUImageFilterPipeline patches this subgraph into
 // its parent graph by acting as both the head (when specifying an external
 // source as input to the pipeline through [pipeline deriveFrom:]) and the tail
@@ -135,7 +135,7 @@
         return NO;
     }
     [self setupFilters];
-    id <GPUImageFlow> trueParent = parent;
+    id <GPUImageUpdating> trueParent = parent;
     parent = [self.filters lastObject];
     BOOL result = [super update];
     parent = trueParent;

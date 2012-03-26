@@ -19,7 +19,7 @@
 // 3) A GPUImage also has, or can produce on demand, an associated 
 //    framebuffer.
 
-@interface GPUImage : GPUImageBase <GPUImageFlow>
+@interface GPUImage : GPUImageBase <GPUImageUpdating>
 {
     GPUImageProvider parent;
     GPUImageTimestamp timeLastChanged;

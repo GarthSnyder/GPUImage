@@ -228,7 +228,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     for (GPUImageShaderSymbol *uniform in uniforms) {
         [uniform gatherOESDetailsForProgram:programHandle];
         // Make sure textures have a texture unit assigned
-        if ([uniform.value conformsToProtocol:@protocol(GPUImageBackingStoreProvider)] && !uniform.textureUnit) {
+        if ([uniform.value conformsToProtocol:@protocol(GPUImageProvider)] && !uniform.textureUnit) {
             uniform.textureUnit = [GPUImageTextureUnit unitAtIndex:nextTextureUnit++];
         }
         [uniform setOESValue];
