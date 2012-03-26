@@ -5,7 +5,7 @@
 #import "GPUImageTypes.h"
 #import "GPUimageBuffer.h"
 
-// The GPUImageProvider protocol lets an object vend its
+// The GPUImageSource protocol lets an object vend its
 // GPUImageBuffer object, which wraps its renderbuffer or texture buffer
 // and FBO. The caller may adjust scalar attributes of the buffer (e.g.,
 // texture edge treatment params), but should not change the contents. This
@@ -15,9 +15,9 @@
 //
 // All objects that participate in a filter graph should implement 
 // GPUImageUpdating, but terminal objects (that is, objects that are image
-// consumers only) need not implement GPUImageProvider.
+// consumers only) need not implement GPUImageSource.
 
-@protocol GPUImageProvider <NSObject>
+@protocol GPUImageSource <NSObject>
 
 - (GPUImageBuffer *) backingStore;
 
@@ -46,9 +46,9 @@
 
 @protocol GPUImageUpdating <NSObject>
 
-typedef id <GPUImageUpdating, GPUImageProvider> GPUImageProvider;
+typedef id <GPUImageUpdating, GPUImageSource> GPUImageSource;
 
-- (void) deriveFrom:(GPUImageProvider)parent; // Pass nil to undo
+- (void) deriveFrom:(GPUImageSource)parent; // Pass nil to undo
 - (GPUImageTimestamp) timeLastChanged;
 - (BOOL) update;
 

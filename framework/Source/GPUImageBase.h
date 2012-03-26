@@ -4,10 +4,10 @@
 
 #import "GPUImageHeaders.h"
 
-// GPUImageBase is the drawing and texture management (GPUImageProvider) 
+// GPUImageBase is the drawing and texture management (GPUImageSource) 
 // portion of GPUImage. See header comments in GPUImage.h for more details.
 
-@interface GPUImageBase : NSObject <GPUImageProvider>
+@interface GPUImageBase : NSObject <GPUImageSource>
 
 @property (nonatomic) GLsize size;
 @property (nonatomic) GLenum baseFormat;    // GL_RGBA, etc.
@@ -39,14 +39,14 @@
 - (void) drawWithProgram:(GPUImageProgram *)prog;
 
 // Adopts size and base format only, and only if receiver's are unknown
-- (void) adoptParametersFrom:(id <GPUImageProvider>)other;
+- (void) adoptParametersFrom:(id <GPUImageSource>)other;
 
 // Methods for getting image data out of OpenGL
 - (GLuint *) getRawContents;
 - (CGImageRef) getCGImage;
 - (UIImage *) getUIImage;
 
-// Generally NOT necessary to access these directly
+// Generally not necessary to access these directly
 
 - (void) createBackingStore;
 - (void) releaseBackingStore;

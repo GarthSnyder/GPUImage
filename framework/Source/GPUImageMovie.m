@@ -1,8 +1,15 @@
 #import "GPUImageMovie.h"
 
+@interface GPUImageMovie ()
+{
+    GPUImageTimestamp timeLastChanged;
+}
+@end
+
 @implementation GPUImageMovie
 
 @synthesize url = _url;
+@synthesize delegate = _delegate;
 
 - (id)initWithURL:(NSURL *)url 
 {
@@ -69,28 +76,47 @@
 {
     // Upload to texture
     CVPixelBufferLockBaseAddress(_currentBuffer, 0);
-    int bufferHeight = CVPixelBufferGetHeight(_currentBuffer);
-    int bufferWidth = CVPixelBufferGetWidth(_currentBuffer);
+    GLsize buffSize;
+    buffSize.height = CVPixelBufferGetHeight(_currentBuffer);
+    buffSize.width = CVPixelBufferGetWidth(_currentBuffer);
     
-    glBindTexture(GL_TEXTURE_2D, outputTexture);
-    // Using BGRA extension to pull in video frame data directly
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferWidth, bufferHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(_currentBuffer));
+    [GPUImageOpenGLESContext useImageProcessingContext];
+
+    self.usesRenderbuffer = NO;
+    self.size = buffSize;
+    self.pixType = GL_UNSIGNED_BYTE;
+    self.baseFormat = GL_RGBA;
     
-    CGSize currentSize = CGSizeMake(bufferWidth, bufferHeight);
-    for (id<GPUImageInput> currentTarget in targets)
-    {
-        [currentTarget setInputSize:currentSize];
-        [currentTarget newFrameReady];
+    if (!self.backingStore) {
+        [self createBackingStore];
+    } else {
+        [self.backingStore bind];
     }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, buffSize.width, buffSize.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(_currentBuffer));
     CVPixelBufferUnlockBaseAddress(_currentBuffer, 0);
+
+    if (self.generatesMipmap) {
+        [self.backingStore generateMipmap:YES];
+    }
+    if (self.delegate) {
+        [self.delegate movieDidDecodeNewFrame:self];
+    }
 }
 
-- (void)endProcessing 
+- (BOOL) update
 {
-    for (id<GPUImageInput> currentTarget in targets)
-    {
-        [currentTarget endProcessing];
-    }
+    return YES;
+}
+
+- (GPUImageTimestamp)timeLastChanged
+{
+    return timeLastChanged;
+}
+
+- (void) deriveFrom:(GPUImageSource)parent
+{
+    NSAssert(NO, @"Use movie.url = foo to set the input for a GPUImageMovie.");
 }
 
 @end

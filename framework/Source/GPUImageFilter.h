@@ -1,7 +1,7 @@
-#import "GPUImageElement.h"
+#import <UIKit/UIKit.h>
 #import "GPUImageProgram.h"
 #import "GPUImage.h"
-#import <UIKit/UIKit.h>
+#import "GPUImageProgram.h"
 
 // A GPUImageFilter is a GPUImage that uses an OpenGL program to transform
 // its input image. 

@@ -10,19 +10,18 @@
 	AVCaptureVideoDataOutput *videoOutput;
     GPUImageTimestamp timeLastChanged;
 }
-
 @end
 
 @implementation GPUImageVideoCamera
 
+@synthesize delegate = _delegate;
 @synthesize captureSession = _captureSession;
 @synthesize inputCamera = _inputCamera;
-@synthesize runBenchmark = _runBenchmark;
 
 #pragma mark -
 #pragma mark Initialization and teardown
 
-- (id) init;
+- (id) init
 {
     return [self initWithSessionPreset:AVCaptureSessionPreset640x480 
         cameraPosition:AVCaptureDevicePositionBack];
@@ -48,10 +47,8 @@
     // Grab the back-facing or front-facing camera
     _inputCamera = nil;
 	NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-	for (AVCaptureDevice *device in devices) 
-	{
-		if ([device position] == cameraPosition)
-		{
+	for (AVCaptureDevice *device in devices) {
+		if ([device position] == cameraPosition) {
 			_inputCamera = device;
 		}
 	}
@@ -64,8 +61,7 @@
 	// Add the video input	
 	NSError *error = nil;
 	videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:_inputCamera error:&error];
-	if ([_captureSession canAddInput:videoInput]) 
-	{
+	if ([_captureSession canAddInput:videoInput]) {
 		[_captureSession addInput:videoInput];
 	}
 	
@@ -99,8 +95,7 @@
     [_captureSession removeInput:videoInput];
     [_captureSession removeOutput:videoOutput];
 
-    if ([GPUImageOpenGLESContext supportsFastTextureUpload])
-    {
+    if (coreVideoTextureCache) {
         CFRelease(coreVideoTextureCache);
     }
 }
@@ -108,15 +103,15 @@
 #pragma mark -
 #pragma mark Manage the camera video stream
 
-- (void)startCameraCapture;
+- (void)startCameraCapture
 {
     if (![_captureSession isRunning])
 	{
 		[_captureSession startRunning];
-	};
+	}
 }
 
-- (void)stopCameraCapture;
+- (void)stopCameraCapture
 {
     if ([_captureSession isRunning])
     {
@@ -172,21 +167,21 @@
     didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer 
     fromConnection:(AVCaptureConnection *)connection
 {
-    CVImageBufferRef cameraFrame = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CVImageBufferRef imgBuff = CMSampleBufferGetImageBuffer(sampleBuffer);
     
     GLsize buffSize;
-    buffSize.width = CVPixelBufferGetWidth(cameraFrame);
-    buffSize.height = CVPixelBufferGetHeight(cameraFrame);
+    buffSize.width = CVPixelBufferGetWidth(imgBuff);
+    buffSize.height = CVPixelBufferGetHeight(imgBuff);
     self.size = buffSize;
     
     [GPUImageOpenGLESContext useImageProcessingContext];
-    CVPixelBufferLockBaseAddress(cameraFrame, 0);
+    CVPixelBufferLockBaseAddress(imgBuff, 0);
     
     if ([GPUImageOpenGLESContext supportsFastTextureUpload])
     {
         CVOpenGLESTextureRef texture = NULL;
         CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-            coreVideoTextureCache, cameraFrame, NULL, GL_TEXTURE_2D, GL_RGBA, 
+            coreVideoTextureCache, imgBuff, NULL, GL_TEXTURE_2D, GL_RGBA, 
             buffSize.width, buffSize.height, GL_BGRA, GL_UNSIGNED_BYTE, 0, &texture);
                 
         if (!texture || err) {
@@ -211,10 +206,13 @@
         [self.backingStore bind];
         // Using BGRA extension to pull in video frame data directly
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, buffSize.width, buffSize.height, 0, 
-            GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(cameraFrame));
+            GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(imgBuff));
     }    
-    CVPixelBufferUnlockBaseAddress(cameraFrame, 0);
+    CVPixelBufferUnlockBaseAddress(imgBuff, 0);
     timeLastChanged = GPUImageGetCurrentTimestamp();
+    if (self.delegate) {
+        [self.delegate videoCameraDidReceiveNewFrame:self];
+    }
 }
 
 @end
