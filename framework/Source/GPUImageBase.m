@@ -113,24 +113,27 @@
     }
     if (gen) {
         NSAssert(!self.usesRenderbuffer, @"Renderbuffers cannot have mipmaps");
-        _generatesMipmap = gen;
-        if (timeLastChanged > 0) {
+        _generatesMipmap = YES;
+        if (self.backingStore && (timeLastChanged > 0)) {
             GPUImageTextureBuffer *buffer = (GPUImageTextureBuffer *)self.backingStore;
-            [buffer generateMipmap];
+            [buffer generateMipmap:NO];
+            timeLastChanged = 0;
         }
     }
 }
 
-- (void) adoptParametersFrom:(GPUImage *)other
+- (void) adoptParametersFrom:(id <GPUImageProvider>)other
 {
+    GPUImageBuffer *obs = other.backingStore;
+    
     if (!self.size.width || !self.size.height) {
-        self.size = other.size;
+        self.size = obs.size;
     }
     if (!self.baseFormat) {
-        self.baseFormat = other.baseFormat;
+        self.baseFormat = obs.baseFormat;
     }
-    if (!self.pixType) {
-        self.pixType = other.pixType;
+    if (!self.pixType && !self.usesRenderbuffer && [obs isKindOfClass:[GPUImageTextureBuffer class]]) {
+        self.pixType = ((GPUImageTextureBuffer *)obs).pixType;
     }
 }
 

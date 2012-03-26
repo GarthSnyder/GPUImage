@@ -1,5 +1,3 @@
-//  Created by Garth Snyder on 3/17/12.
-
 #import "GPUImageBuffer.h"
 
 @interface GPUImageTextureBuffer : GPUImageBuffer
@@ -15,6 +13,6 @@
 - initWithSize:(GLsize)size baseFormat:(GLenum)format pixType:(GLenum)pix;
 - initWithTexture:(GLint)texHandle size:(GLsize)size format:(GLenum)fmt;
 
-- (void) generateMipmap;
+- (void) generateMipmap:(BOOL)force;
 
 @end

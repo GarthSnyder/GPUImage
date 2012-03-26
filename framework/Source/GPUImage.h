@@ -18,6 +18,12 @@
 //
 // 3) A GPUImage also has, or can produce on demand, an associated 
 //    framebuffer.
+//
+// Actual implementation is split between GPUImageBase and GPUImage. The 
+// former class implements the GPUImageProvider protocol, and the latter
+// implements GPUImageUpdating. The reason for the split implementation is
+// that some classes may wish to provide their own GPUImageUpdating 
+// implementation on top of the foundation provided by GPUImageBase.
 
 @interface GPUImage : GPUImageBase <GPUImageUpdating>
 {

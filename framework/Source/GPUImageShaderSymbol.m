@@ -1,11 +1,3 @@
-//
-//  GPUImageShaderSymbol.m
-//  GPUImage
-//
-//  Created by Lion User on 3/15/12.
-//  Copyright (c) 2012 Brad Larson. All rights reserved.
-//
-
 #import "GPUImageShaderSymbol.h"
 
 @interface GPUImageShaderSymbol ()
@@ -31,11 +23,6 @@
 @synthesize value = _value;
 @synthesize knowsOESDetails = _knowsOESDetails;
 @synthesize dirty = _dirty;
-
-+ (GPUImageShaderSymbol *) symbol
-{
-    return [[GPUImageShaderSymbol alloc] init];
-}
 
 - (id) init
 {

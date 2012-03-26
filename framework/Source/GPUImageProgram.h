@@ -1,23 +1,31 @@
-//  This is adapted from Jeff LaMarche's GLProgram OpenGL shader wrapper class
-//  from his OpenGL ES 2.0 book. A description of this can be found at his page
-//  on the topic:
+// GPUImageProgram wraps an OpenGL ES program consisting of two shaders and
+// values for the shader uniforms.
+// 
+// Use KVC-style syntax to set the value of uniforms. For example:
 //
-//  http://iphonedevelopment.blogspot.com/2010/11/opengl-es-20-for-ios-chapter-4.html
+//     [program setValue:[NSNumber numberWithFloat:3.0] forKey:@"gamma"]
 //
-//  Brad Larson: I've extended this to be able to take programs as NSStrings in
-//    addition to files, for baked-in shaders.
-//  Garth Snyder: Added KVC-style handling of attributes and uniforms, lazy
-//    behavior
+// The values are lazily propagated to OpenGL at the point of use. Furthermore,
+// they are dirtiness-tracked so that values are not actually written out
+// unless they need to be. 
+//
+// For sampler uniforms, you can use any object that conforms to the 
+// GPUImageProvider protocol as a value. GPUImage automatically 
+// manages handles and texture units.
+//
+// Unlike uniforms, vertex attributes are not handled through the KVC system.
+// Use indexOfAttribute: to obtain the appropriate handle and call OpenGL
+// directly to set up values. (But note that most programs's vertex setups
+// will be handled automatically by -draw or -drawWithProgram:.)
 
 #import <Foundation/Foundation.h>
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
-
 #import "GPUImageShader.h"
 #import "GPUImage.h"
 
-// Shortcut for encoding uniform values as NSValues. Argument must be a 
-// non-literal value.
+// Shortcut for encoding uniform values as NSValues. Argument must be 
+// non-literal values such as local variables.
 
 #define UNIFORM(x) [NSValue valueWithBytes:&(x) objCType:@encode(typeof(x))]
 
@@ -29,13 +37,10 @@
     GLint nextTextureUnit;
 }
 
-// These are effectively write-only. 
-@property (nonatomic) NSString *vertexShader;
-@property (nonatomic) NSString *vertexShaderFilename;
-@property (nonatomic) NSString *fragmentShader;
-@property (nonatomic) NSString *fragmentShaderFilename;
-
-+ (GPUImageProgram *) program;
+- (void) setVertexShader:(NSString *)vertexShader;
+- (void) setVertexShaderFilename:(NSString *)vertexShaderFilename;
+- (void) setFragmentShader:(NSString *)fragmentShader;
+- (void) setFragmentShaderFilename:(NSString *)fragmentShaderFilename;
 
 // This is the primary interface for setting attrs/uniforms and executing.
 // Activates (uses) the program and flushes all attribute and uniform values.
@@ -56,13 +61,15 @@
 // accepted by the compiler without additional configuration. In point of fact,
 // all property refs are handled dynamically based on the actual shaders.
 
-@property (nonatomic) GPUImage *inputTexture;
-@property (nonatomic) GPUImage *accessoryTexture; // 2nd input
-@property (nonatomic) GPUImage *outputTexture;
+@property (nonatomic) id <GPUImageProvider> inputTexture;
+@property (nonatomic) id <GPUImageProvider> accessoryTexture; // 2nd input
+@property (nonatomic) id <GPUImageProvider> outputTexture;
 
-// This method is generally used only for determining the handles for vertex
+// This method is used only for determining the handles for vertex
 // attributes for use in drawing. For uniforms, the general GPUImageProgram
-// KVC system should be used (e.g., program.shaderAttr = 3.0).
+// KVC system should be used, e.g.:
+//
+//     [program setValue:[NSNumber numberWithFloat:3.0] forKey:@"gamma"]
 
 - (GLint) indexOfAttribute:(NSString *)name;
 

@@ -1,5 +1,3 @@
-//  Created by Garth Sndyer on 3/17/12.
-
 #import "GPUImageTextureBuffer.h"
 
 @interface GPUImageTextureBuffer ()
@@ -88,9 +86,9 @@ static GLint lastBoundTexture = -1;
 
 // TODO: Generate mipmaps for non-square/non-power-of-two images
 
-- (void) generateMipmap
+- (void) generateMipmap:(BOOL)force
 {
-    if (!self.hasMipmap) {
+    if (force || !self.hasMipmap) {
         unsigned int uWidth = self.size.width;
         unsigned int uHeight = self.size.height;
         // x & (x - 1) flips the rightmost 1 bit of x to 0
@@ -98,9 +96,10 @@ static GLint lastBoundTexture = -1;
         BOOL widthIsPowerOf2 = ((uWidth & (uWidth - 1)) == 0);
         BOOL heightIsPowerOf2 = ((uHeight & (uHeight - 1)) == 0);
         NSAssert(widthIsPowerOf2 && heightIsPowerOf2 && (uWidth == uHeight),
-            @"Mipmaps for non-square or non-power-of-two textures are not yet supported.");
+            @"Mipmaps for non-square or non-power-of-two textures are not yet implemented.");
         [self bind];
         glGenerateMipmap(GL_TEXTURE_2D);
+        _hasMipmap = YES;
     }
 }
 

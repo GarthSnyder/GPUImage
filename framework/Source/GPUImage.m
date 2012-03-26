@@ -33,13 +33,15 @@
 #pragma mark -
 #pragma mark Rendering
 
-// We only know how to deal with parents who are themselves GPUImages. Our
-// contents are expected to reflect theirs after rendering.
+// Update our contents to reflect those of the parent. The parent implements
+// the GPUImageProvider protocol, so we know it can produce an image buffer
+// on demand. The question is, can we share this buffer, or do we need to 
+// copy or adapt it?
 //
 // If our size and color model are compatible with the parent texture's settings,
 // we can simply share that texture's backing store and set ancillary params
 // as needed. (It's fine to override the parent's filter and wraps because the
-// parent will reset them when it next gets drawn into.)
+// parent will reset them when it is next rendered.)
 //
 // If our parent is a texture of incompatible size or backing store, then we
 // need to do a conversion.
@@ -53,7 +55,7 @@
     [self setTextureParams];
     if (!self.usesRenderbuffer && self.generatesMipmap) {
         GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
-        [store generateMipmap]; // Optimized out if already done
+        [store generateMipmap:NO]; // Optimized out if already done
     }
     timeLastChanged = GPUImageGetCurrentTimestamp();
     return YES;
