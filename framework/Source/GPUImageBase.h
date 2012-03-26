@@ -5,10 +5,10 @@
 #import "GPUImageHeaders.h"
 
 // GPUImageBase is the drawing and texture management portion of GPUImage
-// minus the GPUImageFlow protocol implementation. See header comments
+// minus the GPUImageUpdating protocol implementation. See header comments
 // for GPUImage for more details.
 
-@interface GPUImageBase : NSObject <GPUImageBackingStoreProvider>
+@interface GPUImageBase : NSObject <GPUImageProvider>
 
 @property (nonatomic) GLsize size;
 @property (nonatomic) GLenum baseFormat;
