@@ -3,6 +3,25 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import "GPUImageTypes.h"
+#import "GPUimageBuffer.h"
+
+// The GPUImageBackingStoreProvider protocol lets an object vend its
+// GPUImageBuffer object, which wraps its renderbuffer or texture buffer
+// and FBO. The caller may adjust scalar attributes of the buffer (e.g.,
+// texture edge treatment params), but should not change the contents. This
+// convention allows efficient sharing of texture buffers, since buffers
+// can often be treated as logically separate even if they share an OpenGL
+// bufffer.
+//
+// All objects that participate in a filter graph should implement 
+// GPUImageFlow, but terminal objects (that is, objects that are image
+// consumers only) need not implement GPUImageBackingStoreProvider.
+
+@protocol GPUImageBackingStoreProvider <NSObject>
+
+- (GPUImageBuffer *) backingStore;
+
+@end
 
 // An object conforming to GPUImageFlow can participate in GPUImage's 
 // rendering tree. The flow is bottom-up.
@@ -27,7 +46,9 @@
 
 @protocol GPUImageFlow <NSObject>
 
-- (void) deriveFrom:(id <GPUImageFlow>)parent; // Pass nil to undo
+typedef id <GPUImageFlow, GPUImageBackingStoreProvider> GPUImageProvider;
+
+- (void) deriveFrom:(GPUImageProvider)parent; // Pass nil to undo
 - (GPUImageTimestamp) timeLastChanged;
 - (BOOL) update;
 

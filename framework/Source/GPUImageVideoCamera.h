@@ -13,18 +13,23 @@
 @interface GPUImageVideoCamera : GPUImageBase <AVCaptureVideoDataOutputSampleBufferDelegate, GPUImageFlow>
 {
     CVOpenGLESTextureCacheRef coreVideoTextureCache;    
+    AVCaptureSession *_captureSession;
+    AVCaptureDevice *_inputCamera;
 }
 
 @property (readonly) AVCaptureSession *captureSession;
 
+// Use this property to manage camera settings.Focus point, exposure point, etc.
+@property(readonly) AVCaptureDevice *inputCamera;
+
 // Initialization and teardown
 - (id) initWithSessionPreset:(NSString *)sessionPreset cameraPosition:(AVCaptureDevicePosition)cameraPosition; 
-
-// Manage fast texture upload
-+ (BOOL)supportsFastTextureUpload;
 
 // Manage the camera video stream
 - (void) startCameraCapture;
 - (void) stopCameraCapture;
+
+// Rotate the camera
+- (void)rotateCamera;
 
 @end

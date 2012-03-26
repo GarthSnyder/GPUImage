@@ -3,6 +3,7 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import "GPUImageTextureUnit.h"
+#import "GPUImageTextureBuffer.h"
 
 static NSMutableDictionary *textureUnits;
 
@@ -34,11 +35,11 @@ static NSMutableDictionary *textureUnits;
     return self;
 }
 
-- (void) bindTexture:(GPUImage *)texture
+- (void) bindTexture:(GPUImageTextureBuffer *)texture
 {
     glActiveTexture(self.textureUnitID);
-    glBindTexture(GL_TEXTURE_2D, texture.textureHandle);
-    self.currentTextureHandle = texture.textureHandle;
+    glBindTexture(GL_TEXTURE_2D, texture.handle);
+    self.currentTextureHandle = texture.handle;
 }
 
 @end

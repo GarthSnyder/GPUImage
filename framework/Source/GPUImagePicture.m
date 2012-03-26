@@ -32,7 +32,7 @@
 #pragma mark -
 #pragma mark GPUImageFlow protocol
 
-- (void) deriveFrom:(id <GPUImageFlow>)parent
+- (void) deriveFrom:(GPUImageProvider)parent
 {
     NSAssert(NO, @"Use pic.image = foo to set the input image for a GPUImagePicture.");
 }
@@ -47,7 +47,7 @@
     CGFloat scaleOfImage = [imageSource scale];
     GLsize pixelSizeOfImage = {scaleOfImage * pointSizeOfImage.width + 0.1, 
         scaleOfImage * pointSizeOfImage.height + 0.1);
-    if (self.generateMipmap) {
+    if (self.generatesMipmap) {
         // In order to use auto-generated mipmaps, you need to provide
         // power-of-two textures, so convert to the next largest power of
         // two and stretch to fill.
@@ -69,7 +69,7 @@
     CGContextRelease(imageContext);
     CGColorSpaceRelease(genericRGBColorspace);
     
-    self.useRenderbuffer = NO;
+    self.usesRenderbuffer = NO;
     self.size = pixelSizeOfImage;
     self.pixType = GL_UNSIGNED_BYTE;
     self.baseFormat = GL_RGBA;
@@ -80,7 +80,7 @@
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixelSizeOfImage.width, 
         pixelSizeOfImage.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, imageData);
 
-    if (self.generateMipmap) {
+    if (self.generatesMipmap) {
         glGenerateMipmap(GL_TEXTURE_2D);
     }
 

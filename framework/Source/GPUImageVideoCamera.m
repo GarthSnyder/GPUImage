@@ -45,17 +45,17 @@
         NSAssert(!err, @"Error at CVOpenGLESTextureCacheCreate %d");
     }
 
-	// Grab the back-facing camera
-	AVCaptureDevice *backFacingCamera = nil;
+    // Grab the back-facing or front-facing camera
+    _inputCamera = nil;
 	NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
 	for (AVCaptureDevice *device in devices) 
 	{
 		if ([device position] == cameraPosition)
 		{
-			backFacingCamera = device;
+			_inputCamera = device;
 		}
 	}
-    	
+    
 	// Create the capture session
 	_captureSession = [[AVCaptureSession alloc] init];
 	
@@ -195,7 +195,7 @@
         }
         
         GLint outputTexture = CVOpenGLESTextureGetName(texture);
-        self.backingStore = [[GPUImageTextureBuffer alloc] initWithTexture:outputTexture
+        _backingStore = [[GPUImageTextureBuffer alloc] initWithTexture:outputTexture
             size:buffSize format:GL_RGBA];
         [self setTextureParameters];
         
