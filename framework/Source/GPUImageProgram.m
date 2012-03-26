@@ -30,7 +30,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
      
      void main()
      {
-         gl_FragColor = vec4(texture2D(inputTexture, textureCoordinate).rgb, 1.0);
+         gl_FragColor = texture2D(inputTexture, textureCoordinate);
      }
 );
 
@@ -49,6 +49,8 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 @end
 
 @implementation GPUImageProgram
+
+@dynamic inputTexture, outputTexture, accessoryTexture;
 
 #pragma mark -
 #pragma mark Initialization and shader specification
@@ -86,49 +88,29 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     fragmentShader = [[GPUImageShader alloc] initWithFilename:fsFile];
 }
 
-- (NSString *) vertexShader {
-    NSAssert(NO, @"GPUImageProgram: vertexShader property is write-only.");
-    return nil;
-}
-
-- (NSString *) vertexShaderFilename {
-    NSAssert(NO, @"GPUImageProgram: vertexShaderFilename property is write-only.");
-    return nil;
-}
-
-- (NSString *) fragmentShader {
-    NSAssert(NO, @"GPUImageProgram: fragmentShader property is write-only.");
-    return nil;
-}
-
-- (NSString *) fragmentShaderFilename {
-    NSAssert(NO, @"GPUImageProgram: fragmentShaderFilename property is write-only.");
-    return nil;
-}
-
 #pragma mark Pass-alongs for default input and output textures
 
-- (GPUImage *)inputTexture {
+- (id <GPUImageProvider>) inputTexture {
     return [self valueForKey:@"inputTexture"];
 }
 
-- (GPUImage *)outputTexture {
+- (id <GPUImageProvider>) outputTexture {
     return [self valueForKey:@"outputTexture"];
 }
 
-- (GPUImage *)accessoryTexture {
+- (id <GPUImageProvider>) accessoryTexture {
     return [self valueForKey:@"accessoryTexture"];
 }
 
-- (void) setInputTexture:(GPUImage *)inputTexture {
+- (void) setInputTexture:(id <GPUImageProvider>)inputTexture {
     [self setValue:inputTexture forKey:@"inputTexture"];
 }
 
-- (void) setOutputTexture:(GPUImage *)outputTexture {
+- (void) setOutputTexture:(id <GPUImageProvider>)outputTexture {
     [self setValue:outputTexture forKey:@"outputTexture"];
 }
 
-- (void) setAccessoryTexture:(GPUImage *)accessoryTexture {
+- (void) setAccessoryTexture:(id <GPUImageProvider>)accessoryTexture {
     [self setValue:accessoryTexture forKey:@"accessoryTexture"];
 }
 
@@ -206,7 +188,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
         }
         uniform.value = obj;
     } else {
-        uniform = [GPUImageShaderSymbol symbol];
+        uniform = [[GPUImageShaderSymbol alloc] init];
         uniform.name = key;
         uniform.value = obj;
     }

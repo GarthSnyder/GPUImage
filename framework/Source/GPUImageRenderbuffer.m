@@ -1,5 +1,3 @@
-//  Created by Garth Snyder on 3/18/12.
-
 #import <QuartzCore/QuartzCore.h>
 #import "GPUImageRenderbuffer.h"
 #import "GPUImageOpenGLESContext.h"

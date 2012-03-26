@@ -4,20 +4,21 @@
 
 #import "GPUImageHeaders.h"
 
-// GPUImageBase is the drawing and texture management portion of GPUImage
-// minus the GPUImageUpdating protocol implementation. See header comments
-// for GPUImage for more details.
+// GPUImageBase is the drawing and texture management (GPUImageProvider) 
+// portion of GPUImage. See header comments in GPUImage.h for more details.
 
 @interface GPUImageBase : NSObject <GPUImageProvider>
 
 @property (nonatomic) GLsize size;
-@property (nonatomic) GLenum baseFormat;
-@property (nonatomic) GLenum pixType;
+@property (nonatomic) GLenum baseFormat;    // GL_RGBA, etc.
+@property (nonatomic) GLenum pixType;       // GL_UNSIGNED_BYTE, etc.
 
-// Setting an associated layer automatically turns on usesRenderbuffer.
+// Setting an associated layer automatically turns on usesRenderbuffer and
+// prepares the GPUImage object for rendering to an onscreen view.
+//
 // However, you can use a renderbuffer without an associated CAEAGLLayer.
 
-@property (assign, nonatomic) CAEAGLLayer *layer;   // Associated layer, if any
+@property (assign, nonatomic) CAEAGLLayer *layer;
 @property (nonatomic) BOOL usesRenderbuffer;
 
 @property (nonatomic) GLenum wrapS, wrapT;          // Texture edge handling
@@ -27,16 +28,18 @@
 @property (nonatomic) GLenum wrap;
 @property (nonatomic) GLenum filter;
 
+// Automatically maintain a mipmap for this texture. 
+// Incompatible with usesRenderbuffer.
 @property (nonatomic) BOOL generatesMipmap;
 
 - (void) bindAsFramebuffer;
-- (void) clearFramebuffer; // Also binds
+- (void) clearFramebuffer;                       // Also binds
 - (void) clearFramebuffer:(vec4)backgroundColor; // Also binds
 
 - (void) drawWithProgram:(GPUImageProgram *)prog;
 
 // Adopts size and base format only, and only if receiver's are unknown
-- (void) adoptParametersFrom:(GPUImage *)other;
+- (void) adoptParametersFrom:(id <GPUImageProvider>)other;
 
 // Methods for getting image data out of OpenGL
 - (GLuint *) getRawContents;

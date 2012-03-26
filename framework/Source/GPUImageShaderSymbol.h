@@ -1,7 +1,3 @@
-//
-//  Created by Garth Snyder on 3/15/12.
-//
-
 #import <Foundation/Foundation.h>
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
@@ -22,8 +18,6 @@
 @property (nonatomic) BOOL dirty;               // Needs flushed to OES context
 
 @property (strong, nonatomic) GPUImageTextureUnit *textureUnit;  // Only for type = GL_TEXTURE_2D
-
-+ (GPUImageShaderSymbol *) symbol;
 
 // Communicate a value to OpenGL
 - (void) setOESValue;

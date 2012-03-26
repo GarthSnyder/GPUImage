@@ -1,14 +1,12 @@
-//  Created by Garth Snyder on 3/17/12
+//  Thin wrapper for OpenGL ES texture and renderbuffer objects. The
+//  GPUImageBase class handles these objects from an abstract perspective,
+//  whereas a GPUImageBuffer always corresponds to a specific, real OpenGL
+//  image buffer. (By contrast, a GPUImage may not have an actual buffer;
+//  think of it as a "specification for a buffer".)
 //
-//  Thin overlay for OpenGL ES texture and renderbuffer objects. The
-//  GPUImage class handles these objects from a functional and 
-//  logical perspective. This wrapper ensures sharability of the underlying
-//  buffers and proper garbage collection when no one refers to them 
+//  The point of wrapping is to ensure sharability of the underlying
+//  buffers and to ensure that buffers are deleted when no one refers to them 
 //  any longer.
-//
-//  A GPUImage may or may not have an underlying buffer, depending
-//  on its current state. But a GPUImageBuffer always corresponds to a 
-//  single, real OpenGL buffer.
 
 #import <UIKit/UIKit.h>
 #import <OpenGLES/ES2/gl.h>
@@ -18,7 +16,7 @@
 @interface GPUImageBuffer : NSObject
 {
     GLuint _handle;
-    GLuint _fboHandle; // Framebuffer object, if one exists
+    GLuint _fboHandle;
     GLsize _size;
     GLenum _format;
 }
