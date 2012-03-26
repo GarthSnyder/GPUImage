@@ -6,7 +6,7 @@
 
 @implementation GPUImage
 
-- (void) deriveFrom:(GPUImageProvider)newParent
+- (void) deriveFrom:(GPUImageSource)newParent
 {
     if (parent != newParent) {
         parent = newParent;
@@ -34,7 +34,7 @@
 #pragma mark Rendering
 
 // Update our contents to reflect those of the parent. The parent implements
-// the GPUImageProvider protocol, so we know it can produce an image buffer
+// the GPUImageSource protocol, so we know it can produce an image buffer
 // on demand. The question is, can we share this buffer, or do we need to 
 // copy or adapt it?
 //

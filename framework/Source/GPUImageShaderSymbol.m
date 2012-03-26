@@ -58,7 +58,7 @@
 
 - (void) setOESValue
 {
-    if ([_value conformsToProtocol:@protocol(GPUImageProvider)]) {
+    if ([_value conformsToProtocol:@protocol(GPUImageSource)]) {
         [self setOESTextureValue];
         return;
     }
@@ -146,7 +146,7 @@
 
 - (void) setOESTextureValue
 {
-    id <GPUImageProvider> tBuff = _value;
+    id <GPUImageSource> tBuff = _value;
     GPUImageTextureBuffer *texture = tBuff.backingStore;
     NSAssert1(_type == GL_SAMPLER_2D, 
         @"Uniform '%@' has texture value but type != GL_SAMPLER_2D", _name);

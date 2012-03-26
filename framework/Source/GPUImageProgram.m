@@ -90,27 +90,27 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 #pragma mark Pass-alongs for default input and output textures
 
-- (id <GPUImageProvider>) inputTexture {
+- (id <GPUImageSource>) inputTexture {
     return [self valueForKey:@"inputTexture"];
 }
 
-- (id <GPUImageProvider>) outputTexture {
+- (id <GPUImageSource>) outputTexture {
     return [self valueForKey:@"outputTexture"];
 }
 
-- (id <GPUImageProvider>) accessoryTexture {
+- (id <GPUImageSource>) accessoryTexture {
     return [self valueForKey:@"accessoryTexture"];
 }
 
-- (void) setInputTexture:(id <GPUImageProvider>)inputTexture {
+- (void) setInputTexture:(id <GPUImageSource>)inputTexture {
     [self setValue:inputTexture forKey:@"inputTexture"];
 }
 
-- (void) setOutputTexture:(id <GPUImageProvider>)outputTexture {
+- (void) setOutputTexture:(id <GPUImageSource>)outputTexture {
     [self setValue:outputTexture forKey:@"outputTexture"];
 }
 
-- (void) setAccessoryTexture:(id <GPUImageProvider>)accessoryTexture {
+- (void) setAccessoryTexture:(id <GPUImageSource>)accessoryTexture {
     [self setValue:accessoryTexture forKey:@"accessoryTexture"];
 }
 
@@ -210,7 +210,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     for (GPUImageShaderSymbol *uniform in uniforms) {
         [uniform gatherOESDetailsForProgram:programHandle];
         // Make sure textures have a texture unit assigned
-        if ([uniform.value conformsToProtocol:@protocol(GPUImageProvider)] && !uniform.textureUnit) {
+        if ([uniform.value conformsToProtocol:@protocol(GPUImageSource)] && !uniform.textureUnit) {
             uniform.textureUnit = [GPUImageTextureUnit unitAtIndex:nextTextureUnit++];
         }
         [uniform setOESValue];
