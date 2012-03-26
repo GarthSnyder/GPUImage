@@ -8,17 +8,17 @@
 // minus the GPUImageFlow protocol implementation. See header comments
 // for GPUImage for more details.
 
-@interface GPUImageBase : NSObject
+@interface GPUImageBase : NSObject <GPUImageBackingStoreProvider>
 
 @property (nonatomic) GLsize size;
 @property (nonatomic) GLenum baseFormat;
 @property (nonatomic) GLenum pixType;
 
-// Setting an associated layer automatically turns on useRenderbuffer.
+// Setting an associated layer automatically turns on usesRenderbuffer.
 // However, you can use a renderbuffer without an associated CAEAGLLayer.
 
 @property (assign, nonatomic) CAEAGLLayer *layer;   // Associated layer, if any
-@property (nonatomic) BOOL useRenderbuffer;
+@property (nonatomic) BOOL usesRenderbuffer;
 
 @property (nonatomic) GLenum wrapS, wrapT;          // Texture edge handling
 @property (nonatomic) GLenum magFilter, minFilter;  // Linear, nearest, etc.
@@ -27,9 +27,12 @@
 @property (nonatomic) GLenum wrap;
 @property (nonatomic) GLenum filter;
 
-@property (nonatomic) BOOL generateMipmap;
+@property (nonatomic) BOOL generatesMipmap;
 
 - (void) bindAsFramebuffer;
+- (void) clearFramebuffer; // Also binds
+- (void) clearFramebuffer:(vec4)backgroundColor; // Also binds
+
 - (void) drawWithProgram:(GPUImageProgram *)prog;
 
 // Adopts size and base format only, and only if receiver's are unknown
@@ -41,8 +44,6 @@
 - (UIImage *) getUIImage;
 
 // Generally NOT necessary to access these directly
-
-@property (strong, nonatomic) GPUImageBuffer *backingStore;
 
 - (void) createBackingStore;
 - (void) releaseBackingStore;

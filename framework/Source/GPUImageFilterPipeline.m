@@ -111,12 +111,12 @@
 #pragma mark -
 #pragma mark GPUImageFlow protocol
 
-- (void) deriveFrom:(id <GPUImageFlow>)newParent;
+- (void) deriveFrom:(GPUImageProvider)newParent;
 {
-    NSAssert([parent isKindOfClass:[GPUImageBase class]],
-        @"Input to a GPUImageFilterPipeline must be a subclass of GPUImageBase.");
-    parent = newParent
-    timeLastChanged = 0;
+    if (parent != newParent) {
+        parent = newParent
+        timeLastChanged = 0;
+    }
 }
 
 // The filters in the pipeline are in fact an independent GPUImageFlow
@@ -150,8 +150,8 @@
         return;
     }
     arrayHash = newHash;
-    id <GPUImageFlow> previous = parent;
-    for (id <GPUImageFlow> filter in self.filters) {
+    GPUImageProvider previous = parent;
+    for (GPUImageProvider filter in self.filters) {
         [filter deriveFrom:previous];
         previous = filter;
     }

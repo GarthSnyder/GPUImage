@@ -33,7 +33,8 @@
 
 - (void) bind;
 - (void) bindAsFramebuffer;
-- (void) clearFramebuffer;
+
+- (void) clearFrameBuffer:(vec4)backgroundColor;
 
 // Callers are responsible for freeing these
 - (GLubyte *) rawDataFromFramebuffer;

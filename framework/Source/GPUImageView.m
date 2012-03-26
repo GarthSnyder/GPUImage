@@ -44,23 +44,26 @@
     eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, 
         kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];		
+	[self addObserver:self forKeyPath:@"frame" options:0 context:NULL];
 }
 
-- (void) deriveFrom:(id <GPUImageFlow>)newParent
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    NSAssert(!parent, @"GPUImageView can have only one parent; underive first.");
-    NSAssert([newParent isKindOfClass:[GPUImage class]], 
-        @"GPUImageView can only deriveFrom a GPUImage object");
-    parent = newParent;
-    lastTimeChanged = 0;
-    parent.layer = (CAEAGLLayer *)self.layer;
+    if (object == self && [keyPath isEqualToString:@"frame"]) {
+        // TODO: Respond to frame change
+        NSAssert(NO, @"Not implemented: respond to frame change");
+    }
 }
 
-- (void) undoDerivationFrom:(id <GPUImageFlow>)oldParent
+- (void) deriveFrom:(GPUImageProvider)newParent
 {
-    NSAssert(parent == oldParent, @"GPUImageView: attempt to unparent an object that is not my parent");
-    parent = nil;
+    if (parent != newParent) {
+        parent = newParent;
     lastTimeChanged = 0;
+        if (parent) {
+            parent.layer = (CAEAGLLayer *)self.layer;
+        }
+    }
 }
 
 - (GPUImageTimestamp) timeLastChanged
@@ -83,6 +86,9 @@
     return YES;
 }
 
--(void) endProcessing{}
+- (void) dealloc
+{
+    [self removeObserver:self forKeyPath:@"frame"];
+}
 
 @end

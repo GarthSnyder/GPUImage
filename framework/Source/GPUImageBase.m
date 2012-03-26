@@ -2,7 +2,10 @@
 #import "GPUImageTextureBuffer.h"
 #import "GPUImageRenderbuffer.h"
 
-@interface GPUImageBase
+@interface GPUImageBase ()
+{
+    GPUImageBuffer *_backingStore;
+}
 - (void) createBackingStore;
 - (void) setTextureParameters;
 @end
@@ -13,15 +16,14 @@
 @synthesize baseFormat = _baseFormat;
 @synthesize pixType = _pixType;
 
-@synthesize useRenderbuffer = _useRenderbuffer;
-@synthesize generateMipmap = _generateMipmap;
+@synthesize usesRenderbuffer = _usesRenderbuffer;
+@synthesize generatesMipmap = _generatesMipmap;
 
 @synthesize magFilter = _magFilter;
 @synthesize minFilter = _minFilter;
 @synthesize wrapS = _wrapS;
 @synthesize wrapT = _wrapT;
 
-@synthesize backingStore = _backingStore;
 @synthesize layer = _layer;
 
 #pragma mark -
@@ -63,10 +65,10 @@
     self.wrapT = wrap;
 }
 
-- (void) setUseRenderbuffer:(BOOL)use
+- (void) setUsesRenderbuffer:(BOOL)use
 {
-    if (self.useRenderbuffer != use) {
-        _useRenderbuffer = use;
+    if (self.usesRenderbuffer != use) {
+        _usesRenderbuffer = use;
         [self releaseBackingStore];
     }
 }
@@ -74,7 +76,7 @@
 - (void) setLayer:(CAEAGLLayer *)layer
 {
     if (_layer != layer) {
-        _useRenderbuffer = YES;
+        _usesRenderbuffer = YES;
         _layer = layer;
         [self releaseBackingStore];
     }
@@ -104,14 +106,14 @@
     }
 }
 
-- (void) setGenerateMipmap:(BOOL)gen
+- (void) setGeneratesMipmap:(BOOL)gen
 {
-    if (self.generateMipmap == gen) {
+    if (self.generatesMipmap == gen) {
         return;
     }
     if (gen) {
-        NSAssert(!self.useRenderbuffer, @"Renderbuffers cannot have mipmaps");
-        _generateMipmap = gen;
+        NSAssert(!self.usesRenderbuffer, @"Renderbuffers cannot have mipmaps");
+        _generatesMipmap = gen;
         if (timeLastChanged > 0) {
             GPUImageTextureBuffer *buffer = (GPUImageTextureBuffer *)self.backingStore;
             [buffer generateMipmap];
@@ -142,21 +144,21 @@
 {
     NSAssert(self.layer || (self.size.width && self.size.height && self.baseFormat),
              @"Cannot bindAsFramebuffer without at least size and base format.");
-    if (self.useRenderbuffer) {
+    if (self.usesRenderbuffer) {
         if (self.layer) {
-            self.backingStore = [[GPUImageRenderbuffer alloc] initWithLayer:self.layer];
+            _backingStore = [[GPUImageRenderbuffer alloc] initWithLayer:self.layer];
             self.size = self.backingStore.size;
             self.baseFormat = self.backingStore.format;
         } else {
-            self.backingStore = [[GPUImageRenderbuffer alloc] initWithSize:self.size
-                                                                baseFormat:self.baseFormat];
+            _backingStore = [[GPUImageRenderbuffer alloc] initWithSize:self.size
+                                                            baseFormat:self.baseFormat];
         }
     } else {
         if (!self.pixType) {
             self.pixType = GL_UNSIGNED_BYTE;
         }
-        self.backingStore = [[GPUImageTextureBuffer alloc] initWithSize:self.size
-                                                             baseFormat:self.baseFormat pixType:self.pixType];
+        _backingStore = [[GPUImageTextureBuffer alloc] initWithSize:self.size
+                                                         baseFormat:self.baseFormat pixType:self.pixType];
         [self setTextureParams];
     }
     timeLastChanged = 0;
@@ -173,7 +175,7 @@
 
 - (void) setTextureParams
 {
-    if (self.useRenderbuffer || !self.backingStore) {
+    if (self.usesRenderbuffer || !self.backingStore) {
         return;
     }
     GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
@@ -198,6 +200,20 @@
         [self createBackingStore];
     }
     [self.backingStore bindAsFramebuffer];
+}
+
+- (void) clearFramebuffer:(vec4)backgroundColor
+{
+    if (!self.backingStore) {
+        [self createBackingStore];
+    }
+    [self.backingStore clearFramebuffer:backgroundColor];
+}
+
+- (void) clearFramebuffer
+{
+    vec4 opaqueBlack = {0.0, 0.0, 0.0, 1.0};
+    [self clearFramebuffer:opaqueBlack];
 }
 
 #pragma mark -
@@ -247,8 +263,29 @@
 - (UIImage *) getUIImage
 {
     CGImageRef cgRef = [self.backingStore CGImageFromFramebuffer];
+    // Capture image with current device orientation
+	UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+    UIImageOrientation imageOrientation = UIImageOrientationLeft;
+	switch (deviceOrientation)
+    {
+		case UIDeviceOrientationPortrait:
+			imageOrientation = UIImageOrientationUp;
+			break;
+		case UIDeviceOrientationPortraitUpsideDown:
+			imageOrientation = UIImageOrientationDown;
+			break;
+		case UIDeviceOrientationLandscapeLeft:
+			imageOrientation = UIImageOrientationLeft;
+			break;
+		case UIDeviceOrientationLandscapeRight:
+			imageOrientation = UIImageOrientationRight;
+			break;
+		default:
+			imageOrientation = UIImageOrientationUp;
+			break;
+	}
     UIImage *finalImage = [UIImage imageWithCGImage:cgRef scale:1.0
-        orientation:UIImageOrientationLeft];
+        orientation:imageOrientation];
     CGImageRelease(cgRef);
     return finalImage;
 }
