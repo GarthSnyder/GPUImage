@@ -30,7 +30,7 @@
 }
 
 #pragma mark -
-#pragma mark GPUImageFlow protocol
+#pragma mark GPUImageUpdating protocol
 
 - (void) deriveFrom:(GPUImageProvider)parent
 {

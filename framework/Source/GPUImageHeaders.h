@@ -1,8 +1,5 @@
-#import "GPUImageProgram.h"
-
 // Base classes
 #import "GPUImageOpenGLESContext.h"
-#import "GPUImageOutput.h"
 #import "GPUImageView.h"
 #import "GPUImageVideoCamera.h"
 #import "GPUImageMovie.h"
