@@ -16,7 +16,7 @@
 // camera would always deliver buffers in AVCaptureVideoOrientationLandscapeRight."
 // Currently, rotation is needed to handle each camera
 
-@interface GPUImageVideoCamera : GPUImageBase <AVCaptureVideoDataOutputSampleBufferDelegate, GPUImageUpdating>
+@interface GPUImageVideoCamera : GPUImageBase <AVCaptureVideoDataOutputSampleBufferDelegate, GPUImageSource>
 {
     CVOpenGLESTextureCacheRef coreVideoTextureCache;    
     AVCaptureSession *_captureSession;
