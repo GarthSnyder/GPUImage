@@ -1,15 +1,17 @@
 #import "GPUImage.h"
 
 @implementation GPUImage ()
-- (BOOL) parentRequiresConversion;
+- (BOOL) inputImageRequiresConversion;
 @end
 
 @implementation GPUImage
 
-- (void) deriveFrom:(id <GPUImageSource>)newParent
+@synthesize inputImage = _inputImage;
+
+- (void) setInputImage:(id <GPUImageSource>)newParent
 {
-    if (parent != newParent) {
-        parent = newParent;
+    if (_inputImage != newParent) {
+        _inputImage = newParent;
         timeLastChanged = 0; // Force update
     }
 }
@@ -21,10 +23,10 @@
 
 - (BOOL) update
 {
-    if (!parent || ![parent update]) {
+    if (!self.inputImage || ![self.inputImage update]) {
         return NO;
     }
-    if (self.timeLastChanged < parent.timeLastChanged) {
+    if (self.timeLastChanged < self.inputImage.timeLastChanged) {
         return [self render];
     }
     return YES;
@@ -33,7 +35,7 @@
 #pragma mark -
 #pragma mark Rendering
 
-// Update our contents to reflect those of the parent. The parent implements
+// Update our contents to reflect those of the input image. The parent implements
 // the GPUImageSource protocol, so we know it can produce an image buffer
 // on demand. The question is, can we share this buffer, or do we need to 
 // copy or adapt it?
@@ -48,10 +50,10 @@
 
 - (BOOL) render
 {
-    NSAssert([parent backingStore], @"Parent has no backing store; should never happen.");
-    NSAssert(![self parentRequiresConversion],
+    NSAssert([self.inputImage backingStore], @"Input image has no backing store; should never happen.");
+    NSAssert(![self inputImageRequiresConversion],
          @"Automatic texture size and format conversions are not yet implemented.");
-    _backingStore = parent.backingStore;
+    _backingStore = self.inputImage.backingStore;
     [self setTextureParams];
     if (!self.usesRenderbuffer && self.generatesMipmap) {
         GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
@@ -64,9 +66,9 @@
 // Is there anything about the parent object that makes it impossible for us
 // to share its backing texture?
 
-- (BOOL) parentRequiresConversion
+- (BOOL) inputImageRequiresConversion
 {
-    GPUImageBuffer *pbs = parent.backingStore;
+    GPUImageBuffer *pbs = self.inputImage.backingStore;
     
     if ((self.size.width != pbs.size.width) 
         || (self.size.height != pbs.size.height)

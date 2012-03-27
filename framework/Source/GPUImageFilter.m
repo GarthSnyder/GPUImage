@@ -3,10 +3,12 @@
 
 @implementation GPUImageFilter
 
+@synthesize program = _program;
+
 - (id) init
 {
     if (self = [super init]) {
-        program = [GPUImageProgram program];
+        self.program = [GPUImageProgram program];
     }
     return self;
 }
@@ -14,16 +16,42 @@
 #pragma mark -
 #pragma mark Rendering and drawing
 
-- (BOOL) render
+// Update all texture inputs to our OpenGL progrma
+
+- (BOOL) update
 {
-    [self takeUnknownParametersFrom:parent];
-    program.inputTexture = parent;
-    if (![program use] || ![self bindAsFramebuffer]) {
+    BOOL needsRender = NO;
+    if (!self.program) {
         return NO;
     }
-    [self drawWithProgram:program];
-    self.timeLastChanged = GPUImageGetCurrentTimestamp();
+    for (id <GPUImageSource> source in self.program.inputImages) {
+        if (![source update]) {
+            return NO;
+        }
+        if ([source timeLastChanged] > timeLastChanged) {
+            needsRender = YES;
+        }
+    }
+    if (needsRender) {
+        return [self render];
+    }
     return YES;
+}
+
+- (BOOL) render
+{
+    [self takeUnknownParametersFrom:self.inputImage];
+    if (![self.program use] || ![self bindAsFramebuffer]) {
+        return NO;
+    }
+    [self drawWithProgram:self.program];
+    timeLastChanged = GPUImageGetCurrentTimestamp();
+    return YES;
+}
+
+- (GPUImageTimestamp) timeLastChanged
+{
+    return timeLastChanged;
 }
 
 #pragma mark -
@@ -32,10 +60,10 @@
 - (UIImage *) imageByFilteringImage:(UIImage *)imageToFilter
 {
     GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithImage:imageToFilter];
-    [self deriveFrom:stillImageSource];
+    self.inputImage = stillImageSource;
     [self update];
     UIImage *product = [self getUIImage];
-    [self deriveFrom:nil];
+    self.inputImage = nil;
     return product;
 }
 

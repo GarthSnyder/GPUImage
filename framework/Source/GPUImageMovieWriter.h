@@ -13,7 +13,7 @@
 
 @end
 
-@interface GPUImageMovieWriter : GPUImageBase <GPUImageConsumer>
+@interface GPUImageMovieWriter : GPUImageBase 
 {
     NSURL *movieURL;
 	AVAssetWriter *assetWriter;
@@ -26,15 +26,18 @@
     CGSize videoSize;
 }
 
-@property (nonatomic, copy) void(^CompletionBlock)(void);
-@property (nonatomic, copy) void(^FailureBlock)(NSError*);
+@property (nonatomic, retain) id <GPUImageSource> inputImage;
+
+@property (nonatomic, copy) void(^completionBlock)(void);
+@property (nonatomic, copy) void(^failureBlock)(NSError*);
+
 @property (nonatomic, assign) id<GPUImageMovieWriterDelegate> delegate;
 
 - (id) initWithMovieURL:(NSURL *)newMovieURL;
 
 // Movie recording
-- (void)startRecording;
-- (void)finishRecording;
+- (void) startRecording;
+- (void) finishRecording;
 
 - (BOOL) update;
 

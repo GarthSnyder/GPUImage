@@ -25,11 +25,12 @@
 // implementation is that subclasses of GPUImageBase will want to implement
 // their own rendering systems while still taking advantage of GPUImageBase.
 
-@interface GPUImage : GPUImageBase <GPUImageSource, GPUImageConsumer>
+@interface GPUImage : GPUImageBase <GPUImageSource>
 {
-    id <GPUImageSource> parent;
     GPUImageTimestamp timeLastChanged;
 }
+
+@property (nonatomic, retain) id <GPUImageSource> inputImage;
 
 - (BOOL) render;
 

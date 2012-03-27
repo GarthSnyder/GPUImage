@@ -7,13 +7,14 @@
 
 @interface GPUImageView () 
 {
-    GPUImage *parent;
     GPUImageTimestamp timeLastChanged;
 }
 - (void) commonInit;
 @end
 
 @implementation GPUImageView
+
+@synthesize inputImage = _inputImage;
 
 + (Class) layerClass 
 {
@@ -57,25 +58,25 @@
     }
 }
 
-- (void) deriveFrom:(id <GPUImageSource>)newParent
+- (void) setInputImage:(id <GPUImageSource>)newParent
 {
-    if (parent != newParent) {
-        parent = newParent;
+    if (_inputImage != newParent) {
+        _inputImage = newParent;
         timeLastChanged = 0;
-        if (parent) {
-            parent.layer = (CAEAGLLayer *)self.layer;
+        if (_inputImage) {
+            _inputImage.layer = (CAEAGLLayer *)self.layer;
         }
     }
 }
 
 - (BOOL) update
 {
-    if (!parent || ![parent update]) {
+    if (!self.inputImage || ![self.inputImage update]) {
         return NO;
     }
     if (self.timeLastChanged < parent.timeLastChanged) {
         [GPUImageOpenGLESContext useImageProcessingContext];
-        [parent.backingStore bind];
+        [self.inputImage.backingStore bind];
         [[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] 
             presentBufferForDisplay];
         timeLastChanged = GPUImageGetCurrentTimestamp();

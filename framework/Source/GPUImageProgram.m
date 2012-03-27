@@ -172,11 +172,13 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 {
     GPUImageShaderSymbol *uniform;
     if ((uniform = [uniforms objectForKey:key])) {
-        if ([uniform.value isEqual:obj]) {
+        if (!obj) {
+            [uniforms removeObjectForKey:key];
+        } else if ([uniform.value isEqual:obj]) {
             return;
         }
         uniform.value = obj;
-    } else {
+    } else if (!obj) {
         uniform = [[GPUImageShaderSymbol alloc] init];
         uniform.name = key;
         uniform.value = obj;
@@ -204,6 +206,17 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
         }
         [uniform setOESValue];
     }
+}
+
+- (NSArray *) inputImages
+{
+    NSMutableArray *ii = [NSMutableArray array];
+    for (id value in attributes) {
+        if ([value conformsToProtocol:@protocol(GPUImageSource)]) {
+            [ii addObject:value];
+        }
+    }
+    return ii;
 }
 
 #pragma mark -

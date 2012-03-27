@@ -61,8 +61,11 @@
 // accepted by the compiler without additional configuration. In point of fact,
 // all property refs are handled dynamically based on the actual shaders.
 
-@property (nonatomic) id <GPUImageSource> inputTexture;
-@property (nonatomic) id <GPUImageSource> accessoryTexture; // 2nd input
+@property (nonatomic) id <GPUImageSource> inputImage;
+@property (nonatomic) id <GPUImageSource> auxilliaryImage; // 2nd input
+
+// Returns all uniform values that are GPUImageSources
+@property (readonly) NSArray *inputImages;
 
 // This method is used only for determining the handles for vertex
 // attributes for use in drawing. For uniforms, the general GPUImageProgram

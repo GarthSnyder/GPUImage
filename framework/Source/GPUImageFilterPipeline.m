@@ -109,23 +109,12 @@
 }
 
 #pragma mark -
-#pragma mark GPUImageConsumer protocol
-
-- (void) deriveFrom:(id <GPUImageSource>)newParent;
-{
-    if (parent != newParent) {
-        parent = newParent
-        timeLastChanged = 0;
-    }
-}
-
-#pragma mark -
 #pragma mark GPUImageSource protocol
 
-// The filters in the pipeline are in fact an independent GPUImageUpdating
+// The filters in the pipeline are in fact an independent GPUImageSource
 // object subgraph. The GPUImageFilterPipeline patches this subgraph into
 // its parent graph by acting as both the head (when specifying an external
-// source as input to the pipeline through [pipeline deriveFrom:]) and the tail
+// source as input to the pipeline through pipeline.inputImage =) and the tail
 // (when absorbing the output of the pipeline and forwarding it downstream).
 //
 // To implement this dual role, all we have to do is make sure our pipeline
@@ -134,7 +123,7 @@
 
 - (BOOL) update
 {
-    if (!parent || ![parent update]) {
+    if (!self.inputImage || ![self.inputImage update]) {
         return NO;
     }
     [self setupFilters];

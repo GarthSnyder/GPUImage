@@ -1,5 +1,3 @@
-// Garth Snyder - 3/14/2012
-
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import "GPUImageTypes.h"
@@ -29,12 +27,3 @@
 - (GPUImageBuffer *) backingStore;
 @end
 
-// The GPUImageConsumer protocol is intentionally agnostic about how many
-// ancestors an element might have. Basic texture objects will have only one and 
-// should enforce this limit. Objects such as filters may expand their 
-// interpretation of -deriveFrom to allow multiple ancestors, or they may
-// collect ancestor information implicitly.
-
-@protocol GPUImageConsumer <NSObject>
-- (void) deriveFrom:(id <GPUImageSource>)parent; // Pass nil to undo
-@end
