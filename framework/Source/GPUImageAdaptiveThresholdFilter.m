@@ -5,21 +5,21 @@
 
 NSString *const kGPUImageAdaptiveThresholdFragmentShaderString = SHADER_STRING
 ( 
- varying highp vec2 textureCoordinate;
- 
-    uniform sampler2D inputTexture;
-    uniform sampler2D inputTexture2; 
- 
- void main()
- {
-        highp vec4 textureColor = texture2D(inputTexture, textureCoordinate);
-        highp float localLuminance = texture2D(inputTexture2, textureCoordinate).r;
-     highp float thresholdResult = step(localLuminance - 0.05, textureColor.r);
-     
-     gl_FragColor = vec4(vec3(thresholdResult), textureColor.w);
-//     gl_FragColor = vec4(localLuminance, textureColor.r, 0.0, textureColor.w);
- }
- );
+    varying highp vec2 textureCoordinate;
+
+    uniform sampler2D inputImage;
+    uniform sampler2D inputImage2; 
+
+    void main()
+    {
+        highp vec4 textureColor = texture2D(inputImage, textureCoordinate);
+        highp float localLuminance = texture2D(inputImage2, textureCoordinate).r;
+        highp float thresholdResult = step(localLuminance - 0.05, textureColor.r);
+
+        gl_FragColor = vec4(vec3(thresholdResult), textureColor.w);
+        //     gl_FragColor = vec4(localLuminance, textureColor.r, 0.0, textureColor.w);
+    }
+);
 
 @implementation GPUImageAdaptiveThresholdFilter
 
@@ -27,77 +27,24 @@ NSString *const kGPUImageAdaptiveThresholdFragmentShaderString = SHADER_STRING
 {
     if (self = [super init]) 
     {
-        grayscaleFilter = [[GPUImageGrayscaleFilter alloc] init];
-        boxBlurFilter = [[GPUImageBoxBlurFilter alloc] init];
-        
-        [boxBlurFilter deriveFrom:grayscaleFilter];
-        self.accessoryTexture = boxBlurFilter;
+        GPUImageGrayscaleFilter *grayscaleFilter = [[GPUImageGrayscaleFilter alloc] init];
+        GPUImageBoxBlurFilter *boxBlurFilter = [[GPUImageBoxBlurFilter alloc] init];
         
         program.fragmentShader = kGPUImageAdaptiveThresholdFragmentShaderString;
-        [program setValue:boxBlurFilter forKey:@"acc
-         
-        // First pass: reduce to luminance
-        [self.filters addObject:[[GPUImageGrayscaleFilter alloc] init]];
+        [program setValue:grayscaleFilter forKey:@"inputImage"];
+        [program setValue:boxBlurFilter forKey:@"inputImage2"];
         
-        // Second pass: perform a box blur
-        [self.filters addObject:[[GPUImageBoxBlurFilter alloc] init]];
-        
-        // Third pass: compare the blurred background luminance to the local value
-        GPUImageFilter *adaptiveThresholdFilter = [[GPUImageFilter alloc] initWithFragmentShaderFromString:kGPUImageAdaptiveThresholdFragmentShaderString];
-        [self addFilter:adaptiveThresholdFilter];
-        
-        [self setTargetFilter:boxBlurFilter forFilter:luminanceFilter];
-        [self setTargetFilter:adaptiveThresholdFilter forFilter:luminanceFilter];
-        [self setTargetFilter:adaptiveThresholdFilter forFilter:boxBlurFilter];
-        
-        return self;
-       
+        boxBlurFilter.inputImage = grayscaleFilter;
     }
-
-    // First pass: reduce to luminance
-    GPUImageGrayscaleFilter *luminanceFilter = [[GPUImageGrayscaleFilter alloc] init];
-    [self addFilter:luminanceFilter];
-    
-    // Second pass: perform a box blur
-    GPUImageBoxBlurFilter *boxBlurFilter = [[GPUImageBoxBlurFilter alloc] init];
-    [self addFilter:boxBlurFilter];
-    
-    // Third pass: compare the blurred background luminance to the local value
-    GPUImageFilter *adaptiveThresholdFilter = [[GPUImageFilter alloc] initWithFragmentShaderFromString:kGPUImageAdaptiveThresholdFragmentShaderString];
-    [self addFilter:adaptiveThresholdFilter];
-    
-     boxBlurFilter.inputTexture = luminanceFilter;
-     adaptiveThresholdFilter.inputTexture = luminanceFilter;
-     adaptiveThresholdFilter.accessoryTexture = boxBlurFilter;
-     
-     [self setTargetFilter:boxBlurFilter forFilter:luminanceFilter];
-     [self setTargetFilter:adaptiveThresholdFilter forFilter:luminanceFilter];
-     [self setTargetFilter:adaptiveThresholdFilter forFilter:boxBlurFilter];
-         
-         
-    // First pass: reduce to luminance
-    GPUImageGrayscaleFilter *luminanceFilter = [[GPUImageGrayscaleFilter alloc] init];
-    [self addFilter:luminanceFilter];
-    
-    // Second pass: perform a box blur
-    GPUImageBoxBlurFilter *boxBlurFilter = [[GPUImageBoxBlurFilter alloc] init];
-    [self addFilter:boxBlurFilter];
-    
-    // Third pass: compare the blurred background luminance to the local value
-    GPUImageFilter *adaptiveThresholdFilter = [[GPUImageFilter alloc] initWithFragmentShaderFromString:kGPUImageAdaptiveThresholdFragmentShaderString];
-    [self addFilter:adaptiveThresholdFilter];
-    
-    [luminanceFilter addTarget:boxBlurFilter];
-    
-    [boxBlurFilter addTarget:adaptiveThresholdFilter];
-    // To prevent double updating of this filter, disable updates from the sharp luminance image side
-    adaptiveThresholdFilter.shouldIgnoreUpdatesToThisTarget = YES;
-    [luminanceFilter addTarget:adaptiveThresholdFilter];
-    
-    self.initialFilters = [NSArray arrayWithObject:luminanceFilter];
-    self.terminalFilter = adaptiveThresholdFilter;
-    
     return self;
+}
+
+// Normally we'd set this on our own program, but here, we pass it along as
+// input to the luminance filter.
+
+- (void) setInputImage:(id <GPUImageSource>)img
+{
+    [[program valueForKey:@"inputImage"] setValue:img forKey:@"inputImage"];
 }
 
 @end

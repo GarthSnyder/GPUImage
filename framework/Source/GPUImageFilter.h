@@ -24,6 +24,7 @@
 
 @interface GPUImageFilter : GPUImageBase <GPUImageSource>
 {
+    GPUImageProgram *program;
     GPUImageTimestamp timeLastChanged;
 }
 
