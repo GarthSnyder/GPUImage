@@ -1,8 +1,7 @@
-#import "GPUImageView.h"
 #import <OpenGLES/EAGLDrawable.h>
 #import <QuartzCore/QuartzCore.h>
 #import "GPUImageOpenGLESContext.h"
-#import "GPUImageFilter.h"
+#import "GPUImageView.h"
 
 @interface GPUImageView () 
 {
@@ -49,12 +48,14 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
     if (object == self && [keyPath isEqualToString:@"frame"]) {
-        // TODO: Respond to frame change
-        NSAssert(NO, @"Not implemented: respond to frame change");
+        if (parent && [parent respondsToSelector:@selector(releaseBackingStore)]) {
+            [(id)parent releaseBackingStore];
+        }
+        lastTimeChanged = 0;
     }
 }
 
-- (void) deriveFrom:(GPUImageSource)newParent
+- (void) deriveFrom:(id <GPUImageSource>)newParent
 {
     if (parent != newParent) {
         parent = newParent;
@@ -63,11 +64,6 @@
             parent.layer = (CAEAGLLayer *)self.layer;
         }
     }
-}
-
-- (GPUImageTimestamp) timeLastChanged
-{
-    return lastTimeChanged;
 }
 
 - (BOOL) update

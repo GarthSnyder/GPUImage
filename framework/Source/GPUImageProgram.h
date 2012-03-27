@@ -56,14 +56,13 @@
 - (NSString *) programLog;
 
 // Most programs within GPUImage will use the following standard names
-// for inputs and outputs, although this is not required. These properties
+// for inputs, although this is not required. These properties
 // are defined here so that program.inputTexture is always understood and 
 // accepted by the compiler without additional configuration. In point of fact,
 // all property refs are handled dynamically based on the actual shaders.
 
 @property (nonatomic) id <GPUImageSource> inputTexture;
 @property (nonatomic) id <GPUImageSource> accessoryTexture; // 2nd input
-@property (nonatomic) id <GPUImageSource> outputTexture;
 
 // This method is used only for determining the handles for vertex
 // attributes for use in drawing. For uniforms, the general GPUImageProgram

@@ -10,7 +10,7 @@
 - movieDidDecodeNewFrame:(GPUImageMovie *)movie;
 @end
 
-@interface GPUImageMovie : GPUImageBase <GPUImageUpdating> 
+@interface GPUImageMovie : GPUImageBase <GPUImageSource> 
 {
   CVPixelBufferRef _currentBuffer;
 }

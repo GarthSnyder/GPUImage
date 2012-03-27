@@ -2,6 +2,6 @@
 #import "GPUImageProtocols.h"
 #import "GPUImage.h"
 
-@interface GPUImageView : UIView <GPUImageUpdating>
+@interface GPUImageView : UIView <GPUImageConsumer>
 
 @end

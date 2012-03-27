@@ -6,7 +6,7 @@
 
 @implementation GPUImage
 
-- (void) deriveFrom:(GPUImageSource)newParent
+- (void) deriveFrom:(id <GPUImageSource>)newParent
 {
     if (parent != newParent) {
         parent = newParent;
@@ -86,6 +86,11 @@
         }
     }
     return NO;
+}
+
+- (GPUImageBuffer *)backingStore 
+{
+    return _backingStore;
 }
 
 @end
