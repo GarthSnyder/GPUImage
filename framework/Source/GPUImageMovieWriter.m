@@ -16,7 +16,6 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
 @interface GPUImageMovieWriter ()
 {
-    id <GPUImageSource> parent;
     GPUImageProgram *colorSwizzlingProgram;
     NSDate *startTime;
 }
@@ -31,6 +30,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
 @implementation GPUImageMovieWriter
 
+@synthesize inputImage;
 @synthesize completionBlock;
 @synthesize failureBlock;
 @synthesize delegate;
@@ -186,10 +186,10 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     }
 }
 
-- (void) deriveFrom:(id<GPUImageSource>)newParent
+- (void) setInputImage:(id<GPUImageSource>)newParent
 {
-    if (parent != newParent) {
-        parent = newParent;
+    if (_inputImage != newParent) {
+        _inputImage = newParent;
         colorSwizzlingProgram.inputTexture = newParent;
         timeLastChanged = 0;
     }
@@ -197,9 +197,9 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
 - (BOOL) update
 {
-    if (parent) {
-        [parent update];
-        if (timeLastChanged < [parent timeLastChanged]) {
+    if (_inputImage) {
+        [_inputImage update];
+        if (timeLastChanged < [_inputImage timeLastChanged]) {
             return [self render];
         }
     }

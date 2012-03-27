@@ -5,8 +5,8 @@
 #import "GPUImageHeaders.h"
 
 // GPUImageBase is the drawing and texture management portion of GPUImage.
-// On top of this platform, GPUImage adds the GPUImageSource and GPUImageConsumer
-// protocol implementations to form a general-purpose GPUImage graph element
+// On top of this platform, GPUImage adds the GPUImageSource 
+// protocol implementation to form a general-purpose GPUImage graph element
 // object. See header comments in GPUImage.h for more details.
 
 @interface GPUImageBase : NSObject
@@ -53,7 +53,7 @@
 
 // Generally not necessary to access these directly
 
-- (GPUImageBuffer *)backingStore;
+- (GPUImageBuffer *) backingStore;
 - (void) createBackingStore;
 - (void) releaseBackingStore;
 

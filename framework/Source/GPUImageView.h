@@ -2,6 +2,8 @@
 #import "GPUImageProtocols.h"
 #import "GPUImage.h"
 
-@interface GPUImageView : UIView <GPUImageConsumer>
+@interface GPUImageView : UIView
+
+@property (nonatomic, retain) id <GPUImageSource> inputImage;
 
 @end

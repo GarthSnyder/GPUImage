@@ -13,7 +13,7 @@
 
 @end
 
-@interface GPUImageMovieWriter : GPUImageBase <GPUImageConsumer>
+@interface GPUImageMovieWriter : GPUImageBase 
 {
     NSURL *movieURL;
 	AVAssetWriter *assetWriter;
@@ -23,6 +23,8 @@
     CVOpenGLESTextureCacheRef coreVideoTextureCache;
     CVPixelBufferRef renderTarget;
 }
+
+@property (nonatomic, retain) id <GPUImageSource> inputImage;
 
 @property (nonatomic, copy) void(^completionBlock)(void);
 @property (nonatomic, copy) void(^failureBlock)(NSError*);
