@@ -3,7 +3,7 @@
 
 @implementation GPUImageFilter
 
-@synthesize program = _program;
+@synthesize program;
 
 - (id) init
 {

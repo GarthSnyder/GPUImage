@@ -1,5 +1,5 @@
 #import "GPUImageFilterGroup.h"
 
-@interface GPUImageAdaptiveThresholdFilter : GPUImageFilterPipeline
+@interface GPUImageAdaptiveThresholdFilter : GPUImageFilter
 
 @end
