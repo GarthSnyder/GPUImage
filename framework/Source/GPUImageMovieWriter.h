@@ -1,50 +1,41 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import "GPUImageOpenGLESContext.h"
+#import "GPUImage.h"
+
+@class GPUImageMovieWriter;
 
 @protocol GPUImageMovieWriterDelegate <NSObject>
 
 @optional
-- (void)movieRecordingCompleted;
-- (void)movieRecordingFailedWithError:(NSError*)error;
+-(void)movieWriterDidComplete:(GPUImageMovieWriter *)writer;
+-(void)movieWriter:(GPUImageMovieWriter *)writer didFailWithError:(NSError*)error;
 
 @end
 
-@interface GPUImageMovieWriter : NSObject <GPUImageInput>
+@interface GPUImageMovieWriter : GPUImageBase <GPUImageConsumer>
 {
-    CMVideoDimensions videoDimensions;
-	CMVideoCodecType videoType;
-
     NSURL *movieURL;
 	AVAssetWriter *assetWriter;
-	AVAssetWriterInput *assetWriterAudioInput;
+//	AVAssetWriterInput *assetWriterAudioIn;
 	AVAssetWriterInput *assetWriterVideoInput;
-    AVAssetWriterInputPixelBufferAdaptor *assetWriterPixelBufferInput;
-	dispatch_queue_t movieWritingQueue;
-    
+    AVAssetWriterInputPixelBufferAdaptor *assetWriterPixelBufferInput;    
     CVOpenGLESTextureCacheRef coreVideoTextureCache;
     CVPixelBufferRef renderTarget;
-    CVOpenGLESTextureRef renderTexture;
 
     CGSize videoSize;
 }
 
-@property(readwrite, nonatomic) BOOL hasAudioTrack;
-@property(readwrite, nonatomic) BOOL shouldPassthroughAudio;
-@property(nonatomic, copy) void(^completionBlock)(void);
-@property(nonatomic, copy) void(^failureBlock)(NSError*);
-@property(nonatomic, assign) id<GPUImageMovieWriterDelegate> delegate;
-@property(readwrite, nonatomic) BOOL encodingLiveVideo;
-@property(nonatomic, copy) void(^videoInputReadyCallback)(void);
-@property(nonatomic, copy) void(^audioInputReadyCallback)(void);
+@property (nonatomic, copy) void(^CompletionBlock)(void);
+@property (nonatomic, copy) void(^FailureBlock)(NSError*);
+@property (nonatomic, assign) id<GPUImageMovieWriterDelegate> delegate;
 
-// Initialization and teardown
-- (id)initWithMovieURL:(NSURL *)newMovieURL size:(CGSize)newSize;
+- (id) initWithMovieURL:(NSURL *)newMovieURL;
 
 // Movie recording
 - (void)startRecording;
 - (void)finishRecording;
-- (void)processAudioBuffer:(CMSampleBufferRef)audioBuffer;
-- (void)enableSynchronizationCallbacks;
+
+- (BOOL) update;
 
 @end

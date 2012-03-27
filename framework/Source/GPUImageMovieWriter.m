@@ -16,7 +16,6 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
  }
 );
 
-
 @interface GPUImageMovieWriter ()
 {
     GLuint movieFramebuffer, movieRenderbuffer;
@@ -126,7 +125,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 #pragma mark -
 #pragma mark Movie recording
 
-- (void)initializeMovie;
+- (void) initializeMovie
 {
     isRecording = NO;
     
@@ -198,7 +197,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     [assetWriter addInput:assetWriterVideoInput];
 }
 
-- (void)startRecording;
+- (void) startRecording
 {
     isRecording = YES;
     startTime = kCMTimeInvalid;
@@ -207,7 +206,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 //    [assetWriter startSessionAtSourceTime:kCMTimeZero];
 }
 
-- (void)finishRecording;
+- (void) finishRecording
 {
     isRecording = NO;
 //    [assetWriterVideoInput markAsFinished];
@@ -264,7 +263,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 #pragma mark -
 #pragma mark Frame rendering
 
-- (void)createDataFBO;
+- (void) createBackingStore
 {
     glActiveTexture(GL_TEXTURE1);
     glGenFramebuffers(1, &movieFramebuffer);

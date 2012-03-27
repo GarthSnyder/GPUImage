@@ -2,7 +2,7 @@
 #import "GPUImageBase.h"
 
 // A GPUImage is an element that knows how to render itself into a framebuffer,
-// and which owns that framebuffer and its associated backing store.
+// and which may have a framebuffer and its associated backing store.
 //
 // For most purposes, a GPUImage can be thought of as a wrapper for an OpenGL
 // texture. But there are some important differences:
@@ -20,14 +20,14 @@
 //    framebuffer.
 //
 // Actual implementation is split between GPUImageBase and GPUImage. The 
-// former class implements the GPUImageSource protocol, and the latter
-// implements GPUImageUpdating. The reason for the split implementation is
-// that some classes may wish to provide their own GPUImageUpdating 
-// implementation on top of the foundation provided by GPUImageBase.
+// former class implements the basic OpenGL infrastructure, while GPUImage
+// adds the graph participation protocols. The reason for the split
+// implementation is that subclasses of GPUImageBase will want to implement
+// their own rendering systems while still taking advantage of GPUImageBase.
 
-@interface GPUImage : GPUImageBase <GPUImageUpdating>
+@interface GPUImage : GPUImageBase <GPUImageSource, GPUImageConsumer>
 {
-    GPUImageSource parent;
+    id <GPUImageSource> parent;
     GPUImageTimestamp timeLastChanged;
 }
 

@@ -159,7 +159,7 @@
         {
             [self endProcessing];
         }
-    }
+    }];
 }
 
 - (void)processFrame 
@@ -202,11 +202,6 @@
 - (GPUImageTimestamp)timeLastChanged
 {
     return timeLastChanged;
-}
-
-- (void) deriveFrom:(GPUImageSource)parent
-{
-    NSAssert(NO, @"Use movie.url = foo to set the input for a GPUImageMovie.");
 }
 
 @end

@@ -3,10 +3,6 @@
 #import "GPUImageRenderbuffer.h"
 
 @interface GPUImageBase ()
-{
-    GPUImageBuffer *_backingStore;
-}
-- (void) createBackingStore;
 - (void) setTextureParameters;
 @end
 
@@ -122,6 +118,11 @@
     }
 }
 
+- (GPUImageBuffer *)backingStore
+{
+    return _backingStore;
+}
+
 - (void) adoptParametersFrom:(id <GPUImageSource>)other
 {
     GPUImageBuffer *obs = other.backingStore;
@@ -151,8 +152,8 @@
     if (self.usesRenderbuffer) {
         if (self.layer) {
             _backingStore = [[GPUImageRenderbuffer alloc] initWithLayer:self.layer];
-            self.size = self.backingStore.size;
-            self.baseFormat = self.backingStore.format;
+            self.size = _backingStore.size;
+            self.baseFormat = _backingStore.format;
         } else {
             _backingStore = [[GPUImageRenderbuffer alloc] initWithSize:self.size
                                                             baseFormat:self.baseFormat];

@@ -4,10 +4,9 @@
 #import "GPUImageVideoCamera.h"
 #import "GPUImageMovie.h"
 #import "GPUImagePicture.h"
-#import "GPUImageRawData.h"
 #import "GPUImageMovieWriter.h"
 #import "GPUImageFilterPipeline.h"
-#import "GPUImageOutput.h"
+#import "GPUImage.h"
 
 // Filters
 #import "GPUImageFilter.h"

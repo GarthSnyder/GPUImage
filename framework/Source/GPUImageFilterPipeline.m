@@ -109,15 +109,18 @@
 }
 
 #pragma mark -
-#pragma mark GPUImageUpdating protocol
+#pragma mark GPUImageConsumer protocol
 
-- (void) deriveFrom:(GPUImageSource)newParent;
+- (void) deriveFrom:(id <GPUImageSource>)newParent;
 {
     if (parent != newParent) {
         parent = newParent
         timeLastChanged = 0;
     }
 }
+
+#pragma mark -
+#pragma mark GPUImageSource protocol
 
 // The filters in the pipeline are in fact an independent GPUImageUpdating
 // object subgraph. The GPUImageFilterPipeline patches this subgraph into
@@ -135,7 +138,7 @@
         return NO;
     }
     [self setupFilters];
-    id <GPUImageUpdating> trueParent = parent;
+    id <GPUImageSource> trueParent = parent;
     parent = [self.filters lastObject];
     BOOL result = [super update];
     parent = trueParent;
@@ -150,8 +153,8 @@
         return;
     }
     arrayHash = newHash;
-    GPUImageSource previous = parent;
-    for (GPUImageSource filter in self.filters) {
+    id <GPUImageSource> previous = parent;
+    for (id <GPUImageConsumer> filter in self.filters) {
         [filter deriveFrom:previous];
         previous = filter;
     }

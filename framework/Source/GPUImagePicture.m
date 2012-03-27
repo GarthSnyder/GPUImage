@@ -30,12 +30,7 @@
 }
 
 #pragma mark -
-#pragma mark GPUImageUpdating protocol
-
-- (void) deriveFrom:(GPUImageSource)parent
-{
-    NSAssert(NO, @"Use pic.image = foo to set the input image for a GPUImagePicture.");
-}
+#pragma mark GPUImageSource protocol
 
 - (BOOL) update
 {
@@ -78,6 +73,11 @@
     free(imageData);
     timeLastChanged = GPUImageGetCurrentTimestamp();
     return YES;
+}
+    
+- (GPUImageTimestamp)timeLastChanged
+{
+    return timeLastChanged;
 }
 
 @end

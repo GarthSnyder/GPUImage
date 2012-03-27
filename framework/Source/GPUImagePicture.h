@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import "GPUImageBase.h"
 
-@interface GPUImagePicture : GPUImageBase <GPUImageUpdating>
+@interface GPUImagePicture : GPUImageBase <GPUImageSource>
 
 - (id) initWithImage:(UIImage *)img;
 

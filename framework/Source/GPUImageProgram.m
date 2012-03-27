@@ -21,9 +21,6 @@ NSString *const kGPUImageDefaultVertexShader = SHADER_STRING
 
 NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 (
-     attribute vec4 position;
-     attribute vec4 inputTextureCoordinate;
-     
      uniform sampler2D inputTexture;
      
      varying vec2 textureCoordinate;
@@ -94,20 +91,12 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     return [self valueForKey:@"inputTexture"];
 }
 
-- (id <GPUImageSource>) outputTexture {
-    return [self valueForKey:@"outputTexture"];
-}
-
 - (id <GPUImageSource>) accessoryTexture {
     return [self valueForKey:@"accessoryTexture"];
 }
 
 - (void) setInputTexture:(id <GPUImageSource>)inputTexture {
     [self setValue:inputTexture forKey:@"inputTexture"];
-}
-
-- (void) setOutputTexture:(id <GPUImageSource>)outputTexture {
-    [self setValue:outputTexture forKey:@"outputTexture"];
 }
 
 - (void) setAccessoryTexture:(id <GPUImageSource>)accessoryTexture {
