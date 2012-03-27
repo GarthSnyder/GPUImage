@@ -3,9 +3,6 @@
 
 @implementation GPUImageFilter
 
-#pragma mark -
-#pragma mark Rendering and drawing
-
 - (id) init
 {
     if (self = [super init]) {
@@ -14,10 +11,13 @@
     return self;
 }
 
+#pragma mark -
+#pragma mark Rendering and drawing
+
 - (BOOL) render
 {
     [self takeUnknownParametersFrom:parent];
-    [program setValue:parent forKey:@"inputTexture"];
+    program.inputTexture = parent;
     if (![program use] || ![self bindAsFramebuffer]) {
         return NO;
     }
@@ -38,10 +38,5 @@
     [self deriveFrom:nil];
     return product;
 }
-
-#pragma mark -
-#pragma mark Attribute and uniform processing
-
-// TODO: Handle attribs and uniforms on behalf of program
 
 @end

@@ -4,11 +4,11 @@ NSString *const kGPUImageRotationFragmentShaderString =  SHADER_STRING
 (
  varying highp vec2 textureCoordinate;
  
- uniform sampler2D inputImageTexture;
+ uniform sampler2D inputTexture;
  
  void main()
  {
-     gl_FragColor = texture2D(inputImageTexture, textureCoordinate);
+     gl_FragColor = texture2D(inputTexture, textureCoordinate);
  }
 );
 

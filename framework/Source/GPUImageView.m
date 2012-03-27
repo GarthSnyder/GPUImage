@@ -8,7 +8,7 @@
 @interface GPUImageView () 
 {
     GPUImage *parent;
-    GPUImageTimestamp lastTimeChanged;
+    GPUImageTimestamp timeLastChanged;
 }
 - (void) commonInit;
 @end
@@ -53,7 +53,7 @@
         if (parent && [parent respondsToSelector:@selector(releaseBackingStore)]) {
             [(id)parent releaseBackingStore];
         }
-        lastTimeChanged = 0;
+        timeLastChanged = 0;
     }
 }
 
@@ -61,7 +61,7 @@
 {
     if (parent != newParent) {
         parent = newParent;
-    lastTimeChanged = 0;
+        timeLastChanged = 0;
         if (parent) {
             parent.layer = (CAEAGLLayer *)self.layer;
         }
@@ -78,7 +78,7 @@
         [parent.backingStore bind];
         [[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] 
             presentBufferForDisplay];
-        lastTimeChanged = GPUImageGetCurrentTimestamp();
+        timeLastChanged = GPUImageGetCurrentTimestamp();
     }
     return YES;
 }

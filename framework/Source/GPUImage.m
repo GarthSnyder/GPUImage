@@ -88,7 +88,7 @@
     return NO;
 }
 
-- (GPUImageBuffer *)backingStore 
+- (GPUImageBuffer *) backingStore 
 {
     return _backingStore;
 }

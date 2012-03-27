@@ -5,7 +5,7 @@
         verticalExcludeCirclePointUniform,
         verticalExcludeCircleBlurSizeUniform;
     
-    GLuint originalInputImageTexture;
+    GLuint originalinputTexture;
 }
 
 @property (readwrite, nonatomic) CGFloat excludeCircleRadius;
