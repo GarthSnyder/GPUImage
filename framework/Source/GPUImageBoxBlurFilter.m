@@ -41,7 +41,7 @@ NSString *const kGPUImageBoxBlurFragmentShaderString = SHADER_STRING
 (
  precision highp float;
 
- uniform sampler2D inputImageTexture;
+ uniform sampler2D inputTexture;
  
  varying mediump vec2 centerTextureCoordinate;
  varying mediump vec2 oneStepLeftTextureCoordinate;
@@ -53,19 +53,19 @@ NSString *const kGPUImageBoxBlurFragmentShaderString = SHADER_STRING
  
  void main()
  {
-     mediump vec4 fragmentColor = texture2D(inputImageTexture, centerTextureCoordinate) * 0.2;
-     fragmentColor += texture2D(inputImageTexture, oneStepLeftTextureCoordinate) * 0.2;
-     fragmentColor += texture2D(inputImageTexture, oneStepRightTextureCoordinate) * 0.2;
-     fragmentColor += texture2D(inputImageTexture, twoStepsLeftTextureCoordinate) * 0.2;
-     fragmentColor += texture2D(inputImageTexture, twoStepsRightTextureCoordinate) * 0.2;
-//     mediump vec4 fragmentColor = texture2D(inputImageTexture, centerTextureCoordinate) * 0.1428;
-//     fragmentColor += texture2D(inputImageTexture, oneStepLeftTextureCoordinate) * 0.1428;
-//     fragmentColor += texture2D(inputImageTexture, oneStepRightTextureCoordinate) * 0.1428;
-//     fragmentColor += texture2D(inputImageTexture, twoStepsLeftTextureCoordinate) * 0.1428;
-//     fragmentColor += texture2D(inputImageTexture, twoStepsRightTextureCoordinate) * 0.1428;
+     mediump vec4 fragmentColor = texture2D(inputTexture, centerTextureCoordinate) * 0.2;
+     fragmentColor += texture2D(inputTexture, oneStepLeftTextureCoordinate) * 0.2;
+     fragmentColor += texture2D(inputTexture, oneStepRightTextureCoordinate) * 0.2;
+     fragmentColor += texture2D(inputTexture, twoStepsLeftTextureCoordinate) * 0.2;
+     fragmentColor += texture2D(inputTexture, twoStepsRightTextureCoordinate) * 0.2;
+//     mediump vec4 fragmentColor = texture2D(inputTexture, centerTextureCoordinate) * 0.1428;
+//     fragmentColor += texture2D(inputTexture, oneStepLeftTextureCoordinate) * 0.1428;
+//     fragmentColor += texture2D(inputTexture, oneStepRightTextureCoordinate) * 0.1428;
+//     fragmentColor += texture2D(inputTexture, twoStepsLeftTextureCoordinate) * 0.1428;
+//     fragmentColor += texture2D(inputTexture, twoStepsRightTextureCoordinate) * 0.1428;
      
-//     fragmentColor += texture2D(inputImageTexture, threeStepsLeftTextureCoordinate) * 0.1428;
-//     fragmentColor += texture2D(inputImageTexture, threeStepsRightTextureCoordinate) * 0.1428;
+//     fragmentColor += texture2D(inputTexture, threeStepsLeftTextureCoordinate) * 0.1428;
+//     fragmentColor += texture2D(inputTexture, threeStepsRightTextureCoordinate) * 0.1428;
      
      gl_FragColor = fragmentColor;
  }

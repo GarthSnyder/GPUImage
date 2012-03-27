@@ -17,11 +17,11 @@
 /*
  * Strength of the color applied. Default 0. Values between -.3 and .3 are best
  */
-@property(readwrite, nonatomic) CGFloat distance; 
+@property ( nonatomic) CGFloat distance; 
 
 /*
  * Amount of color change. Default 0. Values between -.3 and .3 are best
  */
-@property(readwrite, nonatomic) CGFloat slope;
+@property (nonatomic) CGFloat slope;
 
 @end

@@ -4,15 +4,15 @@ NSString *const kGPUImageHardLightBlendFragmentShaderString = SHADER_STRING
 (
  varying highp vec2 textureCoordinate;
  
- uniform sampler2D inputImageTexture;
- uniform sampler2D inputImageTexture2;
+ uniform sampler2D inputTexture;
+ uniform sampler2D inputTexture2;
 
  const highp vec3 W = vec3(0.2125, 0.7154, 0.0721);
 
  void main()
  {
-     mediump vec4 textureColor = texture2D(inputImageTexture, textureCoordinate);
-     mediump vec4 textureColor2 = texture2D(inputImageTexture2, textureCoordinate);
+     mediump vec4 textureColor = texture2D(inputTexture, textureCoordinate);
+     mediump vec4 textureColor2 = texture2D(inputTexture2, textureCoordinate);
      mediump float luminance = dot(textureColor.rgb, W);
 
      mediump vec4 whiteColor = vec4(1.0);

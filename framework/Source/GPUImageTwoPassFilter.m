@@ -30,8 +30,8 @@
     
     secondFilterPositionAttribute = [secondFilterProgram attributeIndex:@"position"];
     secondFilterTextureCoordinateAttribute = [secondFilterProgram attributeIndex:@"inputTextureCoordinate"];
-    secondFilterInputTextureUniform = [secondFilterProgram uniformIndex:@"inputImageTexture"]; // This does assume a name of "inputImageTexture" for the fragment shader
-    secondFilterInputTextureUniform2 = [secondFilterProgram uniformIndex:@"inputImageTexture2"]; // This does assume a name of "inputImageTexture2" for second input texture in the fragment shader
+    secondFilterInputTextureUniform = [secondFilterProgram uniformIndex:@"inputTexture"]; // This does assume a name of "inputTexture" for the fragment shader
+    secondFilterInputTextureUniform2 = [secondFilterProgram uniformIndex:@"inputTexture2"]; // This does assume a name of "inputTexture2" for second input texture in the fragment shader
     
     [secondFilterProgram use];    
 	glEnableVertexAttribArray(secondFilterPositionAttribute);

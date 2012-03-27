@@ -2,7 +2,7 @@
 
 NSString *const kGPUImageVignetteFragmentShaderString = SHADER_STRING
 (
- uniform sampler2D inputImageTexture;
+ uniform sampler2D inputTexture;
  varying highp vec2 textureCoordinate;
  
  uniform highp float vignetteX;
@@ -10,7 +10,7 @@ NSString *const kGPUImageVignetteFragmentShaderString = SHADER_STRING
  
  void main()
 {
-    lowp vec3 rgb = texture2D(inputImageTexture, textureCoordinate).xyz;
+    lowp vec3 rgb = texture2D(inputTexture, textureCoordinate).xyz;
     lowp float d = distance(textureCoordinate, vec2(0.5,0.5));
     rgb *= smoothstep(vignetteX, vignetteY, d);
     gl_FragColor = vec4(vec3(rgb),1.0);

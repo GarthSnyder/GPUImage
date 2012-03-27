@@ -39,7 +39,7 @@ NSString *const kGPUImageFastBlurFragmentShaderString = SHADER_STRING
 (
  precision highp float;
 
- uniform sampler2D inputImageTexture;
+ uniform sampler2D inputTexture;
  
  varying highp vec2 centerTextureCoordinate;
  varying highp vec2 oneStepLeftTextureCoordinate;
@@ -51,11 +51,11 @@ NSString *const kGPUImageFastBlurFragmentShaderString = SHADER_STRING
  
  void main()
  {
-     lowp vec4 fragmentColor = texture2D(inputImageTexture, centerTextureCoordinate) * 0.2270270270;
-     fragmentColor += texture2D(inputImageTexture, oneStepLeftTextureCoordinate) * 0.3162162162;
-     fragmentColor += texture2D(inputImageTexture, oneStepRightTextureCoordinate) * 0.3162162162;
-     fragmentColor += texture2D(inputImageTexture, twoStepsLeftTextureCoordinate) * 0.0702702703;
-     fragmentColor += texture2D(inputImageTexture, twoStepsRightTextureCoordinate) * 0.0702702703;
+     lowp vec4 fragmentColor = texture2D(inputTexture, centerTextureCoordinate) * 0.2270270270;
+     fragmentColor += texture2D(inputTexture, oneStepLeftTextureCoordinate) * 0.3162162162;
+     fragmentColor += texture2D(inputTexture, oneStepRightTextureCoordinate) * 0.3162162162;
+     fragmentColor += texture2D(inputTexture, twoStepsLeftTextureCoordinate) * 0.0702702703;
+     fragmentColor += texture2D(inputTexture, twoStepsRightTextureCoordinate) * 0.0702702703;
      
      gl_FragColor = fragmentColor;
  }

@@ -4,13 +4,13 @@ NSString *const kGPUImageLightenBlendFragmentShaderString = SHADER_STRING
 (
  varying highp vec2 textureCoordinate;
  
- uniform sampler2D inputImageTexture;
- uniform sampler2D inputImageTexture2;
+ uniform sampler2D inputTexture;
+ uniform sampler2D inputTexture2;
  
  void main()
  {
-    lowp vec4 textureColor = texture2D(inputImageTexture, textureCoordinate);
-    lowp vec4 textureColor2 = texture2D(inputImageTexture2, textureCoordinate);
+    lowp vec4 textureColor = texture2D(inputTexture, textureCoordinate);
+    lowp vec4 textureColor2 = texture2D(inputTexture2, textureCoordinate);
     
     gl_FragColor = max(textureColor, textureColor2);
  }
