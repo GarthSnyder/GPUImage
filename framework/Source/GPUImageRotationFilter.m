@@ -24,7 +24,7 @@
 {
     // If no explicit size has been specified, inherit in orientation-specific way
     if (!self.size.width || !self.size.height) {
-        GLsize newSize = self.inputImage.size;
+        GLsize newSize = self.inputImage.backingStore.size;
         if ((_rotationMode == kGPUImageRotateLeft) 
             || (_rotationMode == kGPUImageRotateRight)
             || (_rotationMode == kGPUImageRotateRightFlipVertical))
@@ -32,8 +32,8 @@
             newSize = (GLsize){newSize.height, newSize.width};
         }
         self.size = newSize;
-        return [super render];
     }
+    return [super render];
 }
 
 - (void) drawWithProgram:(id)prog
@@ -80,9 +80,9 @@
         1.0f, 1.0f,
     };
 
-    GLfloat *texCoords;
+    const GLfloat *texCoords;
 
-    switch (rotationMode)
+    switch (self.rotationMode)
     {
         case kGPUImageRotateLeft: 
             texCoords = rotateLeftTextureCoordinates;
@@ -104,8 +104,6 @@
     }
 
     [self drawWithProgram:self.program vertices:rotationSquareVertices textureCoordinates:texCoords];
-    timeLastChanged = GPUImageGetCurrentTimestamp();
-    return YES;
 }
 
 @end

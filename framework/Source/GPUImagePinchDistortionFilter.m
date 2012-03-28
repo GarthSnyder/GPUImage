@@ -30,64 +30,25 @@ NSString *const kGPUImagePinchDistortionFragmentShaderString = SHADER_STRING
 
 @implementation GPUImagePinchDistortionFilter
 
+@dynamic radius, scale;
 @synthesize center = _center;
-@synthesize radius = _radius;
-@synthesize scale = _scale;
 
-#pragma mark -
-#pragma mark Initialization and teardown
-
-- (id)init;
+- (id) init
 {
-    if (!(self = [super initWithFragmentShaderFromString:kGPUImagePinchDistortionFragmentShaderString]))
-    {
-		return nil;
+    if (self = [super init]) {
+        self.program.fragmentShader = kGPUImagePinchDistortionFragmentShaderString;
+        self.radius = 1.0;
+        self.scale = 0.5;
+        self.center = CGPointMake(0.5, 0.5);
     }
-    
-    radiusUniform = [filterProgram uniformIndex:@"radius"];
-    scaleUniform = [filterProgram uniformIndex:@"scale"];
-    centerUniform = [filterProgram uniformIndex:@"center"];
-
-    self.radius = 1.0;
-    self.scale = 0.5;
-    self.center = CGPointMake(0.5, 0.5);
-    
     return self;
 }
 
-#pragma mark -
-#pragma mark Accessors
-
-- (void)setRadius:(CGFloat)newValue;
-{
-    _radius = newValue;
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    glUniform1f(radiusUniform, _radius);
-}
-
-- (void)setScale:(CGFloat)newValue;
-{
-    _scale = newValue;
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    glUniform1f(scaleUniform, _scale);
-}
-
-- (void)setCenter:(CGPoint)newValue;
+- (void)setCenter:(CGPoint)newValue
 {
     _center = newValue;
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    
-    GLfloat centerPosition[2];
-    centerPosition[0] = _center.x;
-    centerPosition[1] = _center.y;
-    
-    glUniform2fv(centerUniform, 1, centerPosition);
+    vec2 centerPos = {newValue.x, newValue.y};
+    [self.program setValue:UNIFORM(centerPos) forKey:@"center"];
 }
 
 @end
