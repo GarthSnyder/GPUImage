@@ -32,11 +32,7 @@ NSString *const kGPUImagePixellationFragmentShaderString = SHADER_STRING
 
 - (BOOL) render
 {
-    if (!self.size.width || !self.size.height) {
-        self.size = self.inputImage.backingStore.size;
-    }
-
-    // Convert fractional width of a pixel
+    // Bound fractional width of a pixel
     CGFloat singlePixelSpacing;
     if (self.size.width) {
         singlePixelSpacing = 1.0 / self.size.width;

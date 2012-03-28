@@ -37,9 +37,6 @@
 
 - (BOOL) render;
 
-// Called as part of render; override if you don't want std triangulation
-- (void) draw;
-
 // Still image processing convenience methods
 - (UIImage *) imageByFilteringImage:(UIImage *)imageToFilter;
 

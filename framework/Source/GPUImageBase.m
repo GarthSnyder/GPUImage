@@ -243,6 +243,8 @@
         t = squareTextureCoordinates;
     }
     
+    [prog use];
+    
     GLint position = [prog indexOfAttribute:@"position"];
     GLint itc = [prog indexOfAttribute:@"inputImageCoordinate"];
     

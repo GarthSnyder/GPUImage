@@ -21,10 +21,10 @@
 
 - (BOOL) update
 {
-    BOOL needsRender = NO;
     if (!self.program) {
         return NO;
     }
+    BOOL needsRender = NO;
     for (id <GPUImageSource> source in self.program.inputImages) {
         if (![source update]) {
             return NO;
@@ -37,6 +37,7 @@
         needsRender = YES;
     }
     if (needsRender) {
+        [self adoptParametersFrom:self.inputImage];
         return [self render];
     }
     return YES;
@@ -44,10 +45,6 @@
 
 - (BOOL) render
 {
-    [self adoptParametersFrom:self.inputImage];
-    if (![self.program use]) {
-        return NO;
-    }
     [self bindAsFramebuffer];
     [self drawWithProgram:self.program];
     timeLastChanged = GPUImageGetCurrentTimestamp();

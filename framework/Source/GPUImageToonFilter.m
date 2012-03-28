@@ -91,10 +91,6 @@ NSString *const kGPUImageToonFragmentShaderString = SHADER_STRING
     if (![self.program valueForKey:@"imageWidthFactor"]
         || ![self.program valueForKey:@"imageHeightFactor"])
     {
-        // If no explicit size has been specified, inherit it
-        if (!self.size.width || !self.size.height) {
-            self.size = self.inputImage.backingStore.size;
-        }
         self.imageWidthFactor = self.size.width;
         self.imageHeightFactor = self.size.height;
     }
