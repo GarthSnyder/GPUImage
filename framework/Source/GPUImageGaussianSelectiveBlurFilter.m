@@ -2,8 +2,8 @@
 
 NSString *const kGPUImageGaussianSelectiveBlurFragmentShaderString = SHADER_STRING
 (
-    uniform sampler2D inputImageTexture;
-    uniform sampler2D inputImageTexture2; // The un-blurred image
+    uniform sampler2D inputImage;
+    uniform sampler2D auxilliaryImage; // The un-blurred image
 
     const lowp int GAUSSIAN_SAMPLES = 9;
 
@@ -20,17 +20,17 @@ NSString *const kGPUImageGaussianSelectiveBlurFragmentShaderString = SHADER_STRI
     {
         lowp vec4 sum = vec4(0.0);
 
-        sum += texture2D(inputImageTexture, blurCoordinates[0]) * 0.05;
-        sum += texture2D(inputImageTexture, blurCoordinates[1]) * 0.09;
-        sum += texture2D(inputImageTexture, blurCoordinates[2]) * 0.12;
-        sum += texture2D(inputImageTexture, blurCoordinates[3]) * 0.15;
-        sum += texture2D(inputImageTexture, blurCoordinates[4]) * 0.18;
-        sum += texture2D(inputImageTexture, blurCoordinates[5]) * 0.15;
-        sum += texture2D(inputImageTexture, blurCoordinates[6]) * 0.12;
-        sum += texture2D(inputImageTexture, blurCoordinates[7]) * 0.09;
-        sum += texture2D(inputImageTexture, blurCoordinates[8]) * 0.05;
+        sum += texture2D(inputImage, blurCoordinates[0]) * 0.05;
+        sum += texture2D(inputImage, blurCoordinates[1]) * 0.09;
+        sum += texture2D(inputImage, blurCoordinates[2]) * 0.12;
+        sum += texture2D(inputImage, blurCoordinates[3]) * 0.15;
+        sum += texture2D(inputImage, blurCoordinates[4]) * 0.18;
+        sum += texture2D(inputImage, blurCoordinates[5]) * 0.15;
+        sum += texture2D(inputImage, blurCoordinates[6]) * 0.12;
+        sum += texture2D(inputImage, blurCoordinates[7]) * 0.09;
+        sum += texture2D(inputImage, blurCoordinates[8]) * 0.05;
 
-        lowp vec4 overlay = texture2D(inputImageTexture2, textureCoordinate);
+        lowp vec4 overlay = texture2D(auxilliaryImage, textureCoordinate);
         lowp float d = distance(textureCoordinate, excludeCirclePoint);
 
         sum = mix(overlay, sum, smoothstep(excludeCircleRadius - excludeBlurSize, excludeCircleRadius, d));
