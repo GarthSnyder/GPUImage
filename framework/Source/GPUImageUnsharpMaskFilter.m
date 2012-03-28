@@ -1,5 +1,4 @@
 #import "GPUImageUnsharpMaskFilter.h"
-#import "GPUImageFilter.h"
 #import "GPUImageGaussianBlurFilter.h"
 
 NSString *const kGPUImageUnsharpMaskFragmentShaderString = SHADER_STRING
@@ -41,7 +40,7 @@ NSString *const kGPUImageUnsharpMaskFragmentShaderString = SHADER_STRING
 
 - (void) setInputImage:(id<GPUImageSource>)inputImage
 {
-    [self.program setValue:inputImage forKey:@"inputImage"];
+    self.program.inputImage = inputImage;
     blurFilter.inputImage = inputImage;
 }
 
