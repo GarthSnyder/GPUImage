@@ -1,8 +1,10 @@
-#import "GPUImageTwoPassFilter.h"
+#import "GPUImage.h"
+#import "GPUIMageFilter.h"
 
-@interface GPUImageBoxBlurFilter : GPUImageTwoPassFilter
+@interface GPUImageBoxBlurFilter : GPUImage
 {
-    GLint verticalPassTexelWidthOffsetUniform, verticalPassTexelHeightOffsetUniform, horizontalPassTexelWidthOffsetUniform, horizontalPassTexelHeightOffsetUniform, blurSizeUniform;
+    GPUImageFilter *stageOne, *stageTwo;
+    id <GPUImageSource> trueParent;
 }
 
 @end

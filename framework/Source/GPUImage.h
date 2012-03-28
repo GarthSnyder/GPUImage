@@ -26,6 +26,9 @@
 // their own rendering systems while still taking advantage of GPUImageBase.
 
 @interface GPUImage : GPUImageBase <GPUImageSource>
+{
+    id <GPUImageSource> _inputImage;
+}
 
 @property (nonatomic, retain) id <GPUImageSource> inputImage;
 

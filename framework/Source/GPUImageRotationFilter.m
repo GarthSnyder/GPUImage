@@ -20,11 +20,11 @@
     }
 }
 
-- (BOOL) render
+- (void)adoptParametersFrom:(id<GPUImageSource>)other
 {
     // If no explicit size has been specified, inherit in orientation-specific way
     if (!self.size.width || !self.size.height) {
-        GLsize newSize = self.inputImage.backingStore.size;
+        GLsize newSize = other.backingStore.size;
         if ((_rotationMode == kGPUImageRotateLeft) 
             || (_rotationMode == kGPUImageRotateRight)
             || (_rotationMode == kGPUImageRotateRightFlipVertical))
@@ -33,7 +33,7 @@
         }
         self.size = newSize;
     }
-    return [super render];
+    [super adoptParametersFrom:other];
 }
 
 - (void) drawWithProgram:(id)prog
