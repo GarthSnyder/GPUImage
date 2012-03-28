@@ -4,12 +4,12 @@ NSString *const kGPUImageExposureFragmentShaderString = SHADER_STRING
 (
     varying highp vec2 textureCoordinate;
 
-    uniform sampler2D inputTexture;
+    uniform sampler2D inputImage;
     uniform highp float exposure;
 
     void main()
     {
-        highp vec4 textureColor = texture2D(inputTexture, textureCoordinate);
+        highp vec4 textureColor = texture2D(inputImage, textureCoordinate);
 
         gl_FragColor = vec4(textureColor.rgb * pow(2.0, exposure), textureColor.w);
     }

@@ -244,7 +244,7 @@
     }
     
     GLint position = [prog indexOfAttribute:@"position"];
-    GLint itc = [prog indexOfAttribute:@"inputTextureCoordinate"];
+    GLint itc = [prog indexOfAttribute:@"inputImageCoordinate"];
     
     glVertexAttribPointer(position, 2, GL_FLOAT, 0, 0, v);
     glEnableVertexAttribArray(position);

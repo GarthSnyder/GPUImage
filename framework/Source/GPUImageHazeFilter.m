@@ -4,7 +4,7 @@ NSString *const kGPUImageHazeFragmentShaderString = SHADER_STRING
 (
     varying highp vec2 textureCoordinate;
 
-    uniform sampler2D inputTexture;
+    uniform sampler2D inputImage;
 
     uniform lowp float distance;
     uniform highp float slope;
@@ -14,7 +14,7 @@ NSString *const kGPUImageHazeFragmentShaderString = SHADER_STRING
         //todo reconsider precision modifiers	 
         highp vec4 color = vec4(1.0);//todo reimplement as a parameter
         highp float  d = textureCoordinate.y * slope  +  distance; 
-        highp vec4 c = texture2D(inputTexture, textureCoordinate) ; // consider using unpremultiply
+        highp vec4 c = texture2D(inputImage, textureCoordinate) ; // consider using unpremultiply
 
         c = (c - d * color) / (1.0 -d); 
 

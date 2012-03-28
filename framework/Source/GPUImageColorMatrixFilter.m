@@ -4,14 +4,14 @@ NSString *const kGPUImageColorMatrixFragmentShaderString = SHADER_STRING
 (
     varying highp vec2 textureCoordinate;
 
-    uniform sampler2D inputTexture;
+    uniform sampler2D inputImage;
 
     uniform lowp mat4 colorMatrix;
     uniform lowp float intensity;
 
     void main()
     {
-        lowp vec4 textureColor = texture2D(inputTexture, textureCoordinate);
+        lowp vec4 textureColor = texture2D(inputImage, textureCoordinate);
         lowp vec4 outputColor = textureColor * colorMatrix;
 
         gl_FragColor = (intensity * outputColor) + ((1.0 - intensity) * textureColor);

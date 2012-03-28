@@ -57,7 +57,7 @@
 
 // Most programs within GPUImage will use the following standard names
 // for inputs, although this is not required. These properties
-// are defined here so that program.inputTexture is always understood and 
+// are defined here so that program.inputImage is always understood and 
 // accepted by the compiler without additional configuration. This is just
 // a simple wrapper for [program setValue:xxx forKey:@"inputImage] et al.
 

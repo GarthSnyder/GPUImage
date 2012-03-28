@@ -8,13 +8,13 @@ NSString *const kGPUImageLuminanceFragmentShaderString = SHADER_STRING
 
     varying vec2 textureCoordinate;
 
-    uniform sampler2D inputTexture;
+    uniform sampler2D inputImage;
 
     const highp vec3 W = vec3(0.2125, 0.7154, 0.0721);
 
     void main()
     {
-        float luminance = dot(texture2D(inputTexture, textureCoordinate).rgb, W);
+        float luminance = dot(texture2D(inputImage, textureCoordinate).rgb, W);
 
         gl_FragColor = vec4(vec3(luminance), 1.0);
     }

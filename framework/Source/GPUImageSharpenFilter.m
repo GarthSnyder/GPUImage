@@ -49,17 +49,17 @@ NSString *const kGPUImageSharpenFragmentShaderString = SHADER_STRING
     varying highp float centerMultiplier;
     varying highp float edgeMultiplier;
 
-    uniform sampler2D inputTexture;
+    uniform sampler2D inputImage;
 
     void main()
     {
-        mediump vec3 textureColor = texture2D(inputTexture, textureCoordinate).rgb;
-        mediump vec3 leftTextureColor = texture2D(inputTexture, leftTextureCoordinate).rgb;
-        mediump vec3 rightTextureColor = texture2D(inputTexture, rightTextureCoordinate).rgb;
-        mediump vec3 topTextureColor = texture2D(inputTexture, topTextureCoordinate).rgb;
-        mediump vec3 bottomTextureColor = texture2D(inputTexture, bottomTextureCoordinate).rgb;
+        mediump vec3 textureColor = texture2D(inputImage, textureCoordinate).rgb;
+        mediump vec3 leftTextureColor = texture2D(inputImage, leftTextureCoordinate).rgb;
+        mediump vec3 rightTextureColor = texture2D(inputImage, rightTextureCoordinate).rgb;
+        mediump vec3 topTextureColor = texture2D(inputImage, topTextureCoordinate).rgb;
+        mediump vec3 bottomTextureColor = texture2D(inputImage, bottomTextureCoordinate).rgb;
 
-        gl_FragColor = vec4((textureColor * centerMultiplier - (leftTextureColor * edgeMultiplier + rightTextureColor * edgeMultiplier + topTextureColor * edgeMultiplier + bottomTextureColor * edgeMultiplier)), texture2D(inputTexture, bottomTextureCoordinate).w);
+        gl_FragColor = vec4((textureColor * centerMultiplier - (leftTextureColor * edgeMultiplier + rightTextureColor * edgeMultiplier + topTextureColor * edgeMultiplier + bottomTextureColor * edgeMultiplier)), texture2D(inputImage, bottomTextureCoordinate).w);
     }
 );
 
