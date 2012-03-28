@@ -189,6 +189,18 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     return uniform ? uniform.value : nil;
 }
 
+// Any values set for uniforms that haven't been flushed out?
+
+- (BOOL) hasDirtyUniforms
+{
+    for (GPUImageShaderSymbol *uniform in uniforms) {
+        if ([uniform dirty]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 // Set all uniform values in OpenGL in preparation for drawing. Only sets
 // uniforms whose values have changed since the last call. For textures,
 // always sets up the appropriate texture units since these setups do not

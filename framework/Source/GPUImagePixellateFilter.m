@@ -2,69 +2,54 @@
 
 NSString *const kGPUImagePixellationFragmentShaderString = SHADER_STRING
 (
- varying highp vec2 textureCoordinate;
- 
- uniform sampler2D inputImage;
- 
- uniform highp float fractionalWidthOfPixel;
- 
- void main()
- {
-     highp vec2 sampleDivisor = vec2(fractionalWidthOfPixel);
-     
-     highp vec2 samplePos = textureCoordinate - mod(textureCoordinate, sampleDivisor);
-     gl_FragColor = texture2D(inputImage, samplePos );
- }
- );
+    varying highp vec2 textureCoordinate;
+
+    uniform sampler2D inputImage;
+
+    uniform highp float fractionalWidthOfPixel;
+
+    void main()
+    {
+        highp vec2 sampleDivisor = vec2(fractionalWidthOfPixel);
+
+        highp vec2 samplePos = textureCoordinate - mod(textureCoordinate, sampleDivisor);
+        gl_FragColor = texture2D(inputImage, samplePos );
+    }
+);
 
 @implementation GPUImagePixellateFilter
 
 @synthesize fractionalWidthOfAPixel = _fractionalWidthOfAPixel;
 
-#pragma mark -
-#pragma mark Initialization and teardown
-
-- (id)init;
+- (id) init
 {
-    if (!(self = [super initWithFragmentShaderFromString:kGPUImagePixellationFragmentShaderString]))
-    {
-		return nil;
+    if (self = [super init]) {
+        self.program.fragmentShader = kGPUImagePixellationFragmentShaderString;
+        self.fractionalWidthOfAPixel = 0.05;
     }
-    
-    fractionalWidthOfAPixelUniform = [filterProgram uniformIndex:@"fractionalWidthOfPixel"];
-
-    self.fractionalWidthOfAPixel = 0.05;
-    
     return self;
 }
 
-#pragma mark -
-#pragma mark Accessors
-
-- (void)setFractionalWidthOfAPixel:(CGFloat)newValue;
+- (BOOL) render
 {
-    CGFloat singlePixelSpacing;
-    if (inputImageSize.width != 0.0)
-    {
-        singlePixelSpacing = 1.0 / inputImageSize.width;
+    if (!self.size.width || !self.size.height) {
+        self.size = self.inputImage.backingStore.size;
     }
-    else
-    {
+
+    // Convert fractional width of a pixel
+    CGFloat singlePixelSpacing;
+    if (self.size.width) {
+        singlePixelSpacing = 1.0 / self.size.width;
+    } else {
         singlePixelSpacing = 1.0 / 2048.0;
     }
-    
-    if (newValue < singlePixelSpacing)
-    {
+    if (_fractionalWidthOfAPixel < singlePixelSpacing) {
         _fractionalWidthOfAPixel = singlePixelSpacing;
     }
-    else
-    {
-        _fractionalWidthOfAPixel = newValue;
-    }
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    glUniform1f(fractionalWidthOfAPixelUniform, _fractionalWidthOfAPixel);
+
+    [self.program setValue:[NSNumber numberWithFloat:_fractionalWidthOfAPixel] 
+                    forKey:@"fractionalWidthOfPixel"];
+    return [super render];
 }
 
 @end

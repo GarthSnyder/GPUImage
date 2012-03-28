@@ -69,89 +69,37 @@ NSString *const kGPUImageToonFragmentShaderString = SHADER_STRING
 
 @implementation GPUImageToonFilter
 
-@synthesize imageWidthFactor = _imageWidthFactor; 
-@synthesize imageHeightFactor = _imageHeightFactor; 
-@synthesize threshold = _threshold; 
-@synthesize quantizationLevels = _quantizationLevels; 
+@dynamic imageHeightFactor, imageWidthFactor;
 
-#pragma mark -
-#pragma mark Initialization and teardown
-
-- (id)init;
+- (id) init
 {
-    if (!(self = [super initWithVertexShaderFromString:kGPUImageNearbyTexelSamplingVertexShaderString fragmentShaderFromString:kGPUImageToonFragmentShaderString]))
-    {
-		return nil;
+    if (self = [super init]) {
+        self.program.fragmentShader = kGPUImageSobelEdgeDetectionVertexShaderString;
+        self.program.fragmentShader = kGPUImageToonFragmentShaderString;
     }
     
     hasOverriddenImageSizeFactor = NO;
     
     imageWidthFactorUniform = [filterProgram uniformIndex:@"imageWidthFactor"];
     imageHeightFactorUniform = [filterProgram uniformIndex:@"imageHeightFactor"];
-    thresholdUniform = [filterProgram uniformIndex:@"threshold"];
-    quantizationLevelsUniform = [filterProgram uniformIndex:@"quantizationLevels"];
     
-    self.threshold = 0.2;
-    self.quantizationLevels = 10.0;    
-
     return self;
 }
 
-- (void)setupFilterForSize:(CGSize)filterFrameSize;
+- (BOOL) render
 {
-    if (!hasOverriddenImageSizeFactor)
+    if (![self.program valueForKey:@"imageWidthFactor"]
+        || ![self.program valueForKey:@"imageHeightFactor"])
     {
-        _imageWidthFactor = filterFrameSize.width;
-        _imageHeightFactor = filterFrameSize.height;
-        
-        [GPUImageOpenGLESContext useImageProcessingContext];
-        [filterProgram use];
-        glUniform1f(imageWidthFactorUniform, 1.0 / _imageWidthFactor);
-        glUniform1f(imageHeightFactorUniform, 1.0 / _imageHeightFactor);
+        // If no explicit size has been specified, inherit it
+        if (!self.size.width || !self.size.height) {
+            self.size = self.inputImage.backingStore.size;
+        }
+        self.imageWidthFactor = self.size.width;
+        self.imageHeightFactor = self.size.height;
     }
+    return [super render];
 }
-
-#pragma mark -
-#pragma mark Accessors
-
-- (void)setImageWidthFactor:(CGFloat)newValue;
-{
-    hasOverriddenImageSizeFactor = YES;
-    _imageWidthFactor = newValue;
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    glUniform1f(imageWidthFactorUniform, 1.0 / _imageWidthFactor);
-}
-
-- (void)setImageHeightFactor:(CGFloat)newValue;
-{
-    hasOverriddenImageSizeFactor = YES;
-    _imageHeightFactor = newValue;
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    glUniform1f(imageHeightFactorUniform, 1.0 / _imageHeightFactor);
-}
-
-- (void)setThreshold:(CGFloat)newValue;
-{
-    _threshold = newValue;
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    glUniform1f(thresholdUniform, _threshold);
-}
-
-- (void)setQuantizationLevels:(CGFloat)newValue;
-{
-    _quantizationLevels = newValue;
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    glUniform1f(quantizationLevelsUniform, _quantizationLevels);
-}
-
 
 @end
 

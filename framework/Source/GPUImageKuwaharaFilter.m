@@ -78,35 +78,15 @@ NSString *const kGPUImageKuwaharaFragmentShaderString = SHADER_STRING
 
 @implementation GPUImageKuwaharaFilter
 
-@synthesize radius = _radius;
+@dynamic radius;
 
-#pragma mark -
-#pragma mark Initialization and teardown
-
-- (id)init;
+- (id) init
 {
-    if (!(self = [super initWithFragmentShaderFromString:kGPUImageKuwaharaFragmentShaderString]))
-    {
-		return nil;
+    if (self = [super init]) {
+        self.program.fragmentShader = kGPUImageKuwaharaFragmentShaderString;
+        self.radius = 3;
     }
-    
-    radiusUniform = [filterProgram uniformIndex:@"radius"];
-
-    self.radius = 3;
-    
     return self;
-}
-
-#pragma mark -
-#pragma mark Accessors
-
-- (void)setRadius:(GLuint)newValue;
-{
-    _radius = newValue;
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    glUniform1i(radiusUniform, _radius);
 }
 
 @end

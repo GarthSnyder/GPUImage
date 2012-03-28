@@ -33,6 +33,9 @@
             needsRender = YES;
         }
     }
+    if ([self.program hasDirtyUniforms]) {
+        needsRender = YES;
+    }
     if (needsRender) {
         return [self render];
     }

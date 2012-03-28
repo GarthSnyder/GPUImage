@@ -1,12 +1,12 @@
-#import "GPUImageTwoPassFilter.h"
+#import "GPUImageFilter.h"
 
-@interface GPUImageSobelEdgeDetectionFilter : GPUImageTwoPassFilter
-{
-    GLint imageWidthFactorUniform, imageHeightFactorUniform;
-    BOOL hasOverriddenImageSizeFactor;
-}
+extern NSString *const kGPUImageSobelEdgeDetectionVertexShaderString;
 
-// The image width and height factors tweak the appearance of the edges. By default, they match the filter size in pixels
+@interface GPUImageSobelEdgeDetectionFilter : GPUImageFilter
+
+// The image width and height factors tweak the appearance of the edges.
+// By default, they match the filter size in pixels.
+
 @property(readwrite, nonatomic) CGFloat imageWidthFactor; 
 @property(readwrite, nonatomic) CGFloat imageHeightFactor; 
 

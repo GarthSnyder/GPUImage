@@ -50,6 +50,8 @@
 // Available, but not needed for typical use.
 - (BOOL) link;
 
+- (BOOL) hasDirtyUniforms;
+
 - (NSString *) logs;
 - (NSString *) vertexShaderLog;
 - (NSString *) fragmentShaderLog;
