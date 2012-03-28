@@ -1,14 +1,13 @@
 #import "GPUImageFilter.h"
+#import "GPUImage.h"
 
-@interface GPUImageGaussianBlurFilter : GPUImageTwoPassFilter 
+@interface GPUImageGaussianBlurFilter : GPUImage 
 {
-    GLint horizontalGaussianArrayUniform, horizontalBlurSizeUniform, verticalGaussianArrayUniform, verticalBlurSizeUniform;
-    GLint verticalPassTexelWidthOffsetUniform, verticalPassTexelHeightOffsetUniform, horizontalPassTexelWidthOffsetUniform, horizontalPassTexelHeightOffsetUniform, blurSizeUniform;
+    GPUImageFilter *stageOne, *stageTwo;
+    id <GPUImageSource> trueParent;
 }
 
 // A multiplier for the blur size, ranging from 0.0 on up, with a default of 1.0
 @property (readwrite, nonatomic) CGFloat blurSize;
-
-- (void)setGaussianValues;
 
 @end
