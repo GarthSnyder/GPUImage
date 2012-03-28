@@ -15,6 +15,7 @@
 //     return [[program valueForKey:@"gamma"] floatValue];
 // }
 
+#import <Foundation/NSObjCRuntime.h>
 #import "GPUImageFilter.h"
 
 @interface GPUImageFilter (Uniforms)
@@ -94,6 +95,16 @@
         totalSize += alignedSize;
     }
     return totalSize;
+}
+
+- (void) setValue:(id)value forKey:(NSString *)key
+{
+    [self.program setValue:value forKey:key];
+}
+
+- (id) valueForKey:(NSString *)key
+{
+    return [self.program valueForKey:key];
 }
 
 @end
