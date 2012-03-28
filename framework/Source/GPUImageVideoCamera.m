@@ -1,6 +1,7 @@
 
 #import "GPUImageVideoCamera.h"
 #import "GPUImageTextureBuffer.h"
+#import "GPUImageOpenGLESContext.h"
 
 #pragma mark -
 #pragma mark Private methods and instance variables
@@ -130,7 +131,7 @@
 #pragma mark -
 #pragma mark Manage the camera video stream
 
-- (void)startCameraCapture
+- (void) startCameraCapture
 {
     if (![_captureSession isRunning])
 	{
@@ -139,7 +140,7 @@
 	}
 }
 
-- (void)stopCameraCapture
+- (void) stopCameraCapture
 {
     if ([_captureSession isRunning])
     {
@@ -147,7 +148,7 @@
     }
 }
 
-- (void)rotateCamera
+- (void) rotateCamera
 {
     NSError *error;
     AVCaptureDeviceInput *newVideoInput;

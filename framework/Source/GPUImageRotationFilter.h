@@ -3,11 +3,7 @@
 typedef enum { kGPUImageRotateLeft, kGPUImageRotateRight, kGPUImageFlipVertical, kGPUImageFlipHorizonal, kGPUImageRotateRightFlipVertical} GPUImageRotationMode;
 
 @interface GPUImageRotationFilter : GPUImageFilter
-{
-    GPUImageRotationMode rotationMode;
-}
 
-// Initialization and teardown
-- (id)initWithRotation:(GPUImageRotationMode)newRotationMode;
+@property (nonatomic) GPUImageRotationMode rotationMode;
 
 @end

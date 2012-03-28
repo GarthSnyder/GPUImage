@@ -2,10 +2,6 @@
 #import "GPUImageTextureBuffer.h"
 #import "GPUImageRenderbuffer.h"
 
-@interface GPUImageBase ()
-- (void) setTextureParameters;
-@end
-
 @implementation GPUImageBase
 
 @synthesize size = _size;
@@ -131,7 +127,7 @@
         self.size = obs.size;
     }
     if (!self.baseFormat) {
-        self.baseFormat = obs.baseFormat;
+        self.baseFormat = obs.format;
     }
     if (!self.pixType && !self.usesRenderbuffer && [obs isKindOfClass:[GPUImageTextureBuffer class]]) {
         self.pixType = ((GPUImageTextureBuffer *)obs).pixType;
@@ -224,7 +220,7 @@
 #pragma mark -
 #pragma mark Drawing
 
-- (void) drawWithProgram:(GPUImageProgram *)prog
+- (void) drawWithProgram:(GPUImageProgram *)prog vertices:(const GLfloat *)v textureCoordinates:(const GLfloat *)t
 {
     static const GLfloat squareVertices[] = {
         -1.0, -1.0,
@@ -239,23 +235,35 @@
         0.0,  1.0,
         1.0,  1.0,
     };
+
+    if (!v) {
+        v = squareVertices;
+    }
+    if (!t) {
+        t = squareTextureCoordinates;
+    }
     
     GLint position = [prog indexOfAttribute:@"position"];
     GLint itc = [prog indexOfAttribute:@"inputTextureCoordinate"];
     
-    glVertexAttribPointer(position, 2, GL_FLOAT, 0, 0, squareVertices);
+    glVertexAttribPointer(position, 2, GL_FLOAT, 0, 0, v);
     glEnableVertexAttribArray(position);
     
-    glVertexAttribPointer(itc, 2, GL_FLOAT, 0, 0, squareTextureCoordinates);
+    glVertexAttribPointer(itc, 2, GL_FLOAT, 0, 0, t);
     glEnableVertexAttribArray(itc);
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);    
 }
 
+- (void) drawWithProgram:(GPUImageProgram *)prog
+{
+    [self drawWithProgram:prog vertices:NULL textureCoordinates:NULL];
+}
+
 #pragma mark -
 #pragma mark Exporting images
 
-- (GLuint *) getRawContents
+- (GLubyte *) getRawContents
 {
     return [self.backingStore rawDataFromFramebuffer];
 }

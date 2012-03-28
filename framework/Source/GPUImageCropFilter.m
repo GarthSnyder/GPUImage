@@ -1,67 +1,24 @@
 #import "GPUImageCropFilter.h"
 
-NSString *const kGPUImageCropFragmentShaderString =  SHADER_STRING
-(
- varying highp vec2 textureCoordinate;
- 
- uniform sampler2D inputTexture;
- 
- void main()
- {
-     gl_FragColor = texture2D(inputTexture, textureCoordinate);
- }
-);
-
 @implementation GPUImageCropFilter
 
 @synthesize cropRegion = _cropRegion;
 
-#pragma mark -
-#pragma mark Initialization and teardown
-
-- (id)initWithCropRegion:(CGRect)newCropRegion;
+- (id) initWithCropRegion:(CGRect)newCropRegion
 {
-    if (!(self = [super initWithFragmentShaderFromString:kGPUImageCropFragmentShaderString]))
-    {
-        return nil;
+    if (self = [super init]) {
+        self.cropRegion = newCropRegion;
     }
-    
-    self.cropRegion = newCropRegion;
-
     return self;
 }
 
-- (id)init;
+- (id) init
 {
-    if (!(self = [self initWithCropRegion:CGRectMake(0.0, 0.0, 1.0, 1.0)]))
-    {
-        return nil;
-    }
-    
-    return self;
+    return [self initWithCropRegion:CGRectMake(0.0, 0.0, 1.0, 1.0)];
 }
 
-#pragma mark -
-#pragma mark GPUImageInput
-
-//- (void)setInputSize:(CGSize)newSize;
-//{
-//    CGSize croppedSize;
-//    croppedSize.width = newSize.width * _cropRegion.size.width;
-//    croppedSize.height = newSize.height * _cropRegion.size.height;
-//    
-//    inputTextureSize = croppedSize;
-//}
-//
-- (void)newFrameReadyAtTime:(CMTime)frameTime;
+- (void) drawWithProgram:(GPUImageProgram *)prog
 {
-    static const GLfloat cropSquareVertices[] = {
-        -1.0f, -1.0f,
-        1.0f, -1.0f,
-        -1.0f,  1.0f,
-        1.0f,  1.0f,
-    };
-    
     GLfloat cropTextureCoordinates[] = {
         _cropRegion.origin.x, _cropRegion.origin.y,
         CGRectGetMaxX(_cropRegion), _cropRegion.origin.y,
@@ -69,9 +26,7 @@ NSString *const kGPUImageCropFragmentShaderString =  SHADER_STRING
         CGRectGetMaxX(_cropRegion), CGRectGetMaxY(_cropRegion),
     };
 
-    [self renderToTextureWithVertices:cropSquareVertices textureCoordinates:cropTextureCoordinates sourceTexture:filterSourceTexture];
-
-    [self informTargetsAboutNewFrameAtTime:frameTime];
+    [self drawWithProgram:prog vertices:NULL textureCoordinates:cropTextureCoordinates];
 }
 
 @end

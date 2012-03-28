@@ -22,12 +22,12 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import "GPUImageShader.h"
-#import "GPUImage.h"
+#import "GPUImageProtocols.h"
 
 // Shortcut for encoding uniform values as NSValues. Argument must be 
 // non-literal values such as local variables.
 
-#define UNIFORM(x) [NSValue valueWithBytes:&(x) objCType:@encode(typeof(x))]
+#define UNIFORM(x) ([NSValue valueWithBytes:&(x) objCType:@encode(typeof(x))])
 
 @interface GPUImageProgram : NSObject
 {
@@ -58,8 +58,8 @@
 // Most programs within GPUImage will use the following standard names
 // for inputs, although this is not required. These properties
 // are defined here so that program.inputTexture is always understood and 
-// accepted by the compiler without additional configuration. In point of fact,
-// all property refs are handled dynamically based on the actual shaders.
+// accepted by the compiler without additional configuration. This is just
+// a simple wrapper for [program setValue:xxx forKey:@"inputImage] et al.
 
 @property (nonatomic) id <GPUImageSource> inputImage;
 @property (nonatomic) id <GPUImageSource> auxilliaryImage; // 2nd input

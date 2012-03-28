@@ -1,7 +1,7 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import "GPUImageTypes.h"
-#import "GPUimageBuffer.h"
+#import "GPUImageBuffer.h"
 
 // The GPUImageSource protocol lets an object vend its GPUImageBuffer object
 // and participate in the GPUImage graph update protocol.

@@ -1,8 +1,8 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 #import <QuartzCore/QuartzCore.h>
-
-#import "GPUImageHeaders.h"
+#import "GPUImageTypes.h"
+#import "GPUImageProgram.h"
 
 // GPUImageBase is the drawing and texture management portion of GPUImage.
 // On top of this platform, GPUImage adds the GPUImageSource 
@@ -11,6 +11,7 @@
 
 @interface GPUImageBase : NSObject
 {
+    GPUImageTimestamp timeLastChanged;
     GPUImageBuffer *_backingStore;
 }
 
@@ -42,12 +43,13 @@
 - (void) clearFramebuffer:(vec4)backgroundColor; // Also binds
 
 - (void) drawWithProgram:(GPUImageProgram *)prog;
+- (void) drawWithProgram:(GPUImageProgram *)prog vertices:(const GLfloat *)v textureCoordinates:(const GLfloat *)t;
 
 // Adopts size and base format only, and only if receiver's are unknown
 - (void) adoptParametersFrom:(id <GPUImageSource>)other;
 
 // Methods for getting image data out of OpenGL
-- (GLuint *) getRawContents;
+- (GLubyte *) getRawContents;
 - (CGImageRef) getCGImage;
 - (UIImage *) getUIImage;
 
@@ -56,5 +58,6 @@
 - (GPUImageBuffer *) backingStore;
 - (void) createBackingStore;
 - (void) releaseBackingStore;
+- (void) setTextureParameters;
 
 @end

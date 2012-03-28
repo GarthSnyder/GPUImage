@@ -1,52 +1,42 @@
 #import "GPUImageRotationFilter.h"
 
-NSString *const kGPUImageRotationFragmentShaderString =  SHADER_STRING
-(
- varying highp vec2 textureCoordinate;
- 
- uniform sampler2D inputTexture;
- 
- void main()
- {
-     gl_FragColor = texture2D(inputTexture, textureCoordinate);
- }
-);
-
 @implementation GPUImageRotationFilter
 
-#pragma mark -
-#pragma mark Initialization and teardown
+@synthesize rotationMode = _rotationMode;
 
-- (id)initWithRotation:(GPUImageRotationMode)newRotationMode;
+- (id) init
 {
-    if (!(self = [super initWithFragmentShaderFromString:kGPUImageRotationFragmentShaderString]))
-    {
-        return nil;
+    if (self = [super init]) {
+        self.rotationMode = kGPUImageFlipVertical;
     }
-    
-    rotationMode = newRotationMode;
-
     return self;
 }
 
-
-#pragma mark -
-#pragma mark GPUImageInput
-
-- (void)setInputSize:(CGSize)newSize;
+- (void) setRotationMode:(GPUImageRotationMode)newMode
 {
-    CGSize processedSize = newSize;
-    
-    if ( (rotationMode == kGPUImageRotateLeft) || (rotationMode == kGPUImageRotateRight) || (rotationMode == kGPUImageRotateRightFlipVertical) )
-    {
-        processedSize.width = newSize.height;
-        processedSize.height = newSize.width;
+    if (newMode != _rotationMode) {
+        _rotationMode = newMode;
+        [self releaseBackingStore];
     }
-    
-    [super setInputSize:processedSize];
 }
 
-- (void)newFrameReadyAtTime:(CMTime)frameTime;
+- (BOOL) render
+{
+    // If no explicit size has been specified, inherit in orientation-specific way
+    if (!self.size.width || !self.size.height) {
+        GLsize newSize = self.inputImage.size;
+        if ((_rotationMode == kGPUImageRotateLeft) 
+            || (_rotationMode == kGPUImageRotateRight)
+            || (_rotationMode == kGPUImageRotateRightFlipVertical))
+        {
+            newSize = (GLsize){newSize.height, newSize.width};
+        }
+        self.size = newSize;
+        return [super render];
+    }
+}
+
+- (void) drawWithProgram:(id)prog
 {
     static const GLfloat rotationSquareVertices[] = {
         -1.0f, -1.0f,
@@ -61,21 +51,21 @@ NSString *const kGPUImageRotationFragmentShaderString =  SHADER_STRING
         0.0f, 0.0f,
         0.0f, 1.0f,
     };
-
+    
     static const GLfloat rotateRightTextureCoordinates[] = {
         0.0f, 1.0f,
         0.0f, 0.0f,
         1.0f, 1.0f,
         1.0f, 0.0f,
     };
-
+    
     static const GLfloat verticalFlipTextureCoordinates[] = {
         0.0f, 1.0f,
         1.0f, 1.0f,
         0.0f,  0.0f,
         1.0f,  0.0f,
     };
-
+    
     static const GLfloat horizontalFlipTextureCoordinates[] = {
         1.0f, 0.0f,
         0.0f, 0.0f,
@@ -90,16 +80,32 @@ NSString *const kGPUImageRotationFragmentShaderString =  SHADER_STRING
         1.0f, 1.0f,
     };
 
+    GLfloat *texCoords;
 
     switch (rotationMode)
     {
-        case kGPUImageRotateLeft: [self renderToTextureWithVertices:rotationSquareVertices textureCoordinates:rotateLeftTextureCoordinates sourceTexture:filterSourceTexture]; break;
-        case kGPUImageRotateRight: [self renderToTextureWithVertices:rotationSquareVertices textureCoordinates:rotateRightTextureCoordinates sourceTexture:filterSourceTexture]; break;
-        case kGPUImageFlipHorizonal: [self renderToTextureWithVertices:rotationSquareVertices textureCoordinates:verticalFlipTextureCoordinates sourceTexture:filterSourceTexture]; break;
-        case kGPUImageFlipVertical: [self renderToTextureWithVertices:rotationSquareVertices textureCoordinates:horizontalFlipTextureCoordinates sourceTexture:filterSourceTexture]; break;
-   		case kGPUImageRotateRightFlipVertical: [self renderToTextureWithVertices:rotationSquareVertices textureCoordinates:rotateRightVerticalFlipTextureCoordinates sourceTexture:filterSourceTexture]; break;
+        case kGPUImageRotateLeft: 
+            texCoords = rotateLeftTextureCoordinates;
+            break;
+        case kGPUImageRotateRight: 
+            texCoords = rotateRightTextureCoordinates;
+            break;
+        case kGPUImageFlipHorizonal: 
+            texCoords = horizontalFlipTextureCoordinates;
+            break;
+        case kGPUImageFlipVertical: 
+            texCoords = verticalFlipTextureCoordinates;
+            break;
+        case kGPUImageRotateRightFlipVertical: 
+            texCoords = rotateRightVerticalFlipTextureCoordinates;
+            break;
+        default:
+            NSAssert1(NO, @"Bad rotation mode: %d", (int)_rotationMode);
     }
-    [self informTargetsAboutNewFrameAtTime:frameTime];
+
+    [self drawWithProgram:self.program vertices:rotationSquareVertices textureCoordinates:texCoords];
+    timeLastChanged = GPUImageGetCurrentTimestamp();
+    return YES;
 }
 
 @end
