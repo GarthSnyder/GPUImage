@@ -1,9 +1,6 @@
 #import "GPUImageTwoPassFilter.h"
 
-@interface GPUImageFastBlurFilter : GPUImageTwoPassFilter
-{
-    GLint verticalPassTexelWidthOffsetUniform, verticalPassTexelHeightOffsetUniform, horizontalPassTexelWidthOffsetUniform, horizontalPassTexelHeightOffsetUniform, blurSizeUniform;
-}
+@interface GPUImageFastBlurFilter : GPUImageFilter
 
 // The number of times to sequentially blur the incoming image. The more passes, the slower the filter.
 @property(readwrite, nonatomic) NSUInteger blurPasses;
