@@ -1,5 +1,5 @@
 #import "GPUImage.h"
-#import "GPUIMageFilter.h"
+#import "GPUImageFilter.h"
 
 @interface GPUImageBoxBlurFilter : GPUImage
 {
