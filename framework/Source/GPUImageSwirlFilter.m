@@ -6,7 +6,7 @@ NSString *const kGPUImageSwirlFragmentShaderString = SHADER_STRING
 (
  varying highp vec2 textureCoordinate;
  
- uniform sampler2D inputTexture;
+ uniform sampler2D inputImage;
  
  uniform highp vec2 center;
  uniform highp float radius;
@@ -27,7 +27,7 @@ NSString *const kGPUImageSwirlFragmentShaderString = SHADER_STRING
      }
      textureCoordinateToUse += center;
     
-     gl_FragColor = texture2D(inputTexture, textureCoordinateToUse );
+     gl_FragColor = texture2D(inputImage, textureCoordinateToUse );
      
  }
 );

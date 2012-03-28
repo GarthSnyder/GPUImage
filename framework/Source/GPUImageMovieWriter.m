@@ -6,11 +6,11 @@
 NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 (
     varying highp vec2 textureCoordinate;
-    uniform sampler2D inputTexture;
+    uniform sampler2D inputImage;
 
     void main()
     {
-         gl_FragColor = texture2D(inputTexture, textureCoordinate).bgra;
+         gl_FragColor = texture2D(inputImage, textureCoordinate).bgra;
     }
 );
 
@@ -190,7 +190,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 {
     if (_inputImage != newParent) {
         _inputImage = newParent;
-        colorSwizzlingProgram.inputTexture = newParent;
+        colorSwizzlingProgram.inputImage = newParent;
         timeLastChanged = 0;
     }
 }

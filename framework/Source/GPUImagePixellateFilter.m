@@ -4,7 +4,7 @@ NSString *const kGPUImagePixellationFragmentShaderString = SHADER_STRING
 (
  varying highp vec2 textureCoordinate;
  
- uniform sampler2D inputTexture;
+ uniform sampler2D inputImage;
  
  uniform highp float fractionalWidthOfPixel;
  
@@ -13,7 +13,7 @@ NSString *const kGPUImagePixellationFragmentShaderString = SHADER_STRING
      highp vec2 sampleDivisor = vec2(fractionalWidthOfPixel);
      
      highp vec2 samplePos = textureCoordinate - mod(textureCoordinate, sampleDivisor);
-     gl_FragColor = texture2D(inputTexture, samplePos );
+     gl_FragColor = texture2D(inputImage, samplePos );
  }
  );
 
@@ -44,9 +44,9 @@ NSString *const kGPUImagePixellationFragmentShaderString = SHADER_STRING
 - (void)setFractionalWidthOfAPixel:(CGFloat)newValue;
 {
     CGFloat singlePixelSpacing;
-    if (inputTextureSize.width != 0.0)
+    if (inputImageSize.width != 0.0)
     {
-        singlePixelSpacing = 1.0 / inputTextureSize.width;
+        singlePixelSpacing = 1.0 / inputImageSize.width;
     }
     else
     {

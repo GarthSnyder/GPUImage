@@ -21,13 +21,13 @@ NSString *const kGPUImageDefaultVertexShader = SHADER_STRING
 
 NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 (
-     uniform sampler2D inputTexture;
+     uniform sampler2D inputImage;
      
      varying vec2 textureCoordinate;
      
      void main()
      {
-         gl_FragColor = texture2D(inputTexture, textureCoordinate);
+         gl_FragColor = texture2D(inputImage, textureCoordinate);
      }
 );
 
@@ -93,8 +93,8 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     return [self valueForKey:@"auxilliaryImage"];
 }
 
-- (void) setInputImage:(id <GPUImageSource>)inputTexture {
-    [self setValue:inputTexture forKey:@"inputImage"];
+- (void) setInputImage:(id <GPUImageSource>)inputImage {
+    [self setValue:inputImage forKey:@"inputImage"];
 }
 
 - (void) setAuxilliaryImage:(id <GPUImageSource>)auxImg {

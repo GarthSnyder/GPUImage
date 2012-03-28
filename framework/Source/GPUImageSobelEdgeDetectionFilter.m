@@ -62,19 +62,19 @@ NSString *const kGPUImageSobelEdgeDetectionFragmentShaderString = SHADER_STRING
  varying vec2 bottomLeftTextureCoordinate;
  varying vec2 bottomRightTextureCoordinate;
 
- uniform sampler2D inputTexture;
+ uniform sampler2D inputImage;
  
  void main()
  {
-    float i00   = texture2D(inputTexture, textureCoordinate).r;
-    float im1m1 = texture2D(inputTexture, bottomLeftTextureCoordinate).r;
-    float ip1p1 = texture2D(inputTexture, topRightTextureCoordinate).r;
-    float im1p1 = texture2D(inputTexture, topLeftTextureCoordinate).r;
-    float ip1m1 = texture2D(inputTexture, bottomRightTextureCoordinate).r;
-    float im10 = texture2D(inputTexture, leftTextureCoordinate).r;
-    float ip10 = texture2D(inputTexture, rightTextureCoordinate).r;
-    float i0m1 = texture2D(inputTexture, bottomTextureCoordinate).r;
-    float i0p1 = texture2D(inputTexture, topTextureCoordinate).r;
+    float i00   = texture2D(inputImage, textureCoordinate).r;
+    float im1m1 = texture2D(inputImage, bottomLeftTextureCoordinate).r;
+    float ip1p1 = texture2D(inputImage, topRightTextureCoordinate).r;
+    float im1p1 = texture2D(inputImage, topLeftTextureCoordinate).r;
+    float ip1m1 = texture2D(inputImage, bottomRightTextureCoordinate).r;
+    float im10 = texture2D(inputImage, leftTextureCoordinate).r;
+    float ip10 = texture2D(inputImage, rightTextureCoordinate).r;
+    float i0m1 = texture2D(inputImage, bottomTextureCoordinate).r;
+    float i0p1 = texture2D(inputImage, topTextureCoordinate).r;
     float h = -im1p1 - 2.0 * i0p1 - ip1p1 + im1m1 + 2.0 * i0m1 + ip1m1;
     float v = -im1m1 - 2.0 * im10 - im1p1 + ip1m1 + 2.0 * ip10 + ip1p1;
     

@@ -5,7 +5,7 @@
 NSString *const kGPUImageFastBlurVertexShaderString = SHADER_STRING
 (
  attribute vec4 position;
- attribute vec2 inputTextureCoordinate;
+ attribute vec2 inputImageCoordinate;
 
  uniform highp float texelWidthOffset; 
  uniform highp float texelHeightOffset; 
@@ -26,11 +26,11 @@ NSString *const kGPUImageFastBlurVertexShaderString = SHADER_STRING
      vec2 firstOffset = vec2(1.3846153846 * texelWidthOffset, 1.3846153846 * texelHeightOffset) * blurSize;
      vec2 secondOffset = vec2(3.2307692308 * texelWidthOffset, 3.2307692308 * texelHeightOffset) * blurSize;
      
-     centerTextureCoordinate = inputTextureCoordinate;
-     oneStepLeftTextureCoordinate = inputTextureCoordinate - firstOffset;
-     twoStepsLeftTextureCoordinate = inputTextureCoordinate - secondOffset;
-     oneStepRightTextureCoordinate = inputTextureCoordinate + firstOffset;
-     twoStepsRightTextureCoordinate = inputTextureCoordinate + secondOffset;
+     centerTextureCoordinate = inputImageCoordinate;
+     oneStepLeftTextureCoordinate = inputImageCoordinate - firstOffset;
+     twoStepsLeftTextureCoordinate = inputImageCoordinate - secondOffset;
+     oneStepRightTextureCoordinate = inputImageCoordinate + firstOffset;
+     twoStepsRightTextureCoordinate = inputImageCoordinate + secondOffset;
  }
 );
 
@@ -39,7 +39,7 @@ NSString *const kGPUImageFastBlurFragmentShaderString = SHADER_STRING
 (
  precision highp float;
 
- uniform sampler2D inputTexture;
+ uniform sampler2D inputImage;
  
  varying highp vec2 centerTextureCoordinate;
  varying highp vec2 oneStepLeftTextureCoordinate;
@@ -51,11 +51,11 @@ NSString *const kGPUImageFastBlurFragmentShaderString = SHADER_STRING
  
  void main()
  {
-     lowp vec4 fragmentColor = texture2D(inputTexture, centerTextureCoordinate) * 0.2270270270;
-     fragmentColor += texture2D(inputTexture, oneStepLeftTextureCoordinate) * 0.3162162162;
-     fragmentColor += texture2D(inputTexture, oneStepRightTextureCoordinate) * 0.3162162162;
-     fragmentColor += texture2D(inputTexture, twoStepsLeftTextureCoordinate) * 0.0702702703;
-     fragmentColor += texture2D(inputTexture, twoStepsRightTextureCoordinate) * 0.0702702703;
+     lowp vec4 fragmentColor = texture2D(inputImage, centerTextureCoordinate) * 0.2270270270;
+     fragmentColor += texture2D(inputImage, oneStepLeftTextureCoordinate) * 0.3162162162;
+     fragmentColor += texture2D(inputImage, oneStepRightTextureCoordinate) * 0.3162162162;
+     fragmentColor += texture2D(inputImage, twoStepsLeftTextureCoordinate) * 0.0702702703;
+     fragmentColor += texture2D(inputImage, twoStepsRightTextureCoordinate) * 0.0702702703;
      
      gl_FragColor = fragmentColor;
  }

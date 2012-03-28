@@ -2,29 +2,27 @@
 
 NSString *const kGPUImageLightenBlendFragmentShaderString = SHADER_STRING
 (
- varying highp vec2 textureCoordinate;
- 
- uniform sampler2D inputTexture;
- uniform sampler2D inputTexture2;
- 
- void main()
- {
-    lowp vec4 textureColor = texture2D(inputTexture, textureCoordinate);
-    lowp vec4 textureColor2 = texture2D(inputTexture2, textureCoordinate);
-    
-    gl_FragColor = max(textureColor, textureColor2);
- }
+    varying highp vec2 textureCoordinate;
+
+    uniform sampler2D inputImage;
+    uniform sampler2D auxilliaryImage;
+
+    void main()
+    {
+        lowp vec4 textureColor = texture2D(inputImage, textureCoordinate);
+        lowp vec4 textureColor2 = texture2D(auxilliaryImage, textureCoordinate);
+
+        gl_FragColor = max(textureColor, textureColor2);
+    }
 );
 
 @implementation GPUImageLightenBlendFilter
 
-- (id)init;
+- (id) init
 {
-    if (!(self = [super initWithFragmentShaderFromString:kGPUImageLightenBlendFragmentShaderString]))
-    {
-		return nil;
+    if (self = [super init]) {
+        self.program.fragmentShader = kGPUImageLightenBlendFragmentShaderString;
     }
-    
     return self;
 }
 

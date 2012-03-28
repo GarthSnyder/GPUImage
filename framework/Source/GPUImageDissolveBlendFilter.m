@@ -2,52 +2,32 @@
 
 NSString *const kGPUImageDissolveBlendFragmentShaderString = SHADER_STRING
 (
- varying highp vec2 textureCoordinate;
- 
- uniform sampler2D inputTexture;
- uniform sampler2D inputTexture2;
- uniform lowp float mixturePercent;
- 
- void main()
- {
-    lowp vec4 textureColor = texture2D(inputTexture, textureCoordinate);
-    lowp vec4 textureColor2 = texture2D(inputTexture2, textureCoordinate);
-    
-    gl_FragColor = mix(textureColor, textureColor2, mixturePercent);
- }
+    varying highp vec2 textureCoordinate;
+
+    uniform sampler2D inputImage;
+    uniform sampler2D auxilliaryImage;
+    uniform lowp float mixturePercent;
+
+    void main()
+    {
+        lowp vec4 textureColor = texture2D(inputImage, textureCoordinate);
+        lowp vec4 textureColor2 = texture2D(auxilliaryImage, textureCoordinate);
+
+        gl_FragColor = mix(textureColor, textureColor2, mixturePercent);
+    }
 );
 
 @implementation GPUImageDissolveBlendFilter
 
-@synthesize mix = _mix;
+@dynamic mixturePercent;
 
-#pragma mark -
-#pragma mark Initialization and teardown
-
-- (id)init;
+- (id) init
 {
-    if (!(self = [super initWithFragmentShaderFromString:kGPUImageDissolveBlendFragmentShaderString]))
-    {
-		return nil;
+    if (self = [super init]) {
+        self.program.fragmentShader = kGPUImageDissolveBlendFragmentShaderString;
+        self.mixturePercent = 0.5;
     }
-    
-    mixUniform = [filterProgram uniformIndex:@"mixturePercent"];
-    self.mix = 0.5;
-
     return self;
 }
 
-#pragma mark -
-#pragma mark Accessors
-
-- (void)setMix:(CGFloat)newValue;
-{
-    _mix = newValue;
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    glUniform1f(mixUniform, _mix);
-}
-
 @end
-

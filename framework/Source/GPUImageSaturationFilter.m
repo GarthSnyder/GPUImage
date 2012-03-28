@@ -4,7 +4,7 @@ NSString *const kGPUImageSaturationFragmentShaderString = SHADER_STRING
 (
     varying highp vec2 textureCoordinate;
 
-    uniform sampler2D inputTexture;
+    uniform sampler2D inputImage;
     uniform lowp float saturation;
 
     // Values from "Graphics Shaders: Theory and Practice" by Bailey and Cunningham
@@ -12,7 +12,7 @@ NSString *const kGPUImageSaturationFragmentShaderString = SHADER_STRING
 
     void main()
     {
-        lowp vec4 textureColor = texture2D(inputTexture, textureCoordinate);
+        lowp vec4 textureColor = texture2D(inputImage, textureCoordinate);
         lowp float luminance = dot(textureColor.rgb, luminanceWeighting);
         lowp vec3 greyScaleColor = vec3(luminance);
 

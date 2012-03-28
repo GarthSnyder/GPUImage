@@ -10,7 +10,7 @@
 NSString *const kGPUImageKuwaharaFragmentShaderString = SHADER_STRING
 (
  varying highp vec2 textureCoordinate;
- uniform sampler2D inputTexture;
+ uniform sampler2D inputImage;
  uniform int radius;
  
  precision highp float;
@@ -31,7 +31,7 @@ NSString *const kGPUImageKuwaharaFragmentShaderString = SHADER_STRING
     
     for (int j = -radius; j <= 0; ++j)  {
         for (int i = -radius; i <= 0; ++i)  {
-            vec3 c = texture2D(inputTexture, uv + vec2(i,j) / src_size).rgb;
+            vec3 c = texture2D(inputImage, uv + vec2(i,j) / src_size).rgb;
             m[0] += c;
             s[0] += c * c;
         }
@@ -39,7 +39,7 @@ NSString *const kGPUImageKuwaharaFragmentShaderString = SHADER_STRING
     
     for (int j = -radius; j <= 0; ++j)  {
         for (int i = 0; i <= radius; ++i)  {
-            vec3 c = texture2D(inputTexture, uv + vec2(i,j) / src_size).rgb;
+            vec3 c = texture2D(inputImage, uv + vec2(i,j) / src_size).rgb;
             m[1] += c;
             s[1] += c * c;
         }
@@ -47,7 +47,7 @@ NSString *const kGPUImageKuwaharaFragmentShaderString = SHADER_STRING
     
     for (int j = 0; j <= radius; ++j)  {
         for (int i = 0; i <= radius; ++i)  {
-            vec3 c = texture2D(inputTexture, uv + vec2(i,j) / src_size).rgb;
+            vec3 c = texture2D(inputImage, uv + vec2(i,j) / src_size).rgb;
             m[2] += c;
             s[2] += c * c;
         }
@@ -55,7 +55,7 @@ NSString *const kGPUImageKuwaharaFragmentShaderString = SHADER_STRING
     
     for (int j = 0; j <= radius; ++j)  {
         for (int i = -radius; i <= 0; ++i)  {
-            vec3 c = texture2D(inputTexture, uv + vec2(i,j) / src_size).rgb;
+            vec3 c = texture2D(inputImage, uv + vec2(i,j) / src_size).rgb;
             m[3] += c;
             s[3] += c * c;
         }
