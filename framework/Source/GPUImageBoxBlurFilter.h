@@ -1,10 +1,8 @@
-#import "GPUImage.h"
 #import "GPUImageFilter.h"
 
-@interface GPUImageBoxBlurFilter : GPUImage
+@interface GPUImageBoxBlurFilter : GPUImageFilter
 {
-    GPUImageFilter *stageOne, *stageTwo;
-    id <GPUImageSource> trueParent;
+    GPUImageFilter *stageOne;
 }
 
 @end
