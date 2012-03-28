@@ -39,10 +39,10 @@ static void dataProviderReleaseCallback(void *info, const void *data, size_t siz
     lastBoundFramebuffer = _fboHandle;
 }
 
-- (void) clearFrameBuffer:(vec4)bc
+- (void) clearFramebuffer:(vec4)bc
 {
     [self bindAsFramebuffer];
-    glClearColor(bc[0], bc[1], bc[2], bc[3]);
+    glClearColor(bc.vec4[0], bc.vec4[1], bc.vec4[2], bc.vec4[3]);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 

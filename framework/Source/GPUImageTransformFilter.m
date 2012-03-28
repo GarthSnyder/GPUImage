@@ -2,46 +2,37 @@
 
 NSString *const kGPUImageTransformVertexShaderString = SHADER_STRING
 (
- attribute vec4 position;
- attribute vec4 inputTextureCoordinate;
- 
- uniform mat4 transformMatrix;
- 
- varying vec2 textureCoordinate;
- 
- void main()
- {
-     gl_Position = transformMatrix * vec4(position.xyz, 1.0);
-     textureCoordinate = inputTextureCoordinate.xy;
- }
+    attribute vec4 position;
+    attribute vec4 inputTextureCoordinate;
+
+    uniform mat4 transformMatrix;
+
+    varying vec2 textureCoordinate;
+
+    void main()
+    {
+        gl_Position = transformMatrix * vec4(position.xyz, 1.0);
+        textureCoordinate = inputTextureCoordinate.xy;
+    }
 );
 
 @implementation GPUImageTransformFilter
 
-@synthesize affineTransform;
 @synthesize transform3D = _transform3D;
 
-#pragma mark -
-#pragma mark Initialization and teardown
-
-- (id)init;
+- (id) init
 {
-    if (!(self = [super initWithVertexShaderFromString:kGPUImageTransformVertexShaderString fragmentShaderFromString:kGPUImagePassthroughFragmentShaderString]))
-    {
-        return nil;
+    if (self = [super init]) {
+        self.program.vertexShader = kGPUImageTransformVertexShaderString;
+        self.transform3D = CATransform3DIdentity;
     }
-    
-    transformMatrixUniform = [filterProgram uniformIndex:@"transformMatrix"];
-    
-    self.transform3D = CATransform3DIdentity;
-    
     return self;
 }
 
 #pragma mark -
 #pragma mark Conversion from matrix formats
 
-- (void)convert3DTransform:(CATransform3D *)transform3D toMatrix:(GLfloat *)matrix;
+- (void) convert3DTransform:(CATransform3D *)transform3D toMatrix:(GLfloat *)matrix;
 {
 	//	struct CATransform3D
 	//	{
@@ -72,29 +63,24 @@ NSString *const kGPUImageTransformVertexShaderString = SHADER_STRING
 #pragma mark -
 #pragma mark Accessors
 
-- (void)setAffineTransform:(CGAffineTransform)newValue;
+- (void) setAffineTransform:(CGAffineTransform)newValue
 {
     self.transform3D = CATransform3DMakeAffineTransform(newValue);
 }
 
-- (CGAffineTransform)affineTransform;
+- (CGAffineTransform) affineTransform;
 {
     return CATransform3DGetAffineTransform(self.transform3D);
 }
 
-- (void)setTransform3D:(CATransform3D)newValue;
+- (void) setTransform3D:(CATransform3D)newValue
 {
     _transform3D = newValue;
-    
-    [GPUImageOpenGLESContext useImageProcessingContext];
-    [filterProgram use];
-    
+
     GLfloat temporaryMatrix[16];
     
     [self convert3DTransform:&_transform3D toMatrix:temporaryMatrix];
-    
-    glUniformMatrix4fv(transformMatrixUniform, 1, GL_FALSE, temporaryMatrix);
+    [program setValue:UNIFORM(temporaryMatrix) forKey:@"transformMatrix"];
 }
-
 
 @end

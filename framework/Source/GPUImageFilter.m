@@ -4,11 +4,12 @@
 @implementation GPUImageFilter
 
 @synthesize program;
+@dynamic inputImage, auxilliaryImage;
 
 - (id) init
 {
     if (self = [super init]) {
-        self.program = [GPUImageProgram program];
+        self.program = [[GPUImageProgram alloc] init];
     }
     return self;
 }
@@ -40,10 +41,11 @@
 
 - (BOOL) render
 {
-    [self takeUnknownParametersFrom:self.inputImage];
-    if (![self.program use] || ![self bindAsFramebuffer]) {
+    [self adoptParametersFrom:self.inputImage];
+    if (![self.program use]) {
         return NO;
     }
+    [self bindAsFramebuffer];
     [self drawWithProgram:self.program];
     timeLastChanged = GPUImageGetCurrentTimestamp();
     return YES;

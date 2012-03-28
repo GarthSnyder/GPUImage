@@ -25,7 +25,6 @@
 @interface GPUImageFilter : GPUImageBase <GPUImageSource>
 {
     GPUImageProgram *program;
-    GPUImageTimestamp timeLastChanged;
 }
 
 @property (nonatomic, retain) GPUImageProgram *program;
@@ -33,8 +32,8 @@
 // These properties are defined for convenience. They will not necessarily
 // be used by all filters. Values are passed on to the OpenGL program.
 
-@property (nonatomic, retain) id <GPUimageSource> inputImage;
-@property (nonatomic, retain) id <GPUimageSource> auxilliaryImage;
+@property (nonatomic, retain) id <GPUImageSource> inputImage;
+@property (nonatomic, retain) id <GPUImageSource> auxilliaryImage;
 
 - (BOOL) render;
 

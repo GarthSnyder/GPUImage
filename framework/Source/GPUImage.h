@@ -26,9 +26,6 @@
 // their own rendering systems while still taking advantage of GPUImageBase.
 
 @interface GPUImage : GPUImageBase <GPUImageSource>
-{
-    GPUImageTimestamp timeLastChanged;
-}
 
 @property (nonatomic, retain) id <GPUImageSource> inputImage;
 

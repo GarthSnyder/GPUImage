@@ -1,6 +1,8 @@
 #import "GPUImage.h"
+#import "GPUImageTextureBuffer.h"
+#import "GPUImageRenderbuffer.h"
 
-@implementation GPUImage ()
+@interface GPUImage ()
 - (BOOL) inputImageRequiresConversion;
 @end
 
@@ -54,7 +56,7 @@
     NSAssert(![self inputImageRequiresConversion],
          @"Automatic texture size and format conversions are not yet implemented.");
     _backingStore = self.inputImage.backingStore;
-    [self setTextureParams];
+    [self setTextureParameters];
     if (!self.usesRenderbuffer && self.generatesMipmap) {
         GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
         [store generateMipmap:NO]; // Optimized out if already done
@@ -82,7 +84,7 @@
         if (![pbs isKindOfClass:[GPUImageTextureBuffer class]]) {
             return YES;
         }
-        GPUImageTextureBuffer *ptb = pbs;
+        GPUImageTextureBuffer *ptb = (GPUImageTextureBuffer *)pbs;
         if (self.pixType != ptb.pixType) {
             return YES;
         }

@@ -47,8 +47,6 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 @implementation GPUImageProgram
 
-@dynamic inputTexture, outputTexture, accessoryTexture;
-
 #pragma mark -
 #pragma mark Initialization and shader specification
 
@@ -85,22 +83,22 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     fragmentShader = [[GPUImageShader alloc] initWithFilename:fsFile];
 }
 
-#pragma mark Pass-alongs for default input and output textures
+#pragma mark Pass-alongs for default input texture names
 
-- (id <GPUImageSource>) inputTexture {
-    return [self valueForKey:@"inputTexture"];
+- (id <GPUImageSource>) inputImage {
+    return [self valueForKey:@"inputImage"];
 }
 
-- (id <GPUImageSource>) accessoryTexture {
-    return [self valueForKey:@"accessoryTexture"];
+- (id <GPUImageSource>) auxilliaryImage {
+    return [self valueForKey:@"auxilliaryImage"];
 }
 
-- (void) setInputTexture:(id <GPUImageSource>)inputTexture {
-    [self setValue:inputTexture forKey:@"inputTexture"];
+- (void) setInputImage:(id <GPUImageSource>)inputTexture {
+    [self setValue:inputTexture forKey:@"inputImage"];
 }
 
-- (void) setAccessoryTexture:(id <GPUImageSource>)accessoryTexture {
-    [self setValue:accessoryTexture forKey:@"accessoryTexture"];
+- (void) setAuxilliaryImage:(id <GPUImageSource>)auxImg {
+    [self setValue:auxImg forKey:@"auxilliaryImage"];
 }
 
 #pragma mark Compilation and linking

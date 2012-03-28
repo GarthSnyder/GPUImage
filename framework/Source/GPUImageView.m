@@ -49,8 +49,8 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
     if (object == self && [keyPath isEqualToString:@"frame"]) {
-        if (parent && [parent respondsToSelector:@selector(releaseBackingStore)]) {
-            [(id)parent releaseBackingStore];
+        if (self.inputImage && [self.inputImage respondsToSelector:@selector(releaseBackingStore)]) {
+            [(id)self.inputImage releaseBackingStore];
         }
         timeLastChanged = 0;
     }
@@ -61,8 +61,8 @@
     if (_inputImage != newParent) {
         _inputImage = newParent;
         timeLastChanged = 0;
-        if (_inputImage) {
-            _inputImage.layer = (CAEAGLLayer *)self.layer;
+        if ([_inputImage respondsToSelector:@selector(setLayer:)]) {
+            [(id)_inputImage setLayer:(CAEAGLLayer *)self.layer];
         }
     }
 }
@@ -72,7 +72,7 @@
     if (!self.inputImage || ![self.inputImage update]) {
         return NO;
     }
-    if (self.timeLastChanged < parent.timeLastChanged) {
+    if (timeLastChanged < self.inputImage.timeLastChanged) {
         [GPUImageOpenGLESContext useImageProcessingContext];
         [self.inputImage.backingStore bind];
         [[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] 
