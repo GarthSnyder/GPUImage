@@ -43,10 +43,6 @@
     glCompileShader(_handle);
     glGetShaderiv(_handle, GL_COMPILE_STATUS, &status);
 
-    if (status != GL_TRUE) {
-        NSLog(@"Shader compile log:\n%@", [self log]);
-        [self delete];
-    }	
     return status == GL_TRUE;
 }
 
@@ -54,13 +50,13 @@
 {
     GLint logLength = 0, charsWritten = 0;
     
-    glGetProgramiv(self.handle, GL_INFO_LOG_LENGTH, &logLength);    
+    glGetShaderiv(self.handle, GL_INFO_LOG_LENGTH, &logLength);    
     if (logLength < 1) {
-        return nil;
+        return @"";
     }
     
     char *logBytes = malloc(logLength);
-    glGetProgramInfoLog(self.handle, logLength, &charsWritten, logBytes);
+    glGetShaderInfoLog(self.handle, logLength, &charsWritten, logBytes);
     NSString *log = [[NSString alloc] initWithBytes:logBytes 
         length:logLength encoding:NSUTF8StringEncoding];
     free(logBytes);

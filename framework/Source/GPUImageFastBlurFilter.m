@@ -5,7 +5,7 @@
 NSString *const kGPUImageFastBlurVertexShaderString = SHADER_STRING
 (
     attribute vec4 position;
-    attribute vec2 inputImageCoordinate;
+    attribute vec2 inputTextureCoordinate;
 
     uniform highp float texelWidthOffset; 
     uniform highp float texelHeightOffset; 
@@ -26,11 +26,11 @@ NSString *const kGPUImageFastBlurVertexShaderString = SHADER_STRING
         vec2 firstOffset = vec2(1.3846153846 * texelWidthOffset, 1.3846153846 * texelHeightOffset) * blurSize;
         vec2 secondOffset = vec2(3.2307692308 * texelWidthOffset, 3.2307692308 * texelHeightOffset) * blurSize;
 
-        centerTextureCoordinate = inputImageCoordinate;
-        oneStepLeftTextureCoordinate = inputImageCoordinate - firstOffset;
-        twoStepsLeftTextureCoordinate = inputImageCoordinate - secondOffset;
-        oneStepRightTextureCoordinate = inputImageCoordinate + firstOffset;
-        twoStepsRightTextureCoordinate = inputImageCoordinate + secondOffset;
+        centerTextureCoordinate = inputTextureCoordinate;
+        oneStepLeftTextureCoordinate = inputTextureCoordinate - firstOffset;
+        twoStepsLeftTextureCoordinate = inputTextureCoordinate - secondOffset;
+        oneStepRightTextureCoordinate = inputTextureCoordinate + firstOffset;
+        twoStepsRightTextureCoordinate = inputTextureCoordinate + secondOffset;
     }
 );
 
@@ -64,7 +64,7 @@ NSString *const kGPUImageFastBlurFragmentShaderString = SHADER_STRING
 @implementation GPUImageFastBlurFilter
 
 @synthesize blurPasses = _blurPasses;
-@dynamic blurSize;
+@synthesize blurSize = _blurSize;
 
 - (id) init
 {

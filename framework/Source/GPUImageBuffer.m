@@ -1,4 +1,5 @@
 #import "GPUImageBuffer.h"
+#import "GPUImageTextureBuffer.h"
 
 static GLuint lastBoundFramebuffer = 0;
 
@@ -31,12 +32,19 @@ static void dataProviderReleaseCallback(void *info, const void *data, size_t siz
         glGenFramebuffers(1, &_fboHandle);
         glBindFramebuffer(GL_FRAMEBUFFER, _fboHandle);
         glViewport(0, 0, self.size.width, self.size.height);
-        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        NSAssert(status == GL_FRAMEBUFFER_COMPLETE, @"Incomplete filter FBO: %d", status);
     } else if (_fboHandle != lastBoundFramebuffer) {
         glBindFramebuffer(GL_FRAMEBUFFER, _fboHandle);
     }
     lastBoundFramebuffer = _fboHandle;
+}
+
+- (BOOL) validateFramebuffer
+{
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        NSLog(@"Incomplete framebuffer: %d", status);
+    }
+    return status == GL_FRAMEBUFFER_COMPLETE;
 }
 
 - (void) clearFramebuffer:(vec4)bc

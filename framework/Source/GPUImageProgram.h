@@ -53,8 +53,6 @@
 - (BOOL) hasDirtyUniforms;
 
 - (NSString *) logs;
-- (NSString *) vertexShaderLog;
-- (NSString *) fragmentShaderLog;
 - (NSString *) programLog;
 
 // Most programs within GPUImage will use the following standard names
@@ -63,8 +61,8 @@
 // accepted by the compiler without additional configuration. This is just
 // a simple wrapper for [program setValue:xxx forKey:@"inputImage] et al.
 
-@property (nonatomic) id <GPUImageSource> inputImage;
-@property (nonatomic) id <GPUImageSource> auxilliaryImage; // 2nd input
+@property (nonatomic, retain) id <GPUImageSource> inputImage;
+@property (nonatomic, retain) id <GPUImageSource> auxilliaryImage; // 2nd input
 
 // Returns all uniform values that are GPUImageSources
 @property (readonly) NSArray *inputImages;

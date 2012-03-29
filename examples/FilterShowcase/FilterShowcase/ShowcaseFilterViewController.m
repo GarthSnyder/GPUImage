@@ -1,4 +1,5 @@
 #import "ShowcaseFilterViewController.h"
+#import "GPUImageProgram.h"
 
 @implementation ShowcaseFilterViewController
 
@@ -51,7 +52,9 @@
 - (void)setupFilter;
 {
     videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset640x480 cameraPosition:AVCaptureDevicePositionBack];
-    GPUImageRotationFilter *rotationFilter = [[GPUImageRotationFilter alloc] initWithRotation:kGPUImageRotateRight];
+    videoCamera.delegate = self;
+    GPUImageRotationFilter *rotationFilter = [[GPUImageRotationFilter alloc] init];
+    rotationFilter.rotationMode = kGPUImageRotateRight;
 
     switch (filterType)
     {
@@ -439,7 +442,7 @@
             [self.filterSettingsSlider setValue:0.4];
             
             filter = [[GPUImageChromaKeyBlendFilter alloc] init];
-            [(GPUImageChromaKeyBlendFilter *)filter setColorToReplaceRed:0.0 green:1.0 blue:0.0];
+            [(GPUImageChromaKeyBlendFilter *)filter setColorToReplace:(vec3){0.0, 1.0, 0.0}];
         }; break;
         case GPUIMAGE_MULTIPLY:
         {
@@ -541,7 +544,8 @@
             self.title = @"Custom";
             self.filterSettingsSlider.hidden = YES;
 
-            filter = [[GPUImageFilter alloc] initWithFragmentShaderFromFile:@"CustomFilter"];
+            filter = [[GPUImageFilter alloc] init];
+            filter.program.fragmentShaderFilename = @"CustomFilter";          
         }; break;
         case GPUIMAGE_KUWAHARA:
         {
@@ -606,27 +610,27 @@
             filter = [[GPUImageGaussianSelectiveBlurFilter alloc] init];
             [(GPUImageGaussianSelectiveBlurFilter*)filter setExcludeCircleRadius:40.0/320.0];
         }; break;
-        case GPUIMAGE_FILTERGROUP:
-        {
-            self.title = @"Filter Group";
-            self.filterSettingsSlider.hidden = NO;
-            
-            [self.filterSettingsSlider setValue:0.05];
-            [self.filterSettingsSlider setMinimumValue:0.0];
-            [self.filterSettingsSlider setMaximumValue:0.3];
-            
-            filter = [[GPUImageFilterGroup alloc] init];
-            
-            GPUImageSepiaFilter *sepiaFilter = [[GPUImageSepiaFilter alloc] init];
-            [(GPUImageFilterGroup *)filter addFilter:sepiaFilter];
-
-            GPUImagePixellateFilter *pixellateFilter = [[GPUImagePixellateFilter alloc] init];
-            [(GPUImageFilterGroup *)filter addFilter:pixellateFilter];
-            
-            [sepiaFilter addTarget:pixellateFilter];
-            [(GPUImageFilterGroup *)filter setInitialFilters:[NSArray arrayWithObject:sepiaFilter]];
-            [(GPUImageFilterGroup *)filter setTerminalFilter:pixellateFilter];
-        }; break;
+//        case GPUIMAGE_FILTERGROUP:
+//        {
+//            self.title = @"Filter Group";
+//            self.filterSettingsSlider.hidden = NO;
+//            
+//            [self.filterSettingsSlider setValue:0.05];
+//            [self.filterSettingsSlider setMinimumValue:0.0];
+//            [self.filterSettingsSlider setMaximumValue:0.3];
+//            
+//            filter = [[GPUImageFilterGroup alloc] init];
+//            
+//            GPUImageSepiaFilter *sepiaFilter = [[GPUImageSepiaFilter alloc] init];
+//            [(GPUImageFilterGroup *)filter addFilter:sepiaFilter];
+//
+//            GPUImagePixellateFilter *pixellateFilter = [[GPUImagePixellateFilter alloc] init];
+//            [(GPUImageFilterGroup *)filter addFilter:pixellateFilter];
+//            
+//            [sepiaFilter addTarget:pixellateFilter];
+//            [(GPUImageFilterGroup *)filter setInitialFilters:[NSArray arrayWithObject:sepiaFilter]];
+//            [(GPUImageFilterGroup *)filter setTerminalFilter:pixellateFilter];
+//        }; break;
 
         default: filter = [[GPUImageSepiaFilter alloc] init]; break;
     }
@@ -634,37 +638,27 @@
     if (filterType == GPUIMAGE_FILECONFIG) 
     {
         self.title = @"File Configuration";
-        pipeline = [[GPUImageFilterPipeline alloc] initWithConfigurationFile:[[NSBundle mainBundle] URLForResource:@"SampleConfiguration" withExtension:@"plist"]
-                                                                                               input:videoCamera output:(GPUImageView*)self.view];
-        
-        [pipeline addFilter:rotationFilter atIndex:0];
+        pipeline = [[GPUImageFilterPipeline alloc] initWithConfigurationFile:[[NSBundle mainBundle] URLForResource:@"SampleConfiguration" withExtension:@"plist"]];
+        pipeline.inputImage = videoCamera;
+        [pipeline.filters insertObject:rotationFilter atIndex:0];
     } 
     else 
     {
-        [videoCamera addTarget:rotationFilter];
-        [rotationFilter addTarget:filter];
-        videoCamera.runBenchmark = YES;
+        rotationFilter.inputImage = videoCamera;
+        filter.inputImage = rotationFilter;
+        // videoCamera.runBenchmark = YES;
         
-        if ( (filterType != GPUIMAGE_UNSHARPMASK) && (filterType != GPUIMAGE_TILTSHIFT) )
+        if (filterType != GPUIMAGE_UNSHARPMASK)
         {
-			UIImage *inputImage;
-			
-			if (filterType == GPUIMAGE_MASK) 
-			{
-				inputImage = [UIImage imageNamed:@"mask"];
-			}
-			else
-			{
-				// The picture is only used for two-image blend filters
-				inputImage = [UIImage imageNamed:@"WID-small.jpg"];
-			}
-			
-			
-            sourcePicture = [[GPUImagePicture alloc] initWithImage:inputImage smoothlyScaleOutput:YES];
-            [sourcePicture addTarget:filter];
+            // The picture is only used for two-image blend filters
+            UIImage *inputImage = [UIImage imageNamed:@"WID-small.jpg"];
+            sourcePicture = [[GPUImagePicture alloc] initWithImage:inputImage];
+            // sourcePicture.generatesMipmap = YES;
+            filter.auxilliaryImage = sourcePicture;
         }
 
         GPUImageView *filterView = (GPUImageView *)self.view;
+        filterView.inputImage = filter;
         
         if (filterType == GPUIMAGE_HISTOGRAM)
         {
@@ -692,6 +686,11 @@
     [videoCamera startCameraCapture];
 }
 
+- (void)videoCameraDidReceiveNewFrame:(GPUImageVideoCamera *)camera
+{
+    [(GPUImageView *)self.view update];
+}
+
 #pragma mark -
 #pragma mark Filter adjustments
 
@@ -714,7 +713,7 @@
         case GPUIMAGE_POSTERIZE: [(GPUImagePosterizeFilter *)filter setColorLevels:round([(UISlider*)sender value])]; break;
 		case GPUIMAGE_HAZE: [(GPUImageHazeFilter *)filter setDistance:[(UISlider *)sender value]]; break;
 		case GPUIMAGE_THRESHOLD: [(GPUImageLuminanceThresholdFilter *)filter setThreshold:[(UISlider *)sender value]]; break;
-        case GPUIMAGE_DISSOLVE: [(GPUImageDissolveBlendFilter *)filter setMix:[(UISlider *)sender value]]; break;
+        case GPUIMAGE_DISSOLVE: [(GPUImageDissolveBlendFilter *)filter setMixturePercent:[(UISlider *)sender value]]; break;
         case GPUIMAGE_CHROMAKEY: [(GPUImageChromaKeyBlendFilter *)filter setThresholdSensitivity:[(UISlider *)sender value]]; break;
         case GPUIMAGE_KUWAHARA: [(GPUImageKuwaharaFilter *)filter setRadius:round([(UISlider *)sender value])]; break;
         case GPUIMAGE_SWIRL: [(GPUImageSwirlFilter *)filter setAngle:[(UISlider *)sender value]]; break;
@@ -729,7 +728,7 @@
         case GPUIMAGE_FASTBLUR: [(GPUImageFastBlurFilter *)filter setBlurPasses:round([(UISlider*)sender value])]; break;
 //        case GPUIMAGE_FASTBLUR: [(GPUImageFastBlurFilter *)filter setBlurSize:[(UISlider*)sender value]]; break;
         case GPUIMAGE_GAUSSIAN_SELECTIVE: [(GPUImageGaussianSelectiveBlurFilter *)filter setExcludeCircleRadius:[(UISlider*)sender value]]; break;
-        case GPUIMAGE_FILTERGROUP: [(GPUImagePixellateFilter *)[(GPUImageFilterGroup *)filter filterAtIndex:1] setFractionalWidthOfAPixel:[(UISlider *)sender value]]; break;
+//        case GPUIMAGE_FILTERGROUP: [(GPUImagePixellateFilter *)[(GPUImageFilterGroup *)filter filterAtIndex:1] setFractionalWidthOfAPixel:[(UISlider *)sender value]]; break;
         case GPUIMAGE_CROP: [(GPUImageCropFilter *)filter setCropRegion:CGRectMake(0.0, 0.0, [(UISlider*)sender value], [(UISlider*)sender value])]; break;
         case GPUIMAGE_TRANSFORM: [(GPUImageTransformFilter *)filter setAffineTransform:CGAffineTransformMakeRotation([(UISlider*)sender value])]; break;
         case GPUIMAGE_TRANSFORM3D:

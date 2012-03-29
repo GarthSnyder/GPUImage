@@ -1,5 +1,5 @@
 #import <UIKit/UIKit.h>
-#import "GPUImage.h"
+#import "GPUImageHeaders.h"
 
 typedef enum {
     GPUIMAGE_SATURATION,
@@ -64,10 +64,10 @@ typedef enum {
 } GPUImageShowcaseFilterType; 
 
 
-@interface ShowcaseFilterViewController : UIViewController
+@interface ShowcaseFilterViewController : UIViewController <GPUImageVideoCameraDelegate>
 {
     GPUImageVideoCamera *videoCamera;
-    GPUImageOutput<GPUImageInput> *filter;
+    GPUImageFilter *filter;
     GPUImagePicture *sourcePicture;
     GPUImageShowcaseFilterType filterType;
     

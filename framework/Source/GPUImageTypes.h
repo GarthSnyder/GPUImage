@@ -1,5 +1,3 @@
-//  Created by Garth Snyder on 3/15/12.
-
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 
@@ -8,7 +6,7 @@
 
 typedef unsigned int GPUImageTimestamp;
 
-extern GPUImageTimestamp GPUImageGetCurrentTimestamp();
+GPUImageTimestamp GPUImageGetCurrentTimestamp(void);
 
 // Composite types that are valid as uniforms. (Arrays of these types are
 // also valid.)

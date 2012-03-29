@@ -3,41 +3,58 @@
 #import "GPUImageTextureUnit.h"
 #import "GPUImageTextureBuffer.h"
 
-static NSMutableDictionary *textureUnits;
+static NSMutableArray *textureUnits = nil;
+static NSUInteger nextTextureUnit = 0;
+
+// This should really be an OpenGL query, but for some reason the iOS 
+// implementation of OpenGL ES doesn't seem to define GL_MAX_TEXTURE_COORDS. 
+//
+// GL_MAX_TEXTURE_IMAGE_UNITS, GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, and
+// GL_MAX_TEXTURE_UNITS are not the numbers we need here, as they're all
+// concerned with how many texture units can be simultaneously USED.
+// We're just interested in how many texture unit NAMES are available.
+
+static GLint maxTextureUnits = 32;
 
 @implementation GPUImageTextureUnit
 
 @synthesize currentTextureHandle = _currentTextureHandle;
-@synthesize textureUnitID = _textureUnitID;
+@synthesize textureUnitNumber = _textureUnitNumber;
 
-+ (id) unitAtIndex:(GLint)i
++ (GPUImageTextureUnit *) textureUnit
 {
     if (!textureUnits) {
-        textureUnits = [NSMutableDictionary dictionary];
+        textureUnits = [NSMutableArray array];
     }
-    NSNumber *ixKey = [NSNumber numberWithInt:i];
-    GPUImageTextureUnit *unit;
-    if (!(unit = [textureUnits objectForKey:ixKey])) {
-        unit = [[GPUImageTextureUnit alloc] init];
-        [textureUnits setObject:unit forKey:ixKey];
-        unit.textureUnitID = GL_TEXTURE0 + i;
+    if (nextTextureUnit >= maxTextureUnits) {
+        nextTextureUnit = 0;
     }
+    if ([textureUnits count] > nextTextureUnit) {
+        nextTextureUnit++;
+        return [textureUnits objectAtIndex:(nextTextureUnit - 1)];
+    }
+    GPUImageTextureUnit *unit = [[GPUImageTextureUnit alloc] 
+        initWithTextureUnitNumber:(nextTextureUnit - 1)];
+    [textureUnits addObject:unit];
     return unit;
 }
 
-- (id) init
+- (id) initWithTextureUnitNumber:(NSUInteger)tNum
 {
     if (self = [super init]) {
         self.currentTextureHandle = -1;
+        self.textureUnitNumber = tNum;
     }
     return self;
 }
 
 - (void) bindTexture:(GPUImageTextureBuffer *)texture
 {
-    glActiveTexture(self.textureUnitID);
-    glBindTexture(GL_TEXTURE_2D, texture.handle);
-    self.currentTextureHandle = texture.handle;
+    if (self.currentTextureHandle != texture.handle) {
+        glActiveTexture(self.textureUnitNumber + GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture.handle);
+        self.currentTextureHandle = texture.handle;
+    }
 }
 
 @end

@@ -1,6 +1,7 @@
 #import "GPUImageView.h"
 #import <OpenGLES/EAGLDrawable.h>
 #import <QuartzCore/QuartzCore.h>
+#import <objc/runtime.h>
 #import "GPUImageOpenGLESContext.h"
 #import "GPUImageFilter.h"
 #import <AVFoundation/AVFoundation.h>
@@ -74,6 +75,8 @@
     if (!self.inputImage || ![self.inputImage update]) {
         return NO;
     }
+    glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Update: %s (GPUImageView)", 
+        class_getName([self class])] UTF8String]);
     if (timeLastChanged < self.inputImage.timeLastChanged) {
         [GPUImageOpenGLESContext useImageProcessingContext];
         [self.inputImage.backingStore bind];
@@ -81,6 +84,7 @@
             presentBufferForDisplay];
         timeLastChanged = GPUImageGetCurrentTimestamp();
     }
+    glPopGroupMarkerEXT();
     return YES;
 }
 

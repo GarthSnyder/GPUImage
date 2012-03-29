@@ -7,7 +7,7 @@
 
 @interface GPUImageShaderSymbol : NSObject
 
-@property (strong, nonatomic) NSString *name;   // Uniform name
+@property (nonatomic, retain) NSString *name;   // Uniform name
 
 @property (nonatomic) BOOL knowsOESDetails;     // Asked OpenGL for type, etc?
 @property (nonatomic) GLint index;              // OES parameter index
@@ -17,7 +17,7 @@
 @property (nonatomic) id value;
 @property (nonatomic) BOOL dirty;               // Needs flushed to OES context
 
-@property (strong, nonatomic) GPUImageTextureUnit *textureUnit;  // Only for type = GL_TEXTURE_2D
+@property (nonatomic, retain) GPUImageTextureUnit *textureUnit;  // Only for type = GL_TEXTURE_2D
 
 // Communicate a value to OpenGL
 - (void) setOESValue;

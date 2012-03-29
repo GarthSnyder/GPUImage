@@ -1,6 +1,7 @@
 #import "GPUImage.h"
 #import "GPUImageTextureBuffer.h"
 #import "GPUImageRenderbuffer.h"
+#import <objc/runtime.h>
 
 @interface GPUImage ()
 - (BOOL) inputImageRequiresConversion;
@@ -52,6 +53,8 @@
 
 - (BOOL) render
 {
+    glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Render: %s (GPUImage)", 
+        class_getName([self class])] UTF8String]);
     NSAssert([self.inputImage backingStore], @"Input image has no backing store; should never happen.");
     NSAssert(![self inputImageRequiresConversion],
          @"Automatic texture size and format conversions are not yet implemented.");
@@ -62,6 +65,7 @@
         [store generateMipmap:NO]; // Optimized out if already done
     }
     timeLastChanged = GPUImageGetCurrentTimestamp();
+    glPopGroupMarkerEXT();
     return YES;
 }
 

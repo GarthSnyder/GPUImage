@@ -31,7 +31,7 @@ NSString *const kGPUImageHazeFragmentShaderString = SHADER_STRING
     if (self = [super init]) {
         program.fragmentShader = kGPUImageHazeFragmentShaderString;
         self.distance = 0.2;
-        self.slope = 0.0
+        self.slope = 0.0;
     }
     return self;
 }

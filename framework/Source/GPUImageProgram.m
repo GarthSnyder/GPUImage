@@ -10,7 +10,7 @@ NSString *const kGPUImageDefaultVertexShader = SHADER_STRING
      attribute vec4 position;
      attribute vec4 inputTextureCoordinate;
      
-     varying vec2 textureCoordinate;
+     varying highp vec2 textureCoordinate;
      
      void main()
      {
@@ -23,7 +23,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 (
      uniform sampler2D inputImage;
      
-     varying vec2 textureCoordinate;
+     varying highp vec2 textureCoordinate;
      
      void main()
      {
@@ -49,11 +49,6 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 #pragma mark -
 #pragma mark Initialization and shader specification
-
-+ (GPUImageProgram *) program
-{
-    return [[GPUImageProgram alloc] init];
-}
 
 - (GPUImageProgram *) init
 {
@@ -176,10 +171,11 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
             return;
         }
         uniform.value = obj;
-    } else if (!obj) {
+    } else if (obj) {
         uniform = [[GPUImageShaderSymbol alloc] init];
         uniform.name = key;
         uniform.value = obj;
+        [uniforms setObject:uniform forKey:key];
     }
 }
 
@@ -193,7 +189,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 - (BOOL) hasDirtyUniforms
 {
-    for (GPUImageShaderSymbol *uniform in uniforms) {
+    for (GPUImageShaderSymbol *uniform in [uniforms allValues]) {
         if ([uniform dirty]) {
             return YES;
         }
@@ -202,28 +198,31 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 }
 
 // Set all uniform values in OpenGL in preparation for drawing. Only sets
-// uniforms whose values have changed since the last call. For textures,
-// always sets up the appropriate texture units since these setups do not
-// stick to the program.
+// uniforms whose values have changed since the last call. 
 
 - (void) setUniformValues
 {
-    for (GPUImageShaderSymbol *uniform in uniforms) {
+    for (GPUImageShaderSymbol *uniform in [uniforms allValues]) {
         [uniform gatherOESDetailsForProgram:programHandle];
         // Make sure textures have a texture unit assigned
         if ([uniform.value conformsToProtocol:@protocol(GPUImageSource)] && !uniform.textureUnit) {
-            uniform.textureUnit = [GPUImageTextureUnit unitAtIndex:nextTextureUnit++];
+            uniform.textureUnit = [GPUImageTextureUnit textureUnit];
         }
         [uniform setOESValue];
     }
 }
 
+// Returns all uniform values that are GPUImageSources, but only if the 
+// uniform is actually used.
+
 - (NSArray *) inputImages
 {
     NSMutableArray *ii = [NSMutableArray array];
-    for (id value in attributes) {
-        if ([value conformsToProtocol:@protocol(GPUImageSource)]) {
-            [ii addObject:value];
+    for (GPUImageShaderSymbol *uniform in [uniforms allValues]) {
+        if (!uniform.knowsOESDetails || (uniform.index >= 0)) {
+            if ([uniform.value conformsToProtocol:@protocol(GPUImageSource)]) {
+                [ii addObject:uniform.value];
+            }
         }
     }
     return ii;
@@ -249,22 +248,12 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     return log;
 }
 
-- (NSString *) vertexShaderLog
-{
-    return [vertexShader log];
-}
-                  
-- (NSString *) fragmentShaderLog
-{
-    return [fragmentShader log];
-}
-                  
 - (NSString *) logs
 {
     return [NSString stringWithFormat:@"%@: %@\n%@: %@\n%@: %@\n",
-        "Vertex shader log", [self vertexShaderLog], 
-        "Fragment shader log", [self fragmentShaderLog],
-        "Program log", [self programLog]];
+        @"Vertex shader log", [vertexShader log], 
+        @"Fragment shader log", [fragmentShader log],
+        @"Program log", [self programLog]];
 }
 
 #pragma mark -

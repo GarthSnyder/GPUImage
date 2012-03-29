@@ -160,7 +160,7 @@
         }
         _backingStore = [[GPUImageTextureBuffer alloc] initWithSize:self.size
                                                          baseFormat:self.baseFormat pixType:self.pixType];
-        [self setTextureParams];
+        [self setTextureParameters];
     }
     timeLastChanged = 0;
 }
@@ -174,7 +174,7 @@
 // Propagate configuration parameters for textures through to the OpenGL
 // wrapper layer.
 
-- (void) setTextureParams
+- (void) setTextureParameters
 {
     if (self.usesRenderbuffer || !self.backingStore) {
         return;
@@ -246,7 +246,7 @@
     [prog use];
     
     GLint position = [prog indexOfAttribute:@"position"];
-    GLint itc = [prog indexOfAttribute:@"inputImageCoordinate"];
+    GLint itc = [prog indexOfAttribute:@"inputTextureCoordinate"];
     
     glVertexAttribPointer(position, 2, GL_FLOAT, 0, 0, v);
     glEnableVertexAttribArray(position);
@@ -301,7 +301,7 @@
 	}
     UIImage *finalImage = [UIImage imageWithCGImage:cgRef scale:1.0
         orientation:imageOrientation];
-    CGImageRelease(cgRef);
+    // CGImageRelease(cgRef);
     return finalImage;
 }
 

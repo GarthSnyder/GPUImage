@@ -31,6 +31,7 @@
 
 - (void) bind;
 - (void) bindAsFramebuffer;
+- (BOOL) validateFramebuffer;
 
 - (void) clearFramebuffer:(vec4)backgroundColor;
 

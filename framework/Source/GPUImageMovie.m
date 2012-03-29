@@ -162,8 +162,11 @@
     }];
 }
 
-- (void)processFrame 
+- (void) processFrame 
 {
+    glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Movie frame: %s (GPUImage)", 
+        class_getName([self class])] UTF8String]);
+
     // Upload to texture
     CVPixelBufferLockBaseAddress(_currentBuffer, 0);
     GLsize buffSize;
@@ -187,8 +190,11 @@
     CVPixelBufferUnlockBaseAddress(_currentBuffer, 0);
 
     if (self.generatesMipmap) {
-        [self.backingStore generateMipmap:YES];
+        [(GPUImageTextureBuffer *)self.backingStore generateMipmap:YES];
     }
+    
+    glPopGroupMarkerEXT();
+    
     if (self.delegate) {
         [self.delegate movieDidDecodeNewFrame:self];
     }

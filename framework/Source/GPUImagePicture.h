@@ -6,6 +6,6 @@
 - (id) initWithImage:(UIImage *)img;
 
 // May be changed at any time
-@property (nonatomic) UIImage *image;
+@property (nonatomic, retain) UIImage *image;
 
 @end

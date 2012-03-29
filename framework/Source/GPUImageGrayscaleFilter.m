@@ -24,7 +24,6 @@ NSString *const kGPUImageLuminanceFragmentShaderString = SHADER_STRING
 {
     if (self = [super init]) {
         program.fragmentShader = kGPUImageLuminanceFragmentShaderString;
-        self.gamma = 1.0;
     }
     return self;
 }

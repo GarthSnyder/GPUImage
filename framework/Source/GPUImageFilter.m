@@ -1,5 +1,6 @@
 #import "GPUImageFilter.h"
 #import "GPUImagePicture.h"
+#import <objc/runtime.h>
 
 @implementation GPUImageFilter
 
@@ -33,7 +34,7 @@
             needsRender = YES;
         }
     }
-    if ([self.program hasDirtyUniforms]) {
+    if (!needsRender && [self.program hasDirtyUniforms]) {
         needsRender = YES;
     }
     if (needsRender) {
@@ -45,9 +46,12 @@
 
 - (BOOL) render
 {
+    glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Render: %s (GPUImageFilter)", 
+        class_getName([self class])] UTF8String]);
     [self bindAsFramebuffer];
     [self drawWithProgram:self.program];
     timeLastChanged = GPUImageGetCurrentTimestamp();
+    glPopGroupMarkerEXT();
     return YES;
 }
 

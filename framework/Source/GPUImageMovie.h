@@ -18,15 +18,8 @@
 @property (nonatomic, assign) id <GPUImageMovieDelegate> delegate;
 @property (readwrite, retain) NSURL *url;
 
-// Initialization and teardown
-- (id)initWithURL:(NSURL *)url;
-
-// Movie processing
-- (void)enableSynchronizedEncodingUsingMovieWriter:(GPUImageMovieWriter *)movieWriter;
-- (void)readNextVideoFrameFromOutput:(AVAssetReaderTrackOutput *)readerVideoTrackOutput;
-- (void)readNextAudioSampleFromOutput:(AVAssetReaderTrackOutput *)readerAudioTrackOutput;
-- (void)startProcessing;
-- (void)endProcessing;
-- (void)processMovieFrame:(CMSampleBufferRef)movieSampleBuffer; 
+-(id)initWithURL:(NSURL *)url;
+-(void)startProcessing;
+-(void)endProcessing;
 
 @end

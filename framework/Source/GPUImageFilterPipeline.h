@@ -6,7 +6,7 @@
 
 @interface GPUImageFilterPipeline : GPUImage
 
-@property (strong) NSMutableArray *filters;
+@property (retain) NSMutableArray *filters;
 
 - (id) initWithOrderedFilters:(NSArray *)filters;
 - (id) initWithConfiguration:(NSDictionary *)configuration;

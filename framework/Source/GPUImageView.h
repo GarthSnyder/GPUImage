@@ -6,4 +6,6 @@
 
 @property (nonatomic, retain) id <GPUImageSource> inputImage;
 
+- (BOOL) update;
+
 @end

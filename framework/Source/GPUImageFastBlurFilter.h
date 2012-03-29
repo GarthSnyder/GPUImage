@@ -1,6 +1,9 @@
-#import "GPUImageTwoPassFilter.h"
+#import "GPUImageFilter.h"
 
 @interface GPUImageFastBlurFilter : GPUImageFilter
+{
+    GPUImageFilter *stageOne;
+}
 
 // The number of times to sequentially blur the incoming image. The more passes, the slower the filter.
 @property(readwrite, nonatomic) NSUInteger blurPasses;

@@ -28,6 +28,7 @@ static GLint lastBoundTexture = -1;
         _size = size;
         _format = format;
         _pixType = pix;
+        lastBoundTexture = _handle;
     }
     return self;
 }
@@ -118,6 +119,7 @@ static GLint lastBoundTexture = -1;
     if (!hasBoundTextureToFramebuffer) {
         hasBoundTextureToFramebuffer = YES;
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.handle, 0);
+        [self validateFramebuffer]; // TODO: remove for performance
     }
 }
 
