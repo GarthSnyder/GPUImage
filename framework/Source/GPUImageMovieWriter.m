@@ -2,6 +2,7 @@
 #import "GPUImageOpenGLESContext.h"
 #import "GPUImageProgram.h"
 #import "GPUImageFilter.h"
+#import "GPUImageTextureBuffer.h"
 
 NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 (
@@ -42,7 +43,6 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 {
     if (self = [super init]) {
         movieURL = newMovieURL;
-        self.size = newSize;
         self.baseFormat = GL_RGBA;
         self.wrap = GL_CLAMP_TO_EDGE;
         self.filter = GL_LINEAR;
@@ -123,7 +123,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 {
     if (!assetWriter) {
         [self validateSize];
-        [self intializeMovie];
+        [self initializeMovie];
     }
     startTime = [NSDate date];
     [assetWriter startWriting];
@@ -143,9 +143,9 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     if (self.size.width && self.size.height) {
         return;
     }
-    NSAssert(parent, @"GPUImageMovieWriter cannot start recording without an explicit size or a parent of known size.");
-    NSAssert ([parent update], @"GPUImageMovieWriter parent could not update when initiating recording.");
-    GPUImageBuffer *pBuff = parent.backingStore;
+    NSAssert(self.inputImage, @"GPUImageMovieWriter cannot start recording without an explicit size or a parent of known size.");
+    NSAssert ([self.inputImage update], @"GPUImageMovieWriter parent could not update when initiating recording.");
+    GPUImageBuffer *pBuff = self.inputImage.backingStore;
     self.size = pBuff.size;
 }
 
@@ -178,7 +178,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
         _backingStore = [[GPUImageTextureBuffer alloc] initWithTexture:CVOpenGLESTextureGetName(renderTexture) 
                                                                   size:self.size 
                                                                 format:self.baseFormat];
-        [self setTextureParams];
+        [self setTextureParameters];
     }
     else
     {
@@ -188,8 +188,8 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
 - (void) setInputImage:(id<GPUImageSource>)newParent
 {
-    if (_inputImage != newParent) {
-        _inputImage = newParent;
+    if (inputImage != newParent) {
+        inputImage = newParent;
         colorSwizzlingProgram.inputImage = newParent;
         timeLastChanged = 0;
     }
@@ -197,9 +197,9 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
 - (BOOL) update
 {
-    if (_inputImage) {
-        [_inputImage update];
-        if (timeLastChanged < [_inputImage timeLastChanged]) {
+    if (inputImage) {
+        [inputImage update];
+        if (timeLastChanged < [inputImage timeLastChanged]) {
             return [self render];
         }
     }

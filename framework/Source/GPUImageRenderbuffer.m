@@ -50,6 +50,7 @@
         hasBoundRenderbufferToFramebuffer = YES;
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 
             GL_RENDERBUFFER, self.handle);
+        [self validateFramebuffer]; // TODO: remove for performance
     }
 }
 

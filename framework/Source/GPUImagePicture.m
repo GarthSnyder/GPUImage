@@ -1,6 +1,9 @@
 #import "GPUImagePicture.h"
+#import "GPUImageOpenGLESContext.h"
+#import "GPUImageTextureBuffer.h"
+#import <objc/runtime.h>
 
-@interface GPUImagePicture
+@interface GPUImagePicture ()
 {
     GPUImageTimestamp timeLastChanged;
 }
@@ -38,12 +41,15 @@
         return YES;
     }
 
-    CGSize pointSizeOfImage = [imageSource size];
-    CGFloat scaleOfImage = [imageSource scale];
+    glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Update: %s (GPUImagePicture)", 
+        class_getName([self class])] UTF8String]);
+
+    CGSize pointSizeOfImage = [self.image size];
+    CGFloat scaleOfImage = [self.image scale];
     GLsize pixelSizeOfImage = {scaleOfImage * pointSizeOfImage.width + 0.1, 
-        scaleOfImage * pointSizeOfImage.height + 0.1);
+        scaleOfImage * pointSizeOfImage.height + 0.1};
     
-    GLubyte *imageData = (GLubyte *) calloc(pixelSizeOfImage.width *
+    GLubyte *imageData = (GLubyte *) calloc(1, pixelSizeOfImage.width *
         pixelSizeOfImage.height * 4);
     CGColorSpaceRef genericRGBColorspace = CGColorSpaceCreateDeviceRGB();    
     CGContextRef imageContext = CGBitmapContextCreate(imageData, 
@@ -51,7 +57,7 @@
         pixelSizeOfImage.width * 4, genericRGBColorspace,  
         kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
     CGContextDrawImage(imageContext, CGRectMake(0.0, 0.0, pixelSizeOfImage.width, 
-        pixelSizeOfImage.height), [newImageSource CGImage]);
+        pixelSizeOfImage.height), [self.image CGImage]);
     CGContextRelease(imageContext);
     CGColorSpaceRelease(genericRGBColorspace);
     
@@ -67,10 +73,12 @@
         pixelSizeOfImage.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, imageData);
 
     if (self.generatesMipmap) {
-        [self.backingStore generateMipmap:YES];
+        [(GPUImageTextureBuffer *)self.backingStore generateMipmap:YES];
     }
 
     free(imageData);
+    glPopGroupMarkerEXT();
+    
     timeLastChanged = GPUImageGetCurrentTimestamp();
     return YES;
 }

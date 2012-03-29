@@ -27,11 +27,11 @@ NSString *const kGPUImageColorMatrixFragmentShaderString = SHADER_STRING
     if (self = [super init]) {
         program.fragmentShader = kGPUImageColorMatrixFragmentShaderString;
         self.intensity = 1.0;
-        self.colorMatrix = (mat4){
-            {1.f, 0.f, 0.f, 0.f},
-            {0.f, 1.f, 0.f, 0.f},
-            {0.f, 0.f, 1.f, 0.f},
-            {0.f, 0.f, 0.f, 1.f}
+        self.colorMatrix = (mat4) {
+            1.f, 0.f, 0.f, 0.f,
+            0.f, 1.f, 0.f, 0.f,
+            0.f, 0.f, 1.f, 0.f,
+            0.f, 0.f, 0.f, 1.f
         };
     }
     return self;

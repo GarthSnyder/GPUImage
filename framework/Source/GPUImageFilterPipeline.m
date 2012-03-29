@@ -1,4 +1,5 @@
 #import "GPUImageFilterPipeline.h"
+#import "GPUImagePicture.h"
 
 @interface GPUImageFilterPipeline ()
 {
@@ -8,7 +9,7 @@
 - (void) setupFilters;
 @end
 
-@interface nsArray (QuickContentsHash)
+@interface NSArray (QuickContentsHash)
 - (NSUInteger) quickContentsHash;
 @end
 
@@ -29,7 +30,7 @@
 - (id) initWithConfiguration:(NSDictionary*) configuration 
 {
     if (self = [super init]) {
-        if (![self _parseConfiguration:configuration]) {
+        if (![self parseConfiguration:configuration]) {
             NSLog(@"Sorry, a parsing error occurred.");
             abort();
         }
@@ -127,10 +128,10 @@
         return NO;
     }
     [self setupFilters];
-    id <GPUImageSource> trueParent = parent;
-    parent = [self.filters lastObject];
+    id <GPUImageSource> trueParent = _inputImage;
+    _inputImage = [self.filters lastObject];
     BOOL result = [super update];
-    parent = trueParent;
+    _inputImage = trueParent;
     return result;
 }
 
@@ -142,11 +143,24 @@
         return;
     }
     arrayHash = newHash;
-    id <GPUImageSource> previous = parent;
-    for (id <GPUImageConsumer> filter in self.filters) {
-        [filter deriveFrom:previous];
+    id <GPUImageSource> previous = _inputImage;
+    for (GPUImageFilter *filter in self.filters) {
+        filter.inputImage = previous;
         previous = filter;
     }
+}
+
+#pragma mark -
+#pragma mark Still image convenience methods
+
+- (UIImage *) imageByFilteringImage:(UIImage *)imageToFilter
+{
+    GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithImage:imageToFilter];
+    self.inputImage = stillImageSource;
+    [self update];
+    UIImage *product = [self getUIImage];
+    self.inputImage = nil;
+    return product;
 }
 
 @end

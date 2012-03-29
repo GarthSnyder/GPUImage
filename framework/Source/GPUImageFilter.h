@@ -8,7 +8,7 @@
 //
 // By convention, the OpenGL uniform for the input texture should be
 // named inputImage. The vertex attribute for position should be 
-// named "position" and the input texture coordinate, "inputImageCoordinate".
+// named "position" and the input texture coordinate, "inputTextureCoordinate".
 //
 // It's possible to use different names with a few lines of overridden code, 
 // but conforming to these conventions will enhance clarity.

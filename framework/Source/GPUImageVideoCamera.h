@@ -22,7 +22,7 @@
     AVCaptureDevice *_inputCamera;
 }
 
-@property (nonatomic) id <GPUImageVideoCameraDelegate> delegate;
+@property (nonatomic, assign) id <GPUImageVideoCameraDelegate> delegate;
 @property (readonly, nonatomic) AVCaptureSession *captureSession;
 
 // Use this property to manage camera settings.Focus point, exposure point, etc.

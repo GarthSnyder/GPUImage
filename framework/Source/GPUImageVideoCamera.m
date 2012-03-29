@@ -1,6 +1,7 @@
 #import "GPUImageVideoCamera.h"
 #import "GPUImageTextureBuffer.h"
 #import "GPUImageOpenGLESContext.h"
+#import <objc/runtime.h>
 
 #pragma mark -
 #pragma mark Private methods and instance variables
@@ -168,6 +169,9 @@
     didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer 
     fromConnection:(AVCaptureConnection *)connection
 {
+    glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Video frame: %s (GPUImageVideoCamera)", 
+        class_getName([self class])] UTF8String]);
+
     CVImageBufferRef imgBuff = CMSampleBufferGetImageBuffer(sampleBuffer);
     
     GLsize buffSize;
@@ -211,6 +215,9 @@
     }    
     CVPixelBufferUnlockBaseAddress(imgBuff, 0);
     timeLastChanged = GPUImageGetCurrentTimestamp();
+
+    glPopGroupMarkerEXT();
+
     if (self.delegate) {
         [self.delegate videoCameraDidReceiveNewFrame:self];
     }
