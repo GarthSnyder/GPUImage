@@ -1,9 +1,9 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import "GPUImageTypes.h"
-#import "GPUImageBuffer.h"
+#import "GPUImageCanvas.h"
 
-// The GPUImageSource protocol lets an object vend its GPUImageBuffer object
+// The GPUImageSource protocol lets an object vend its GPUImageCanvas object
 // and participate in the GPUImage graph update protocol.
 //
 // The update protocol is bottom-up: a terminal consumer updates itself, and
@@ -24,6 +24,7 @@
 @protocol GPUImageSource <NSObject>
 - (BOOL) update;
 - (GPUImageTimestamp) timeLastChanged;
-- (GPUImageBuffer *) backingStore;
+- (GPUImageCanvas *) canvas;
+- (id <GPUImageSource>) sourceAsRenderbuffer;
 @end
 

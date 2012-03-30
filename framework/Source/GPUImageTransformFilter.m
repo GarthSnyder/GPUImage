@@ -41,6 +41,12 @@ NSString *const kGPUImageTransformVertexShaderString = SHADER_STRING
     return self;
 }
 
+- (BOOL) render
+{
+    [self clearFramebuffer];
+    return [super render];
+}
+
 #pragma mark -
 #pragma mark Conversion from matrix formats
 

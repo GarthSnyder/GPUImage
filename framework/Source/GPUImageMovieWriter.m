@@ -264,7 +264,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 #pragma mark -
 #pragma mark Frame rendering
 
-- (void) createBackingStore
+- (void) createCanvas
 {
     glActiveTexture(GL_TEXTURE1);
     glGenFramebuffers(1, &movieFramebuffer);

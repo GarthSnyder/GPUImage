@@ -36,6 +36,7 @@
 @property (nonatomic, retain) id <GPUImageSource> auxilliaryImage;
 
 - (BOOL) render;
+- (BOOL) canUseRenderbuffer;
 
 // Still image processing convenience methods
 - (UIImage *) imageByFilteringImage:(UIImage *)imageToFilter;

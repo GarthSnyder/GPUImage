@@ -18,23 +18,24 @@
     
     // First, collapse all structs to basic types
     NSRegularExpression *deStruct = [NSRegularExpression 
-                                     regularExpressionWithPattern:@"\\{[^=]+=([^{}]+)\\}" options:0 error:&err];
+        regularExpressionWithPattern:@"\\{[^=]+=([^{}]+)\\}" options:0 error:&err];
     BOOL done = NO;
     do {
         newString = [deStruct stringByReplacingMatchesInString:type
-                                                       options:0 range:NSMakeRange(0, [type length]) withTemplate:@"$1"];
+            options:0 range:NSMakeRange(0, [type length]) withTemplate:@"$1"];
         done = [type isEqualToString:newString];
         type = newString;
     } while (!done);
     
     // Then expand [4ff] to 4 x ff (for example)
     NSRegularExpression *findArray = [NSRegularExpression 
-                                      regularExpressionWithPattern:@"\\[(\\d+)([^][{}]+)\\]" options:0 error:&err];
+        regularExpressionWithPattern:@"\\[(\\d+)([^\\]\\[]+)\\]" options:0 error:&err];
     NSTextCheckingResult *match;
     while ((match = [findArray firstMatchInString:type options:0 range:NSMakeRange(0, [type length])])) {
-        NSString *prefix = [type substringToIndex:[match range].location];
-        NSString *postfix = [type substringFromIndex:[match range].location
-                             + [match range].length];
+        NSRange matchedRange = [match range];
+        NSString *prefix = [type substringToIndex:matchedRange.location];
+        NSString *postfix = [type substringFromIndex:matchedRange.location
+            + matchedRange.length];
         int arrayLength = [[type substringWithRange:[match rangeAtIndex:1]] intValue];
         NSString *typeSpec = [type substringWithRange:[match rangeAtIndex:2]];
         NSMutableString *newType = [NSMutableString stringWithCapacity:[typeSpec length] * arrayLength];
@@ -48,10 +49,10 @@
 
 - (NSUInteger) sizeOfObjCType:(const char *)typeEncoding
 {
-    NSUInteger alignedSize, totalSize = 0;
+    NSUInteger incrementalSize, totalSize = 0;
     while (*typeEncoding) {
-        typeEncoding = NSGetSizeAndAlignment(typeEncoding, NULL, &alignedSize);
-        totalSize += alignedSize;
+        typeEncoding = NSGetSizeAndAlignment(typeEncoding, &incrementalSize, NULL);
+        totalSize += incrementalSize;
     }
     return totalSize;
 }
@@ -67,19 +68,19 @@
 
 - (BOOL) valueTypeMatchesOESType
 {
-    NSValue *value = _value;
-    NSString *objCType = [NSString stringWithCString:value.objCType 
+    NSValue *myValue = self.value;
+    NSString *objCType = [NSString stringWithCString:myValue.objCType 
                                             encoding:NSUTF8StringEncoding];
     objCType = [self flattenedObjCType:objCType];
     if (![self objCTypeIsHomogenous:objCType]) {
         return NO;
     }
-    NSString *oesTypeEncoding = [self flattenedObjCTypeForOESType:_type];
+    NSString *oesTypeEncoding = [self flattenedObjCTypeForOESType:self.type];
     if ([oesTypeEncoding characterAtIndex:0] != [objCType characterAtIndex:0]) {
         return NO;
     }
     int oesTypeLength = [oesTypeEncoding length];
-    int totalLength = oesTypeLength * _count;
+    int totalLength = oesTypeLength * self.count;
     return totalLength == [objCType length];
 }
 

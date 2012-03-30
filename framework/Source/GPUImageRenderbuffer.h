@@ -1,8 +1,8 @@
 //  Thin overlay for an OpenGL ES renderbuffer object.
 
-#import "GPUImageBuffer.h"
+#import "GPUImageCanvas.h"
 
-@interface GPUImageRenderbuffer : GPUImageBuffer
+@interface GPUImageRenderbuffer : GPUImageCanvas
 
 - (id) initWithLayer:(CAEAGLLayer *)layer;
 

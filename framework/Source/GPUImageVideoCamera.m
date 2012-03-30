@@ -1,6 +1,6 @@
 
 #import "GPUImageVideoCamera.h"
-#import "GPUImageTextureBuffer.h"
+#import "GPUImageTexture.h"
 #import "GPUImageOpenGLESContext.h"
 #import <objc/runtime.h>
 
@@ -217,6 +217,7 @@
     if ([GPUImageOpenGLESContext supportsFastTextureUpload])
     {
         CVOpenGLESTextureRef texture = NULL;
+        [GPUImageTexture protectTextureContext];
         CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
             coreVideoTextureCache, imgBuff, NULL, GL_TEXTURE_2D, GL_RGBA, 
             buffSize.width, buffSize.height, GL_BGRA, GL_UNSIGNED_BYTE, 0, &texture);
@@ -227,8 +228,10 @@
         }
         
         GLint outputTexture = CVOpenGLESTextureGetName(texture);
-        _backingStore = [[GPUImageTextureBuffer alloc] initWithTexture:outputTexture
+        if (_canvas.handle != outputTexture) {
+            _canvas = [[GPUImageTexture alloc] initWithTexture:outputTexture
             size:buffSize format:GL_RGBA];
+        }
         [self setTextureParameters];
         
         // Flush the CVOpenGLESTexture cache and release the texture
@@ -237,10 +240,10 @@
     }
     else  
     {
-        if (!self.backingStore) {
-            [self createBackingStore];
+        if (!self.canvas) {
+            [self createCanvas];
         }
-        [self.backingStore bind];
+        [self.canvas bind];
         // Using BGRA extension to pull in video frame data directly
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, buffSize.width, buffSize.height, 0, 
             GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(imgBuff));

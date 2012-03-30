@@ -16,7 +16,7 @@
 {
     if (newMode != _rotationMode) {
         _rotationMode = newMode;
-        [self releaseBackingStore];
+        [self releaseCanvas];
     }
 }
 
@@ -24,7 +24,7 @@
 {
     // If no explicit size has been specified, inherit in orientation-specific way
     if (!self.size.width || !self.size.height) {
-        GLsize newSize = other.backingStore.size;
+        GLsize newSize = other.canvas.size;
         if ((_rotationMode == kGPUImageRotateLeft) 
             || (_rotationMode == kGPUImageRotateRight)
             || (_rotationMode == kGPUImageRotateRightFlipVertical))

@@ -15,6 +15,11 @@
     return self;
 }
 
+- (BOOL) canUseRenderbuffer 
+{
+    return YES;
+}
+
 #pragma mark -
 #pragma mark Rendering and drawing
 

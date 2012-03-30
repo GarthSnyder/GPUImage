@@ -1,5 +1,5 @@
-#import "GPUImageBuffer.h"
-#import "GPUImageTextureBuffer.h"
+#import "GPUImageCanvas.h"
+#import "GPUImageTexture.h"
 
 static GLuint lastBoundFramebuffer = 0;
 
@@ -8,7 +8,7 @@ static void dataProviderReleaseCallback(void *info, const void *data, size_t siz
     free((void *)data);
 }
 
-@implementation GPUImageBuffer
+@implementation GPUImageCanvas
 
 @synthesize handle = _handle;
 @synthesize size = _size;
@@ -17,7 +17,7 @@ static void dataProviderReleaseCallback(void *info, const void *data, size_t siz
 
 - (id) initWithSize:(GLsize)size baseFormat:(GLenum)type 
 {
-    NSAssert(NO, @"GPUImageBuffer subclasses must implement bufferWithSize:baseType:");
+    NSAssert(NO, @"GPUImageCanvas subclasses must implement bufferWithSize:baseType:");
     return nil;
 }
 
@@ -34,6 +34,7 @@ static void dataProviderReleaseCallback(void *info, const void *data, size_t siz
         glViewport(0, 0, self.size.width, self.size.height);
     } else if (_fboHandle != lastBoundFramebuffer) {
         glBindFramebuffer(GL_FRAMEBUFFER, _fboHandle);
+        glViewport(0, 0, self.size.width, self.size.height);
     }
     lastBoundFramebuffer = _fboHandle;
 }
@@ -54,7 +55,7 @@ static void dataProviderReleaseCallback(void *info, const void *data, size_t siz
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-- (GLubyte *) rawDataFromFramebuffer
+- (GLubyte *) copyRawDataFromFramebuffer
 {
     [self bindAsFramebuffer];
     NSUInteger totalBytesForImage = self.size.width * self.size.height * 4;
@@ -64,9 +65,9 @@ static void dataProviderReleaseCallback(void *info, const void *data, size_t siz
     return rawImagePixels;
 }
 
-- (CGImageRef) CGImageFromFramebuffer
+- (CGImageRef) copyCGImageFromFramebuffer
 {
-    GLubyte *rawImagePixels = [self rawDataFromFramebuffer];
+    GLubyte *rawImagePixels = [self copyRawDataFromFramebuffer];
     
     NSUInteger totalBytesForImage = self.size.width * self.size.height * 4;
     CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, 

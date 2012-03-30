@@ -1,3 +1,4 @@
+#import <objc/runtime.h>
 #import "GPUImageProgram.h"
 #import "GPUImageShader.h"
 #import "GPUImageShaderSymbol.h"
@@ -41,7 +42,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 - (void) delete;
 - (void) setValue:(id)obj forKey:(NSString *)key;
 - (id) valueForKey:(NSString *)key;
-- (void) setUniformValues;
+- (BOOL) validateUniforms;
 
 @end
 
@@ -100,10 +101,12 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 - (BOOL) use
 {
-    BOOL status = [self link];
+    BOOL status = [self validateUniforms]; // Links
     if (status == YES) {
         glUseProgram(programHandle);
-        [self setUniformValues];
+        for (GPUImageShaderSymbol *uniform in [uniforms allValues]) {
+            [uniform setOESValue];
+        }
     }
     return status;
 }
@@ -197,35 +200,44 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     return NO;
 }
 
-// Set all uniform values in OpenGL in preparation for drawing. Only sets
-// uniforms whose values have changed since the last call. 
-
-- (void) setUniformValues
-{
-    for (GPUImageShaderSymbol *uniform in [uniforms allValues]) {
-        [uniform gatherOESDetailsForProgram:programHandle];
-        // Make sure textures have a texture unit assigned
-        if ([uniform.value conformsToProtocol:@protocol(GPUImageSource)] && !uniform.textureUnit) {
-            uniform.textureUnit = [GPUImageTextureUnit textureUnit];
-        }
-        [uniform setOESValue];
-    }
-}
-
 // Returns all uniform values that are GPUImageSources, but only if the 
 // uniform is actually used.
 
 - (NSArray *) inputImages
 {
-    NSMutableArray *ii = [NSMutableArray array];
-    for (GPUImageShaderSymbol *uniform in [uniforms allValues]) {
-        if (!uniform.knowsOESDetails || (uniform.index >= 0)) {
-            if ([uniform.value conformsToProtocol:@protocol(GPUImageSource)]) {
-                [ii addObject:uniform.value];
+    NSMutableArray *inputs = [NSMutableArray array];
+    if ([self validateUniforms]) {
+        for (GPUImageShaderSymbol *uniform in [uniforms allValues]) {
+            if (uniform.index >= 0) {
+                if ([uniform.value conformsToProtocol:@protocol(GPUImageSource)]) {
+                    [inputs addObject:uniform.value];
+                }
             }
         }
     }
-    return ii;
+    return inputs;
+}
+
+- (BOOL) validateUniforms
+{
+    BOOL droppedMarker = NO;
+    BOOL status;
+    if ((status = [self link])) {
+        for (GPUImageShaderSymbol *uniform in [uniforms allValues]) {
+            if (!uniform.knowsOESDetails) {
+                if (!droppedMarker) {
+                    glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Validate uniforms: %s", 
+                        class_getName([self class])] UTF8String]);
+                    droppedMarker = YES;
+                }
+                [uniform gatherOESDetailsForProgram:programHandle];
+            }
+        }
+    }
+    if (droppedMarker) {
+        glPopGroupMarkerEXT();
+    }
+    return status;
 }
 
 #pragma mark -
