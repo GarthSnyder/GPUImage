@@ -1,8 +1,8 @@
 //  Thin wrapper for OpenGL ES texture and renderbuffer objects. The
 //  GPUImageBase class handles these objects from an abstract perspective,
-//  whereas a GPUImageBuffer always corresponds to a specific, real OpenGL
-//  image buffer. (By contrast, a GPUImage may not have an actual buffer;
-//  think of it as a "specification for a buffer".)
+//  whereas a GPUImageCanvas always corresponds to a specific, real OpenGL
+//  image buffer. (By contrast, a GPUImage may not have an actual canvas;
+//  think of it as a "specification for a canvas".)
 //
 //  The point of wrapping is to ensure sharability of the underlying
 //  buffers and to ensure that buffers are deleted when no one refers to them 
@@ -13,7 +13,7 @@
 #import <OpenGLES/ES2/glext.h>
 #import "GPUImageTypes.h"
 
-@interface GPUImageBuffer : NSObject
+@interface GPUImageCanvas : NSObject
 {
     GLuint _handle;
     GLuint _fboHandle;
@@ -36,7 +36,7 @@
 - (void) clearFramebuffer:(vec4)backgroundColor;
 
 // Callers are responsible for freeing these
-- (GLubyte *) rawDataFromFramebuffer;
-- (CGImageRef) CGImageFromFramebuffer;
+- (GLubyte *) copyRawDataFromFramebuffer;
+- (CGImageRef) copyCGImageFromFramebuffer;
 
 @end

@@ -31,9 +31,9 @@ NSString *const kGPUImageAdaptiveThresholdFragmentShaderString = SHADER_STRING
         GPUImageBoxBlurFilter *boxBlurFilter = [[GPUImageBoxBlurFilter alloc] init];
         
         program.fragmentShader = kGPUImageAdaptiveThresholdFragmentShaderString;
-        [program setValue:grayscaleFilter forKey:@"inputImage"];
-        [program setValue:boxBlurFilter forKey:@"auxilliaryImage"];
-        
+        program.inputImage = grayscaleFilter;
+        program.auxilliaryImage = boxBlurFilter;
+                
         boxBlurFilter.inputImage = grayscaleFilter;
     }
     return self;

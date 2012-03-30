@@ -1,5 +1,5 @@
 #import "GPUImageMovie.h"
-#import "GPUImageTextureBuffer.h"
+#import "GPUImageTexture.h"
 #import <objc/runtime.h>
 
 @interface GPUImageMovie ()
@@ -89,17 +89,17 @@
     self.pixType = GL_UNSIGNED_BYTE;
     self.baseFormat = GL_RGBA;
     
-    if (!self.backingStore) {
-        [self createBackingStore];
+    if (!self.canvas) {
+        [self createCanvas];
     } else {
-        [self.backingStore bind];
+        [self.canvas bind];
     }
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, buffSize.width, buffSize.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(_currentBuffer));
     CVPixelBufferUnlockBaseAddress(_currentBuffer, 0);
 
     if (self.generatesMipmap) {
-        [(GPUImageTextureBuffer *)self.backingStore generateMipmap:YES];
+        [(GPUImageTexture *)self.canvas generateMipmap:YES];
     }
     
     glPopGroupMarkerEXT();

@@ -1,12 +1,14 @@
-#import "GPUImageTextureBuffer.h"
+#import "GPUImageTexture.h"
+#import "GPUImageTextureUnit.h"
 
-@interface GPUImageTextureBuffer ()
+@interface GPUImageTexture ()
 {
     BOOL hasBoundTextureToFramebuffer;
+    BOOL dontDeleteTextureOnDealloc;
 }
 @end
 
-@implementation GPUImageTextureBuffer
+@implementation GPUImageTexture
 
 @synthesize magFilter = _magFilter;
 @synthesize minFilter = _minFilter;
@@ -17,6 +19,12 @@
 @synthesize pixType = _pixType;
 
 static GLint lastBoundTexture = -1;
+
++ (void) protectTextureContext
+{
+    lastBoundTexture = -1;
+    [GPUImageTextureUnit activateScratchUnit];
+}
 
 - initWithSize:(GLsize)size baseFormat:(GLenum)format pixType:(GLenum)pix
 {
@@ -45,6 +53,7 @@ static GLint lastBoundTexture = -1;
         _size = size;
         _format = fmt;
         _pixType = GL_UNSIGNED_BYTE;
+        dontDeleteTextureOnDealloc = YES; // Typically managed by cache
     }
     return self;
 }
@@ -125,11 +134,11 @@ static GLint lastBoundTexture = -1;
 
 - (void) dealloc
 {
-    if (_handle > 0) {
+    if ((_handle > 0) && !dontDeleteTextureOnDealloc) {
         glDeleteTextures(1, &_handle);
-        if (lastBoundTexture == _handle) {
-            lastBoundTexture = -1;
-        }
+    }
+    if (lastBoundTexture == _handle) {
+        lastBoundTexture = -1;
     }
 }
 

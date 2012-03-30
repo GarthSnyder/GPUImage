@@ -113,10 +113,10 @@
 
 - (NSUInteger) sizeOfObjCType:(const char *)typeEncoding
 {
-    NSUInteger alignedSize, totalSize = 0;
+    NSUInteger incrementalSize, totalSize = 0;
     while (*typeEncoding) {
-        typeEncoding = NSGetSizeAndAlignment(typeEncoding, NULL, &alignedSize);
-        totalSize += alignedSize;
+        typeEncoding = NSGetSizeAndAlignment(typeEncoding, &incrementalSize, NULL);
+        totalSize += incrementalSize;
     }
     return totalSize;
 }

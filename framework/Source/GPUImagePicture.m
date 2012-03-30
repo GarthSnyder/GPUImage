@@ -1,6 +1,6 @@
 #import "GPUImagePicture.h"
 #import "GPUImageOpenGLESContext.h"
-#import "GPUImageTextureBuffer.h"
+#import "GPUImageTexture.h"
 #import <objc/runtime.h>
 
 @interface GPUImagePicture ()
@@ -67,13 +67,13 @@
     self.baseFormat = GL_RGBA;
 
     [GPUImageOpenGLESContext useImageProcessingContext];
-    [self createBackingStore]; // Binds
+    [self createCanvas]; // Binds
 	// Using BGRA extension to pull in data directly
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixelSizeOfImage.width, 
         pixelSizeOfImage.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, imageData);
 
     if (self.generatesMipmap) {
-        [(GPUImageTextureBuffer *)self.backingStore generateMipmap:YES];
+        [(GPUImageTexture *)self.canvas generateMipmap:YES];
     }
 
     free(imageData);

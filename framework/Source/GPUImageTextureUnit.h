@@ -10,17 +10,22 @@
 #import <UIKit/UIKit.h>
 #import <OpenGLES/ES2/gl.h>
 #import "GPUImage.h"
-#import "GPUImageTextureBuffer.h"
+#import "GPUImageTexture.h"
 
 @interface GPUImageTextureUnit : NSObject
 
 + (GPUImageTextureUnit *) textureUnit;
 
+// Activate a scratch texture unit - makes sure that texture bindings
+// don't randomly affect a random texture unit.
+
++ (void) activateScratchUnit;
+
 - (id) initWithTextureUnitNumber:(NSUInteger)tNum;
-- (void) bindTexture:(GPUImageTextureBuffer *)texture;
+- (void) bindTexture:(GPUImageTexture *)texture;
 
 @property (nonatomic) GLint currentTextureHandle;
-@property (nonatomic) GLenum textureUnitNumber;
+@property (nonatomic) NSUInteger textureUnitNumber;
 
 @end
 

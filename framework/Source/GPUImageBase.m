@@ -1,5 +1,5 @@
 #import "GPUImageBase.h"
-#import "GPUImageTextureBuffer.h"
+#import "GPUImageTexture.h"
 #import "GPUImageRenderbuffer.h"
 
 @implementation GPUImageBase
@@ -61,7 +61,7 @@
 {
     if (self.usesRenderbuffer != use) {
         _usesRenderbuffer = use;
-        [self releaseBackingStore];
+        [self releaseCanvas];
     }
 }
 
@@ -70,7 +70,7 @@
     if (_layer != layer) {
         _usesRenderbuffer = YES;
         _layer = layer;
-        [self releaseBackingStore];
+        [self releaseCanvas];
     }
 }
 
@@ -78,7 +78,7 @@
 {
     if ((newSize.width != self.size.width) || (newSize.height != self.size.height)) {
         _size = newSize;
-        [self releaseBackingStore];
+        [self releaseCanvas];
     }
 }
 
@@ -86,7 +86,7 @@
 {
     if (_baseFormat != fmt) {
         _baseFormat = fmt;
-        [self releaseBackingStore];
+        [self releaseCanvas];
     }
 }
 
@@ -94,7 +94,7 @@
 {
     if (_pixType != pix) {
         _pixType = pix;
-        [self releaseBackingStore];
+        [self releaseCanvas];
     }
 }
 
@@ -106,22 +106,22 @@
     if (gen) {
         NSAssert(!self.usesRenderbuffer, @"Renderbuffers cannot have mipmaps");
         _generatesMipmap = YES;
-        if (self.backingStore && (timeLastChanged > 0)) {
-            GPUImageTextureBuffer *buffer = (GPUImageTextureBuffer *)self.backingStore;
+        if (self.canvas && (timeLastChanged > 0)) {
+            GPUImageTexture *buffer = (GPUImageTexture *)self.canvas;
             [buffer generateMipmap:NO];
             timeLastChanged = 0;
         }
     }
 }
 
-- (GPUImageBuffer *)backingStore
+- (GPUImageCanvas *)canvas
 {
-    return _backingStore;
+    return _canvas;
 }
 
 - (void) adoptParametersFrom:(id <GPUImageSource>)other
 {
-    GPUImageBuffer *obs = other.backingStore;
+    GPUImageCanvas *obs = other.canvas;
     
     if (!self.size.width || !self.size.height) {
         self.size = obs.size;
@@ -129,45 +129,45 @@
     if (!self.baseFormat) {
         self.baseFormat = obs.format;
     }
-    if (!self.pixType && !self.usesRenderbuffer && [obs isKindOfClass:[GPUImageTextureBuffer class]]) {
-        self.pixType = ((GPUImageTextureBuffer *)obs).pixType;
+    if (!self.pixType && !self.usesRenderbuffer && [obs isKindOfClass:[GPUImageTexture class]]) {
+        self.pixType = ((GPUImageTexture *)obs).pixType;
     }
 }
 
 #pragma mark -
-#pragma mark Interactions with backing store
+#pragma mark Interactions with canvas
 
 // Must know at least size and base format, or for layer-based renderbuffers,
-// the layer id. This call always creates a new backing store, even if one
+// the layer id. This call always creates a new canvas, even if one
 // already exists.
 
-- (void) createBackingStore
+- (void) createCanvas
 {
     NSAssert(self.layer || (self.size.width && self.size.height && self.baseFormat),
              @"Cannot bindAsFramebuffer without at least size and base format.");
     if (self.usesRenderbuffer) {
         if (self.layer) {
-            _backingStore = [[GPUImageRenderbuffer alloc] initWithLayer:self.layer];
-            self.size = _backingStore.size;
-            self.baseFormat = _backingStore.format;
+            _canvas = [[GPUImageRenderbuffer alloc] initWithLayer:self.layer];
+            _size = _canvas.size;
+            _baseFormat = _canvas.format;
         } else {
-            _backingStore = [[GPUImageRenderbuffer alloc] initWithSize:self.size
+            _canvas = [[GPUImageRenderbuffer alloc] initWithSize:self.size
                                                             baseFormat:self.baseFormat];
         }
     } else {
         if (!self.pixType) {
             self.pixType = GL_UNSIGNED_BYTE;
         }
-        _backingStore = [[GPUImageTextureBuffer alloc] initWithSize:self.size
+        _canvas = [[GPUImageTexture alloc] initWithSize:self.size
                                                          baseFormat:self.baseFormat pixType:self.pixType];
         [self setTextureParameters];
     }
     timeLastChanged = 0;
 }
 
-- (void) releaseBackingStore
+- (void) releaseCanvas
 {
-    _backingStore = nil;
+    _canvas = nil;
     timeLastChanged = 0;
 }
 
@@ -176,10 +176,10 @@
 
 - (void) setTextureParameters
 {
-    if (self.usesRenderbuffer || !self.backingStore) {
+    if (self.usesRenderbuffer || !self.canvas) {
         return;
     }
-    GPUImageTextureBuffer *store = (GPUImageTextureBuffer *)self.backingStore;
+    GPUImageTexture *store = (GPUImageTexture *)self.canvas;
     [store bind];
     if (self.magFilter > 0) {
         store.magFilter = self.magFilter;
@@ -197,18 +197,18 @@
 
 - (void) bindAsFramebuffer
 {
-    if (!self.backingStore) {
-        [self createBackingStore];
+    if (!self.canvas) {
+        [self createCanvas];
     }
-    [self.backingStore bindAsFramebuffer];
+    [self.canvas bindAsFramebuffer];
 }
 
 - (void) clearFramebuffer:(vec4)backgroundColor
 {
-    if (!self.backingStore) {
-        [self createBackingStore];
+    if (!self.canvas) {
+        [self createCanvas];
     }
-    [self.backingStore clearFramebuffer:backgroundColor];
+    [self.canvas clearFramebuffer:backgroundColor];
 }
 
 - (void) clearFramebuffer
@@ -265,19 +265,19 @@
 #pragma mark -
 #pragma mark Exporting images
 
-- (GLubyte *) getRawContents
+- (GLubyte *) copyRawContents
 {
-    return [self.backingStore rawDataFromFramebuffer];
+    return [self.canvas copyRawDataFromFramebuffer];
 }
 
-- (CGImageRef) getCGImage
+- (CGImageRef) copyCGImage
 {
-    return [self.backingStore CGImageFromFramebuffer];
+    return [self.canvas copyCGImageFromFramebuffer];
 }
 
 - (UIImage *) getUIImage
 {
-    CGImageRef cgRef = [self.backingStore CGImageFromFramebuffer];
+    CGImageRef cgRef = [self.canvas copyCGImageFromFramebuffer];
     // Capture image with current device orientation
 	UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
     UIImageOrientation imageOrientation = UIImageOrientationLeft;
@@ -301,7 +301,7 @@
 	}
     UIImage *finalImage = [UIImage imageWithCGImage:cgRef scale:1.0
         orientation:imageOrientation];
-    // CGImageRelease(cgRef);
+    CGImageRelease(cgRef);
     return finalImage;
 }
 

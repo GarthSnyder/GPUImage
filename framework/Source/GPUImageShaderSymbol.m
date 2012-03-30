@@ -2,9 +2,7 @@
 #import "GPUImageShaderSymbol+TypeChecking.h"
 
 @interface GPUImageShaderSymbol ()
-
 - (void) setOESTextureValue;
-
 @end
 
 @implementation GPUImageShaderSymbol
@@ -30,7 +28,16 @@
 - (void) setValue:(id)value
 {
     _value = value;
-    _dirty = YES;
+    self.dirty = YES;
+}
+
+- (GPUImageTextureUnit *) textureUnit
+{
+    // Make sure textures have a texture unit assigned
+    if (!_textureUnit && [self.value conformsToProtocol:@protocol(GPUImageSource)]) {
+        _textureUnit = [GPUImageTextureUnit textureUnit];
+    }
+    return _textureUnit;
 }
 
 // Retrieve uniform information from OpenGL if necessary.
@@ -41,9 +48,9 @@
         return;
     }
     const char *name = [_name UTF8String];
-    _index = glGetUniformLocation(program, name);
-    if (_index >= 0) { // Allow unused uniforms
-        glGetActiveUniform(program, _index, 0, NULL, &_count, &_type, NULL);
+    self.index = glGetUniformLocation(program, name);
+    if (self.index >= 0) { // Allow unused uniforms
+        glGetActiveUniform(program, self.index, 0, NULL, &_count, &_type, NULL);
     }
     self.knowsOESDetails = YES;
 }
@@ -140,15 +147,15 @@
 
 - (void) setOESTextureValue
 {
-    id <GPUImageSource> tBuff = _value;
-    GPUImageTextureBuffer *texture = (GPUImageTextureBuffer *)tBuff.backingStore;
-    NSAssert1(_type == GL_SAMPLER_2D, 
+    id <GPUImageSource> tBuff = self.value;
+    GPUImageTexture *texture = (GPUImageTexture *)tBuff.canvas;
+    NSAssert1(self.type == GL_SAMPLER_2D, 
         @"Uniform '%@' has texture value but type != GL_SAMPLER_2D", _name);
-    NSAssert1([texture isKindOfClass:[GPUImageTextureBuffer class]], 
-        @"Value of uniform '%@' is not convertible to a texture buffer", _name);
-    if (_textureUnit.currentTextureHandle != texture.handle) {
+    NSAssert1([texture isKindOfClass:[GPUImageTexture class]], 
+        @"Value of uniform '%@' is not convertible to a texture buffer", self.name);
+    if (self.textureUnit.currentTextureHandle != texture.handle) {
         [_textureUnit bindTexture:texture];
-        glUniform1i(_index, _textureUnit.textureUnitNumber);
+        glUniform1i(self.index, self.textureUnit.textureUnitNumber);
     }
 }
 

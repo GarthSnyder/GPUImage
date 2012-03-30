@@ -12,7 +12,7 @@
 @interface GPUImageBase : NSObject
 {
     GPUImageTimestamp timeLastChanged;
-    GPUImageBuffer *_backingStore;
+    GPUImageCanvas *_canvas;
 }
 
 @property (nonatomic) GLsize size;
@@ -49,15 +49,15 @@
 - (void) adoptParametersFrom:(id <GPUImageSource>)other;
 
 // Methods for getting image data out of OpenGL
-- (GLubyte *) getRawContents;
-- (CGImageRef) getCGImage;
+- (GLubyte *) copyRawContents;
+- (CGImageRef) copyCGImage;
 - (UIImage *) getUIImage;
 
 // Generally not necessary to access these directly
 
-- (GPUImageBuffer *) backingStore;
-- (void) createBackingStore;
-- (void) releaseBackingStore;
+- (GPUImageCanvas *) canvas;
+- (void) createCanvas;
+- (void) releaseCanvas;
 - (void) setTextureParameters;
 
 @end

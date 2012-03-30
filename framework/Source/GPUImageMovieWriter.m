@@ -2,7 +2,7 @@
 #import "GPUImageOpenGLESContext.h"
 #import "GPUImageProgram.h"
 #import "GPUImageFilter.h"
-#import "GPUImageTextureBuffer.h"
+#import "GPUImageTexture.h"
 
 NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 (
@@ -145,14 +145,14 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     }
     NSAssert(self.inputImage, @"GPUImageMovieWriter cannot start recording without an explicit size or a parent of known size.");
     NSAssert ([self.inputImage update], @"GPUImageMovieWriter parent could not update when initiating recording.");
-    GPUImageBuffer *pBuff = self.inputImage.backingStore;
+    GPUImageCanvas *pBuff = self.inputImage.canvas;
     self.size = pBuff.size;
 }
 
 #pragma mark -
 #pragma mark Frame rendering
 
-- (void) createBackingStore
+- (void) createCanvas
 {
     if ([GPUImageOpenGLESContext supportsFastTextureUpload])
     {
@@ -175,14 +175,14 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
                                                       0,
                                                       &renderTexture);
         
-        _backingStore = [[GPUImageTextureBuffer alloc] initWithTexture:CVOpenGLESTextureGetName(renderTexture) 
+        _canvas = [[GPUImageTexture alloc] initWithTexture:CVOpenGLESTextureGetName(renderTexture) 
                                                                   size:self.size 
                                                                 format:self.baseFormat];
         [self setTextureParameters];
     }
     else
     {
-        [super createBackingStore];	
+        [super createCanvas];	
     }
 }
 
@@ -208,10 +208,10 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
 - (BOOL) render
 {
-    if (!self.backingStore) {
-        [self createBackingStore];
+    if (!self.canvas) {
+        [self createCanvas];
     }
-    [self.backingStore bindAsFramebuffer];
+    [self.canvas bindAsFramebuffer];
     [self drawWithProgram:colorSwizzlingProgram];
     [self processNewFrame];
     timeLastChanged = GPUImageGetCurrentTimestamp();

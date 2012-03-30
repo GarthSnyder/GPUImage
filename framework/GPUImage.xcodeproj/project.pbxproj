@@ -127,8 +127,8 @@
 		BCF1A35214DDB1EC00852800 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BCF1A35014DDB1EC00852800 /* InfoPlist.strings */; };
 		BCF1A35514DDB1EC00852800 /* GPUImageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BCF1A35414DDB1EC00852800 /* GPUImageTests.m */; };
 		CE5613FA15214DF7003F45F3 /* GPUImageFilter+Uniforms.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5613F815214DF6003F45F3 /* GPUImageFilter+Uniforms.m */; };
-		CE6D6A3015250FE900F541E3 /* GPUImageShaderSymbol+TypeWrangling.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6D6A2E15250FE900F541E3 /* GPUImageShaderSymbol+TypeWrangling.h */; };
-		CE6D6A3115250FE900F541E3 /* GPUImageShaderSymbol+TypeWrangling.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6D6A2F15250FE900F541E3 /* GPUImageShaderSymbol+TypeWrangling.m */; };
+		CE6D6A3015250FE900F541E3 /* GPUImageShaderSymbol+TypeChecking.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6D6A2E15250FE900F541E3 /* GPUImageShaderSymbol+TypeChecking.h */; };
+		CE6D6A3115250FE900F541E3 /* GPUImageShaderSymbol+TypeChecking.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6D6A2F15250FE900F541E3 /* GPUImageShaderSymbol+TypeChecking.m */; };
 		CE72156315169911005A2227 /* GPUImageRenderbuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = CE72156115169911005A2227 /* GPUImageRenderbuffer.h */; };
 		CE72156415169911005A2227 /* GPUImageRenderbuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE72156215169911005A2227 /* GPUImageRenderbuffer.m */; };
 		CEE1F7CE1511944100385B6C /* GPUImageUtils.c in Sources */ = {isa = PBXBuildFile; fileRef = CEE1F7CD1511944100385B6C /* GPUImageUtils.c */; };
@@ -142,10 +142,10 @@
 		CEE1F8031512C07300385B6C /* GPUImageShaderSymbol.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE1F8011512C07300385B6C /* GPUImageShaderSymbol.m */; };
 		CEE1F83D15154E3400385B6C /* GPUImageTextureUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE1F83B15154E3400385B6C /* GPUImageTextureUnit.h */; };
 		CEE1F83E15154E3400385B6C /* GPUImageTextureUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE1F83C15154E3400385B6C /* GPUImageTextureUnit.m */; };
-		CEE1F84215159B2B00385B6C /* GPUImageBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE1F84015159B2A00385B6C /* GPUImageBuffer.h */; };
-		CEE1F84315159B2B00385B6C /* GPUImageBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE1F84115159B2B00385B6C /* GPUImageBuffer.m */; };
-		CEE1F84615159CAF00385B6C /* GPUImageTextureBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE1F84415159CAE00385B6C /* GPUImageTextureBuffer.h */; };
-		CEE1F84715159CAF00385B6C /* GPUImageTextureBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE1F84515159CAF00385B6C /* GPUImageTextureBuffer.m */; };
+		CEE1F84215159B2B00385B6C /* GPUImageCanvas.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE1F84015159B2A00385B6C /* GPUImageCanvas.h */; };
+		CEE1F84315159B2B00385B6C /* GPUImageCanvas.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE1F84115159B2B00385B6C /* GPUImageCanvas.m */; };
+		CEE1F84615159CAF00385B6C /* GPUImageTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE1F84415159CAE00385B6C /* GPUImageTexture.h */; };
+		CEE1F84715159CAF00385B6C /* GPUImageTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE1F84515159CAF00385B6C /* GPUImageTexture.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -203,7 +203,7 @@
 		BC982C4514F29E580001FF6F /* GPUImageKuwaharaFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageKuwaharaFilter.h; path = Source/GPUImageKuwaharaFilter.h; sourceTree = SOURCE_ROOT; };
 		BC982C4614F29E580001FF6F /* GPUImageKuwaharaFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageKuwaharaFilter.m; path = Source/GPUImageKuwaharaFilter.m; sourceTree = SOURCE_ROOT; };
 		BC982C6A14F33C290001FF6F /* GPUImageMovie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageMovie.h; path = Source/GPUImageMovie.h; sourceTree = SOURCE_ROOT; };
-		BC982C6B14F33C2A0001FF6F /* GPUImageMovie.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageMovie.m; path = Source/GPUImageMovie.m; sourceTree = SOURCE_ROOT; };
+		BC982C6B14F33C2A0001FF6F /* GPUImageMovie.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageMovie.m; path = Source/GPUImageMovie.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		BC982C6C14F33C2A0001FF6F /* GPUImageOverlayBlendFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageOverlayBlendFilter.h; path = Source/GPUImageOverlayBlendFilter.h; sourceTree = SOURCE_ROOT; };
 		BC982C6D14F33C2A0001FF6F /* GPUImageOverlayBlendFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageOverlayBlendFilter.m; path = Source/GPUImageOverlayBlendFilter.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		BC982C7D14F34F0B0001FF6F /* GPUImageDarkenBlendFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageDarkenBlendFilter.h; path = Source/GPUImageDarkenBlendFilter.h; sourceTree = SOURCE_ROOT; };
@@ -215,9 +215,9 @@
 		BCB5DE0B14E87F32000AF3C2 /* GPUImagePixellateFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImagePixellateFilter.h; path = Source/GPUImagePixellateFilter.h; sourceTree = SOURCE_ROOT; };
 		BCB5DE0C14E87F32000AF3C2 /* GPUImagePixellateFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImagePixellateFilter.m; path = Source/GPUImagePixellateFilter.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		BCB5E75A14E2086300701302 /* GPUImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageView.h; path = Source/GPUImageView.h; sourceTree = SOURCE_ROOT; };
-		BCB5E75B14E2086300701302 /* GPUImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageView.m; path = Source/GPUImageView.m; sourceTree = SOURCE_ROOT; };
+		BCB5E75B14E2086300701302 /* GPUImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageView.m; path = Source/GPUImageView.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		BCB5E76314E208D600701302 /* GPUImageVideoCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageVideoCamera.h; path = Source/GPUImageVideoCamera.h; sourceTree = SOURCE_ROOT; };
-		BCB5E76414E208D600701302 /* GPUImageVideoCamera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageVideoCamera.m; path = Source/GPUImageVideoCamera.m; sourceTree = SOURCE_ROOT; };
+		BCB5E76414E208D600701302 /* GPUImageVideoCamera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageVideoCamera.m; path = Source/GPUImageVideoCamera.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		BCB5E76A14E20AD700701302 /* GPUImageOpenGLESContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageOpenGLESContext.h; path = Source/GPUImageOpenGLESContext.h; sourceTree = SOURCE_ROOT; };
 		BCB5E76B14E20AD700701302 /* GPUImageOpenGLESContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageOpenGLESContext.m; path = Source/GPUImageOpenGLESContext.m; sourceTree = SOURCE_ROOT; };
 		BCB5E76E14E20B7F00701302 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -226,14 +226,14 @@
 		BCB5E77414E20B9700701302 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		BCB5E77614E20BA800701302 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		BCB5E77814E20BAF00701302 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
-		BCB5E77D14E22E4200701302 /* GPUImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImage.h; path = Source/GPUImage.h; sourceTree = SOURCE_ROOT; };
-		BCB5E77E14E22E4200701302 /* GPUImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImage.m; path = Source/GPUImage.m; sourceTree = SOURCE_ROOT; };
+		BCB5E77D14E22E4200701302 /* GPUImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = GPUImage.h; path = Source/GPUImage.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		BCB5E77E14E22E4200701302 /* GPUImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImage.m; path = Source/GPUImage.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		BCB5E7C014E4B6D400701302 /* GPUImageSepiaFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageSepiaFilter.h; path = Source/GPUImageSepiaFilter.h; sourceTree = SOURCE_ROOT; };
 		BCB5E7C114E4B6D400701302 /* GPUImageSepiaFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageSepiaFilter.m; path = Source/GPUImageSepiaFilter.m; sourceTree = SOURCE_ROOT; };
 		BCB5E7D814E6003400701302 /* GPUImagePicture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImagePicture.h; path = Source/GPUImagePicture.h; sourceTree = SOURCE_ROOT; };
-		BCB5E7D914E6003400701302 /* GPUImagePicture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImagePicture.m; path = Source/GPUImagePicture.m; sourceTree = SOURCE_ROOT; };
+		BCB5E7D914E6003400701302 /* GPUImagePicture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImagePicture.m; path = Source/GPUImagePicture.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		BCB5E85314E63BBB00701302 /* GPUImageRotationFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageRotationFilter.h; path = Source/GPUImageRotationFilter.h; sourceTree = SOURCE_ROOT; };
-		BCB5E85414E63BBB00701302 /* GPUImageRotationFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageRotationFilter.m; path = Source/GPUImageRotationFilter.m; sourceTree = SOURCE_ROOT; };
+		BCB5E85414E63BBB00701302 /* GPUImageRotationFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageRotationFilter.m; path = Source/GPUImageRotationFilter.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		BCB6B833150400030041703B /* GPUImageExposureFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageExposureFilter.h; path = Source/GPUImageExposureFilter.h; sourceTree = SOURCE_ROOT; };
 		BCB6B834150400030041703B /* GPUImageExposureFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageExposureFilter.m; path = Source/GPUImageExposureFilter.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		BCB6B835150400030041703B /* GPUImageSharpenFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageSharpenFilter.h; path = Source/GPUImageSharpenFilter.h; sourceTree = SOURCE_ROOT; };
@@ -282,28 +282,28 @@
 		BCF1A35314DDB1EC00852800 /* GPUImageTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GPUImageTests.h; sourceTree = "<group>"; };
 		BCF1A35414DDB1EC00852800 /* GPUImageTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GPUImageTests.m; sourceTree = "<group>"; };
 		CE5613F815214DF6003F45F3 /* GPUImageFilter+Uniforms.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "GPUImageFilter+Uniforms.m"; path = "Source/GPUImageFilter+Uniforms.m"; sourceTree = SOURCE_ROOT; };
-		CE6D6A2E15250FE900F541E3 /* GPUImageShaderSymbol+TypeWrangling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "GPUImageShaderSymbol+TypeWrangling.h"; path = "Source/GPUImageShaderSymbol+TypeWrangling.h"; sourceTree = SOURCE_ROOT; };
-		CE6D6A2F15250FE900F541E3 /* GPUImageShaderSymbol+TypeWrangling.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "GPUImageShaderSymbol+TypeWrangling.m"; path = "Source/GPUImageShaderSymbol+TypeWrangling.m"; sourceTree = SOURCE_ROOT; };
-		CE72156115169911005A2227 /* GPUImageRenderbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageRenderbuffer.h; path = Source/GPUImageRenderbuffer.h; sourceTree = SOURCE_ROOT; };
+		CE6D6A2E15250FE900F541E3 /* GPUImageShaderSymbol+TypeChecking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "GPUImageShaderSymbol+TypeChecking.h"; path = "Source/GPUImageShaderSymbol+TypeChecking.h"; sourceTree = SOURCE_ROOT; };
+		CE6D6A2F15250FE900F541E3 /* GPUImageShaderSymbol+TypeChecking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "GPUImageShaderSymbol+TypeChecking.m"; path = "Source/GPUImageShaderSymbol+TypeChecking.m"; sourceTree = SOURCE_ROOT; };
+		CE72156115169911005A2227 /* GPUImageRenderbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = GPUImageRenderbuffer.h; path = Source/GPUImageRenderbuffer.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CE72156215169911005A2227 /* GPUImageRenderbuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageRenderbuffer.m; path = Source/GPUImageRenderbuffer.m; sourceTree = SOURCE_ROOT; };
 		CECA029515199DB200B4689C /* GPUImageBenchmarking */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GPUImageBenchmarking; path = Source/GPUImageBenchmarking; sourceTree = SOURCE_ROOT; };
-		CEE1F7CB1511932700385B6C /* GPUImageProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GPUImageProtocols.h; path = Source/GPUImageProtocols.h; sourceTree = SOURCE_ROOT; };
+		CEE1F7CB1511932700385B6C /* GPUImageProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = GPUImageProtocols.h; path = Source/GPUImageProtocols.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CEE1F7CD1511944100385B6C /* GPUImageUtils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GPUImageUtils.c; path = Source/GPUImageUtils.c; sourceTree = SOURCE_ROOT; };
-		CEE1F7CF15119A0200385B6C /* GPUImageBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageBase.h; path = Source/GPUImageBase.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		CEE1F7CF15119A0200385B6C /* GPUImageBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = GPUImageBase.h; path = Source/GPUImageBase.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CEE1F7D015119A0200385B6C /* GPUImageBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageBase.m; path = Source/GPUImageBase.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CEE1F7E91512BA1C00385B6C /* GPUImageProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = GPUImageProgram.h; path = Source/GPUImageProgram.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CEE1F7EA1512BA1C00385B6C /* GPUImageProgram.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageProgram.m; path = Source/GPUImageProgram.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CEE1F7EB1512BA1C00385B6C /* GPUImageShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageShader.h; path = Source/GPUImageShader.h; sourceTree = SOURCE_ROOT; };
 		CEE1F7EC1512BA1C00385B6C /* GPUImageShader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageShader.m; path = Source/GPUImageShader.m; sourceTree = SOURCE_ROOT; };
 		CEE1F8001512C07300385B6C /* GPUImageShaderSymbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageShaderSymbol.h; path = Source/GPUImageShaderSymbol.h; sourceTree = SOURCE_ROOT; };
-		CEE1F8011512C07300385B6C /* GPUImageShaderSymbol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageShaderSymbol.m; path = Source/GPUImageShaderSymbol.m; sourceTree = SOURCE_ROOT; };
+		CEE1F8011512C07300385B6C /* GPUImageShaderSymbol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageShaderSymbol.m; path = Source/GPUImageShaderSymbol.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CEE1F82E1513091000385B6C /* GPUImageTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GPUImageTypes.h; path = Source/GPUImageTypes.h; sourceTree = SOURCE_ROOT; };
-		CEE1F83B15154E3400385B6C /* GPUImageTextureUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageTextureUnit.h; path = Source/GPUImageTextureUnit.h; sourceTree = SOURCE_ROOT; };
-		CEE1F83C15154E3400385B6C /* GPUImageTextureUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageTextureUnit.m; path = Source/GPUImageTextureUnit.m; sourceTree = SOURCE_ROOT; };
-		CEE1F84015159B2A00385B6C /* GPUImageBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageBuffer.h; path = Source/GPUImageBuffer.h; sourceTree = SOURCE_ROOT; };
-		CEE1F84115159B2B00385B6C /* GPUImageBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageBuffer.m; path = Source/GPUImageBuffer.m; sourceTree = SOURCE_ROOT; };
-		CEE1F84415159CAE00385B6C /* GPUImageTextureBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageTextureBuffer.h; path = Source/GPUImageTextureBuffer.h; sourceTree = SOURCE_ROOT; };
-		CEE1F84515159CAF00385B6C /* GPUImageTextureBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageTextureBuffer.m; path = Source/GPUImageTextureBuffer.m; sourceTree = SOURCE_ROOT; };
+		CEE1F83B15154E3400385B6C /* GPUImageTextureUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = GPUImageTextureUnit.h; path = Source/GPUImageTextureUnit.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		CEE1F83C15154E3400385B6C /* GPUImageTextureUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageTextureUnit.m; path = Source/GPUImageTextureUnit.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		CEE1F84015159B2A00385B6C /* GPUImageCanvas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = GPUImageCanvas.h; path = Source/GPUImageCanvas.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		CEE1F84115159B2B00385B6C /* GPUImageCanvas.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageCanvas.m; path = Source/GPUImageCanvas.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		CEE1F84415159CAE00385B6C /* GPUImageTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = GPUImageTexture.h; path = Source/GPUImageTexture.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		CEE1F84515159CAF00385B6C /* GPUImageTexture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = GPUImageTexture.m; path = Source/GPUImageTexture.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -579,18 +579,18 @@
 				BCB5E76B14E20AD700701302 /* GPUImageOpenGLESContext.m */,
 				CEE1F7E91512BA1C00385B6C /* GPUImageProgram.h */,
 				CEE1F7EA1512BA1C00385B6C /* GPUImageProgram.m */,
-				CEE1F84015159B2A00385B6C /* GPUImageBuffer.h */,
-				CEE1F84115159B2B00385B6C /* GPUImageBuffer.m */,
-				CEE1F84415159CAE00385B6C /* GPUImageTextureBuffer.h */,
-				CEE1F84515159CAF00385B6C /* GPUImageTextureBuffer.m */,
+				CEE1F84015159B2A00385B6C /* GPUImageCanvas.h */,
+				CEE1F84115159B2B00385B6C /* GPUImageCanvas.m */,
+				CEE1F84415159CAE00385B6C /* GPUImageTexture.h */,
+				CEE1F84515159CAF00385B6C /* GPUImageTexture.m */,
 				CE72156115169911005A2227 /* GPUImageRenderbuffer.h */,
 				CE72156215169911005A2227 /* GPUImageRenderbuffer.m */,
 				CEE1F7EB1512BA1C00385B6C /* GPUImageShader.h */,
 				CEE1F7EC1512BA1C00385B6C /* GPUImageShader.m */,
 				CEE1F8001512C07300385B6C /* GPUImageShaderSymbol.h */,
 				CEE1F8011512C07300385B6C /* GPUImageShaderSymbol.m */,
-				CE6D6A2E15250FE900F541E3 /* GPUImageShaderSymbol+TypeWrangling.h */,
-				CE6D6A2F15250FE900F541E3 /* GPUImageShaderSymbol+TypeWrangling.m */,
+				CE6D6A2E15250FE900F541E3 /* GPUImageShaderSymbol+TypeChecking.h */,
+				CE6D6A2F15250FE900F541E3 /* GPUImageShaderSymbol+TypeChecking.m */,
 				CEE1F83B15154E3400385B6C /* GPUImageTextureUnit.h */,
 				CEE1F83C15154E3400385B6C /* GPUImageTextureUnit.m */,
 			);
@@ -651,8 +651,8 @@
 				CEE1F7EF1512BA1C00385B6C /* GPUImageShader.h in Headers */,
 				CEE1F8021512C07300385B6C /* GPUImageShaderSymbol.h in Headers */,
 				CEE1F83D15154E3400385B6C /* GPUImageTextureUnit.h in Headers */,
-				CEE1F84215159B2B00385B6C /* GPUImageBuffer.h in Headers */,
-				CEE1F84615159CAF00385B6C /* GPUImageTextureBuffer.h in Headers */,
+				CEE1F84215159B2B00385B6C /* GPUImageCanvas.h in Headers */,
+				CEE1F84615159CAF00385B6C /* GPUImageTexture.h in Headers */,
 				CE72156315169911005A2227 /* GPUImageRenderbuffer.h in Headers */,
 				BCB6B9041507CA8D0041703B /* GPUImageCropFilter.h in Headers */,
 				6EE27493150E8FC60040DDB6 /* GPUImageGrayscaleFilter.h in Headers */,
@@ -666,7 +666,7 @@
 				BCC1E610152156620006EFA5 /* GPUImageUnsharpMaskFilter.h in Headers */,
 				BCC1E633152239090006EFA5 /* GPUImageBulgeDistortionFilter.h in Headers */,
 				BCC1E638152243630006EFA5 /* GPUImagePinchDistortionFilter.h in Headers */,
-				CE6D6A3015250FE900F541E3 /* GPUImageShaderSymbol+TypeWrangling.h in Headers */,
+				CE6D6A3015250FE900F541E3 /* GPUImageShaderSymbol+TypeChecking.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -815,8 +815,8 @@
 				CEE1F7F01512BA1C00385B6C /* GPUImageShader.m in Sources */,
 				CEE1F8031512C07300385B6C /* GPUImageShaderSymbol.m in Sources */,
 				CEE1F83E15154E3400385B6C /* GPUImageTextureUnit.m in Sources */,
-				CEE1F84315159B2B00385B6C /* GPUImageBuffer.m in Sources */,
-				CEE1F84715159CAF00385B6C /* GPUImageTextureBuffer.m in Sources */,
+				CEE1F84315159B2B00385B6C /* GPUImageCanvas.m in Sources */,
+				CEE1F84715159CAF00385B6C /* GPUImageTexture.m in Sources */,
 				CE72156415169911005A2227 /* GPUImageRenderbuffer.m in Sources */,
 				BCB6B9051507CA8D0041703B /* GPUImageCropFilter.m in Sources */,
 				6EE27494150E8FC60040DDB6 /* GPUImageGrayscaleFilter.m in Sources */,
@@ -831,7 +831,7 @@
 				BCC1E611152156620006EFA5 /* GPUImageUnsharpMaskFilter.m in Sources */,
 				BCC1E634152239090006EFA5 /* GPUImageBulgeDistortionFilter.m in Sources */,
 				BCC1E639152243630006EFA5 /* GPUImagePinchDistortionFilter.m in Sources */,
-				CE6D6A3115250FE900F541E3 /* GPUImageShaderSymbol+TypeWrangling.m in Sources */,
+				CE6D6A3115250FE900F541E3 /* GPUImageShaderSymbol+TypeChecking.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

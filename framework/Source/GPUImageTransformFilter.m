@@ -29,6 +29,12 @@ NSString *const kGPUImageTransformVertexShaderString = SHADER_STRING
     return self;
 }
 
+- (BOOL) render
+{
+    [self clearFramebuffer];
+    return [super render];
+}
+
 #pragma mark -
 #pragma mark Conversion from matrix formats
 
@@ -80,7 +86,8 @@ NSString *const kGPUImageTransformVertexShaderString = SHADER_STRING
     GLfloat temporaryMatrix[16];
     
     [self convert3DTransform:&_transform3D toMatrix:temporaryMatrix];
-    [program setValue:UNIFORM(temporaryMatrix) forKey:@"transformMatrix"];
+    NSValue *obj = UNIFORM(temporaryMatrix);
+    [program setValue:obj forKey:@"transformMatrix"];
 }
 
 @end

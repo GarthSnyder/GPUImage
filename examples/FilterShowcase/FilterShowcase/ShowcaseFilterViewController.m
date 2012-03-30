@@ -61,12 +61,8 @@
         case GPUIMAGE_SEPIA:
         {
             self.title = @"Sepia Tone";
-            self.filterSettingsSlider.hidden = NO;
+            self.filterSettingsSlider.hidden = YES;
 
-            [self.filterSettingsSlider setValue:1.0];
-            [self.filterSettingsSlider setMinimumValue:0.0];
-            [self.filterSettingsSlider setMaximumValue:1.0];
-            
             filter = [[GPUImageSepiaFilter alloc] init];
         }; break;
         case GPUIMAGE_PIXELLATE:

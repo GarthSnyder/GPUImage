@@ -1,7 +1,7 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import "GPUImageTextureUnit.h"
-#import "GPUImageTextureBuffer.h"
+#import "GPUImageTexture.h"
 
 static NSMutableArray *textureUnits = nil;
 static NSUInteger nextTextureUnit = 0;
@@ -14,12 +14,17 @@ static NSUInteger nextTextureUnit = 0;
 // concerned with how many texture units can be simultaneously USED.
 // We're just interested in how many texture unit NAMES are available.
 
-static GLint maxTextureUnits = 32;
+static GLint maxTextureUnits = 31;
 
 @implementation GPUImageTextureUnit
 
 @synthesize currentTextureHandle = _currentTextureHandle;
 @synthesize textureUnitNumber = _textureUnitNumber;
+
++ (void) activateScratchUnit
+{
+    glActiveTexture(GL_TEXTURE31);
+}
 
 + (GPUImageTextureUnit *) textureUnit
 {
@@ -34,7 +39,7 @@ static GLint maxTextureUnits = 32;
         return [textureUnits objectAtIndex:(nextTextureUnit - 1)];
     }
     GPUImageTextureUnit *unit = [[GPUImageTextureUnit alloc] 
-        initWithTextureUnitNumber:(nextTextureUnit - 1)];
+        initWithTextureUnitNumber:nextTextureUnit++];
     [textureUnits addObject:unit];
     return unit;
 }
@@ -48,7 +53,7 @@ static GLint maxTextureUnits = 32;
     return self;
 }
 
-- (void) bindTexture:(GPUImageTextureBuffer *)texture
+- (void) bindTexture:(GPUImageTexture *)texture
 {
     if (self.currentTextureHandle != texture.handle) {
         glActiveTexture(self.textureUnitNumber + GL_TEXTURE0);
