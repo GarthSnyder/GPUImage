@@ -60,33 +60,14 @@
     }
 }
 
-// We want our supplier to generate a renderbuffer, not a texture.
-// But there are a few case (e.g. iterative filters) that can't declare
-// themselves as renderbuffers arbitrarily. In those cases, we insert a
-// GPUImage converter object into the chain.
-
 - (void) setInputImage:(id <GPUImageSource>)newParent
 {
     if (_inputImage != newParent) {
-        if ([newParent respondsToSelector:@selector(canUseRenderbuffer)]
-            && ![(id)newParent canUseRenderbuffer]) 
-        {
-            if (!hasConverter) {
-                _inputImage = [[GPUImage alloc] init];
-                hasConverter = YES;
-            }
-        } else {
-            hasConverter = NO;
-        }
-        if (hasConverter) {
-            [(GPUImage *)_inputImage setInputImage:newParent];
-        } else {
-            _inputImage = newParent;
-        }
-        timeLastChanged = 0;
-        if ([_inputImage respondsToSelector:@selector(setLayer:)]) {
+        _inputImage = [newParent sourceAsRenderbuffer];
+        NSAssert([_inputImage respondsToSelector:@selector(setLayer:)],
+            @"Input to GPUImageView must allow setLayer:");
             [(id)_inputImage setLayer:(CAEAGLLayer *)self.layer];
-        }
+        timeLastChanged = 0;
     }
 }
 
