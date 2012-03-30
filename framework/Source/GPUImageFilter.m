@@ -20,6 +20,23 @@
     return YES;
 }
 
+// There are a few case (e.g. iterative filters) that can't declare
+// themselves as renderbuffers arbitrarily. In those cases, we insert a
+// GPUImage converter object into the chain.
+
+- (id <GPUImageSource>) sourceAsRenderbuffer
+{
+    if (self.canUseRenderbuffer) {
+        self.usesRenderbuffer = YES;
+        return self;
+    } else {
+        GPUImage *adapter = [[GPUImage alloc] init];
+        adapter.inputImage = self;
+        adapter.usesRenderbuffer = YES;
+        return adapter;
+    }
+}
+
 #pragma mark -
 #pragma mark Rendering and drawing
 
