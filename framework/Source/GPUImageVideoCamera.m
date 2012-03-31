@@ -1,7 +1,8 @@
+#import <objc/runtime.h>
 #import "GPUImageVideoCamera.h"
 #import "GPUImageTexture.h"
 #import "GPUImageOpenGLESContext.h"
-#import <objc/runtime.h>
+#import "GPUImage.h"
 
 #pragma mark -
 #pragma mark Private methods and instance variables
@@ -239,6 +240,14 @@
 - (GPUImageTimestamp) timeLastChanged
 {
     return timeLastChanged;
+}
+
+- (id<GPUImageSource>) sourceAsRenderbuffer
+{
+    GPUImage *adapter = [[GPUImage alloc] init];
+    adapter.inputImage = self;
+    adapter.usesRenderbuffer = YES;
+    return adapter;
 }
 
 @end

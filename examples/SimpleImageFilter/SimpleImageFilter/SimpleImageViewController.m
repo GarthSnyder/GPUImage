@@ -43,15 +43,14 @@
 {
     UIImage *inputImage = [UIImage imageNamed:@"WID-small.jpg"]; // The WID.jpg example is greater than 2048 pixels tall, so it fails on older devices
     
-    sourcePicture = [[GPUImagePicture alloc] initWithImage:inputImage smoothlyScaleOutput:YES];
+    sourcePicture = [[GPUImagePicture alloc] initWithImage:inputImage];
     sepiaFilter = [[GPUImageSepiaFilter alloc] init];
     
     GPUImageView *imageView = (GPUImageView *)self.view;
     
-    [sourcePicture addTarget:sepiaFilter];
-    [sepiaFilter addTarget:imageView];
-
-    [sourcePicture processImage];
+    sepiaFilter.inputImage = sourcePicture;
+    imageView.inputImage = sepiaFilter;
+    [imageView update];
 }
 
 - (void)setupImageFilteringToDisk;
@@ -68,10 +67,10 @@
 //    GPUImageKuwaharaFilter *stillImageFilter = [[GPUImageKuwaharaFilter alloc] init];
 //    stillImageFilter.radius = 9;
     
-    [stillImageSource addTarget:stillImageFilter];
-    [stillImageSource processImage];
+    stillImageFilter.inputImage = stillImageSource;
+    [stillImageFilter update];
     
-    UIImage *currentFilteredVideoFrame = [stillImageFilter imageFromCurrentlyProcessedOutput];
+    UIImage *currentFilteredVideoFrame = [stillImageFilter getUIImage];
     
     // Do a simpler image filtering
 //    GPUImageSepiaFilter *stillImageFilter2 = [[GPUImageSepiaFilter alloc] init];

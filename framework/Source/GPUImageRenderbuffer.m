@@ -8,6 +8,8 @@
 }
 @end
 
+static GLint lastBoundRenderbuffer = -1;
+
 @implementation GPUImageRenderbuffer
 
 - (id) initWithSize:(GLsize)size baseFormat:(GLenum)format
@@ -18,6 +20,7 @@
         glRenderbufferStorage(GL_RENDERBUFFER, format, size.width, size.height);
         _size = size;
         _format = format;
+        lastBoundRenderbuffer = _handle;
     }
     return self;
 }
@@ -27,6 +30,7 @@
     if (self = [super init]) {
         glGenRenderbuffers(1, &_handle);
         glBindRenderbuffer(GL_RENDERBUFFER, _handle);
+        lastBoundRenderbuffer = _handle;
         [[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext].context 
             renderbufferStorage:GL_RENDERBUFFER fromDrawable:layer];
         glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_size.width);
@@ -38,8 +42,9 @@
 
 - (void) bind
 {
-    if (_handle) {
+    if (_handle != lastBoundRenderbuffer) {
         glBindRenderbuffer(GL_RENDERBUFFER, _handle);
+        lastBoundRenderbuffer = _handle;
     }
 }
 

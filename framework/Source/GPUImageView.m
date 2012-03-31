@@ -62,10 +62,14 @@
 - (void) setInputImage:(id <GPUImageSource>)newParent
 {
     if (_inputImage != newParent) {
-        _inputImage = [newParent sourceAsRenderbuffer];
-        NSAssert([_inputImage respondsToSelector:@selector(setLayer:)],
-            @"Input to GPUImageView must allow setLayer:");
-        [(id)_inputImage setLayer:(CAEAGLLayer *)self.layer];
+        if (newParent) {
+            _inputImage = [newParent sourceAsRenderbuffer];
+            NSAssert([_inputImage respondsToSelector:@selector(setLayer:)],
+                @"Input to GPUImageView must allow setLayer:");
+            [(id)_inputImage setLayer:(CAEAGLLayer *)self.layer];
+        } else {
+            _inputImage = nil;
+        }
         timeLastChanged = 0;
     }
 }

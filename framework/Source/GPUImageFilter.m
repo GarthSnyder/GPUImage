@@ -37,6 +37,13 @@
     }
 }
 
+- (void) setUsesRenderbuffer:(BOOL)use
+{
+    NSAssert(!use || [self canUseRenderbuffer],
+        @"This filter cannot use a renderbuffer-based canvas.");
+    [super setUsesRenderbuffer:use];
+}
+
 #pragma mark -
 #pragma mark Rendering and drawing
 
@@ -71,6 +78,7 @@
     glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Render: %s (GPUImageFilter)", 
         class_getName([self class])] UTF8String]);
     [self bindAsFramebuffer];
+    [self clearFramebuffer];
     [self drawWithProgram:self.program];
     timeLastChanged = GPUImageGetCurrentTimestamp();
     glPopGroupMarkerEXT();
@@ -80,6 +88,11 @@
 - (GPUImageTimestamp) timeLastChanged
 {
     return timeLastChanged;
+}
+
+- (void) dealloc
+{
+    NSLog(@"GPUImageFilter dealloc");
 }
 
 #pragma mark -

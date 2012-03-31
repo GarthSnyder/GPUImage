@@ -7,6 +7,7 @@
 @synthesize size = _size;
 @synthesize baseFormat = _baseFormat;
 @synthesize pixType = _pixType;
+@synthesize backgroundColor = _backgroundColor;
 
 @synthesize usesRenderbuffer = _usesRenderbuffer;
 @synthesize generatesMipmap = _generatesMipmap;
@@ -27,6 +28,7 @@
         self.filter = GL_LINEAR;
         self.wrap = GL_CLAMP_TO_EDGE;
         self.pixType = GL_UNSIGNED_BYTE;
+        self.backgroundColor = (vec4) {0.0, 0.0, 0.0, 1.0};
     }
     return self;
 }
@@ -213,8 +215,7 @@
 
 - (void) clearFramebuffer
 {
-    vec4 opaqueBlack = {0.0, 0.0, 0.0, 1.0};
-    [self clearFramebuffer:opaqueBlack];
+    [self clearFramebuffer:self.backgroundColor];
 }
 
 #pragma mark -

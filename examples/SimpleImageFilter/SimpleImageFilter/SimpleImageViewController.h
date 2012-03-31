@@ -1,5 +1,5 @@
 #import <UIKit/UIKit.h>
-#import "GPUImage.h"
+#import "GPUImageHeaders.h"
 
 @interface SimpleImageViewController : UIViewController
 {

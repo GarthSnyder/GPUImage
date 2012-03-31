@@ -16,12 +16,15 @@ typedef enum { GPUIMAGE_SATURATION, GPUIMAGE_CONTRAST, GPUIMAGE_BRIGHTNESS, GPUI
     GPUImagePicture *sourcePicture;
     GPUImageShowcaseFilterType filterType;
     
+    CFAbsoluteTime totalFrameTimeDuringCapture;
+    int numberOfFrames;
+    
     GPUImageFilterPipeline *pipeline;
     
     __unsafe_unretained UISlider *_filterSettingsSlider;
 }
 
-@property(readwrite, unsafe_unretained, nonatomic) IBOutlet UISlider *filterSettingsSlider;
+@property (readwrite, unsafe_unretained, nonatomic) IBOutlet UISlider *filterSettingsSlider;
 
 // Initialization and teardown
 - (id)initWithFilterType:(GPUImageShowcaseFilterType)newFilterType;
