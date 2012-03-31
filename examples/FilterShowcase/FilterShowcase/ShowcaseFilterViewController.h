@@ -71,6 +71,9 @@ typedef enum {
     GPUImagePicture *sourcePicture;
     GPUImageShowcaseFilterType filterType;
     
+    CFAbsoluteTime totalFrameTimeDuringCapture;
+    int numberOfFrames;
+    
     GPUImageFilterPipeline *pipeline;
     
     __unsafe_unretained UISlider *_filterSettingsSlider;

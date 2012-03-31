@@ -1,7 +1,7 @@
-
 #import "GPUImageVideoCamera.h"
 #import "GPUImageTexture.h"
 #import "GPUImageOpenGLESContext.h"
+#import "GPUImage.h"
 #import <objc/runtime.h>
 
 #pragma mark -
@@ -334,6 +334,14 @@
     [_captureSession commitConfiguration];
     
     [super setAudioEncodingTarget:newValue];
+}
+
+- (id<GPUImageSource>) sourceAsRenderbuffer
+{
+    GPUImage *adapter = [[GPUImage alloc] init];
+    adapter.inputImage = self;
+    adapter.usesRenderbuffer = YES;
+    return adapter;
 }
 
 @end

@@ -63,6 +63,8 @@
         
         // Set up a few global settings for the image processing pipeline
         glDisable(GL_DEPTH_TEST);
+        // Not valid for OpenGL ES, see khronos.org/opengles/sdk/docs/man
+        // glEnable(GL_TEXTURE_2D);
     }
     
     return _context;

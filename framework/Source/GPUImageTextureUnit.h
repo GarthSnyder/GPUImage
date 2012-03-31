@@ -20,6 +20,7 @@
 // don't randomly affect a random texture unit.
 
 + (void) activateScratchUnit;
++ (GLint) maxTextureUnits;
 
 - (id) initWithTextureUnitNumber:(NSUInteger)tNum;
 - (void) bindTexture:(GPUImageTexture *)texture;

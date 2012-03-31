@@ -18,6 +18,7 @@
 @property (nonatomic) GLsize size;
 @property (nonatomic) GLenum baseFormat;    // GL_RGBA, etc.
 @property (nonatomic) GLenum pixType;       // GL_UNSIGNED_BYTE, etc.
+@property (nonatomic) vec4 backgroundColor;
 
 // Setting an associated layer automatically turns on usesRenderbuffer and
 // prepares the GPUImage object for rendering to an onscreen view.

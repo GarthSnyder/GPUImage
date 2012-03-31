@@ -60,6 +60,7 @@ static GPUImageProgram *copyProgram;
     NSAssert([self.inputImage canvas], @"Input image has no canvas; should never happen.");
     if ([self inputImageRequiresConversion]) {
         [self bindAsFramebuffer];
+        [self clearFramebuffer];
         if (!copyProgram) {
             copyProgram = [[GPUImageProgram alloc] init];
         }
@@ -109,6 +110,11 @@ static GPUImageProgram *copyProgram;
 - (GPUImageCanvas *) canvas 
 {
     return _canvas;
+}
+
+-(id<GPUImageSource>) sourceAsRenderbuffer
+{
+    return self;
 }
 
 @end

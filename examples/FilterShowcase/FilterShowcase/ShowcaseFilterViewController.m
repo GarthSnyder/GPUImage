@@ -1,6 +1,8 @@
 #import "ShowcaseFilterViewController.h"
 #import "GPUImageProgram.h"
 
+__weak GPUImageFilter *lastFilter;
+
 @implementation ShowcaseFilterViewController
 
 #pragma mark -
@@ -34,7 +36,8 @@
 {
     // Note: I needed to stop camera capture before the view went off the screen in order to prevent a crash from the camera still sending frames
     [videoCamera stopCameraCapture];
-    
+    GPUImageView *filterView = (GPUImageView *)self.view;
+    filterView.inputImage = nil; // Allow filter chain to be released
 	[super viewWillDisappear:animated];
 }
 
@@ -42,6 +45,11 @@
 {
     [super viewDidUnload];
     
+}
+
+- (void) dealloc
+{
+    NSLog(@"Showcase dealloc");
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -55,6 +63,8 @@
     videoCamera.delegate = self;
     GPUImageRotationFilter *rotationFilter = [[GPUImageRotationFilter alloc] init];
     rotationFilter.rotationMode = kGPUImageRotateRight;
+    numberOfFrames = -10; // Skip first 10
+    totalFrameTimeDuringCapture = 0;
 
     switch (filterType)
     {
@@ -684,7 +694,14 @@
 
 - (void)videoCameraDidReceiveNewFrame:(GPUImageVideoCamera *)camera
 {
+    CFAbsoluteTime startTime = CFAbsoluteTimeGetCurrent();
     [(GPUImageView *)self.view update];
+    CFAbsoluteTime currentFrameTime = (CFAbsoluteTimeGetCurrent() - startTime);
+    if (++numberOfFrames > 0) {
+        totalFrameTimeDuringCapture += currentFrameTime;
+        NSLog(@"Average frame time : %f ms", 1000.0 * (totalFrameTimeDuringCapture / numberOfFrames));
+    }
+    NSLog(@"Current frame time : %f ms", 1000.0 * currentFrameTime);
 }
 
 #pragma mark -

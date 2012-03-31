@@ -1,3 +1,4 @@
+#import <objc/runtime.h>
 #import "GPUImageMovie.h"
 #import "GPUImageMovieWriter.h"
 
@@ -208,6 +209,14 @@
 - (GPUImageTimestamp)timeLastChanged
 {
     return timeLastChanged;
+}
+
+- (id<GPUImageSource>) sourceAsRenderbuffer
+{
+    GPUImage *adapter = [[GPUImage alloc] init];
+    adapter.inputImage = self;
+    adapter.usesRenderbuffer = YES;
+    return adapter;
 }
 
 @end

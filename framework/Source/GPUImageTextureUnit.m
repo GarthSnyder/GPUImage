@@ -5,33 +5,24 @@
 
 static NSMutableArray *textureUnits = nil;
 static NSUInteger nextTextureUnit = 0;
+static GLint _maxTextureUnits = -1;
+static GLint _lastBoundTextureUnit = -1;
 
-// This should really be an OpenGL query, but for some reason the iOS 
-// implementation of OpenGL ES doesn't seem to define GL_MAX_TEXTURE_COORDS. 
-//
-// GL_MAX_TEXTURE_IMAGE_UNITS, GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, and
-// GL_MAX_TEXTURE_UNITS are not the numbers we need here, as they're all
-// concerned with how many texture units can be simultaneously USED.
-// We're just interested in how many texture unit NAMES are available.
-
-static GLint maxTextureUnits = 31;
+@interface GPUImageTextureUnit ()
++ (void) activateTextureUnit:(GLint)unit;
+@end
 
 @implementation GPUImageTextureUnit
 
 @synthesize currentTextureHandle = _currentTextureHandle;
 @synthesize textureUnitNumber = _textureUnitNumber;
 
-+ (void) activateScratchUnit
-{
-    glActiveTexture(GL_TEXTURE31);
-}
-
 + (GPUImageTextureUnit *) textureUnit
 {
     if (!textureUnits) {
         textureUnits = [NSMutableArray array];
     }
-    if (nextTextureUnit >= maxTextureUnits) {
+    if (nextTextureUnit >= self.maxTextureUnits) {
         nextTextureUnit = 0;
     }
     if ([textureUnits count] > nextTextureUnit) {
@@ -39,9 +30,31 @@ static GLint maxTextureUnits = 31;
         return [textureUnits objectAtIndex:(nextTextureUnit - 1)];
     }
     GPUImageTextureUnit *unit = [[GPUImageTextureUnit alloc] 
-        initWithTextureUnitNumber:nextTextureUnit++];
+                                 initWithTextureUnitNumber:nextTextureUnit++];
     [textureUnits addObject:unit];
     return unit;
+}
+
++ (void) activateTextureUnit:(GLint)unit
+{
+    if (_lastBoundTextureUnit != unit) {
+        glActiveTexture(GL_TEXTURE0 + unit);
+        _lastBoundTextureUnit = unit;
+    }
+}
+
++ (void) activateScratchUnit
+{
+    [self activateTextureUnit:self.maxTextureUnits];
+}
+
++ (GLint) maxTextureUnits
+{
+    if (_maxTextureUnits < 0) {
+        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &_maxTextureUnits);
+        _maxTextureUnits--; // Save one for scratch
+    }
+    return _maxTextureUnits;
 }
 
 - (id) initWithTextureUnitNumber:(NSUInteger)tNum
@@ -56,7 +69,7 @@ static GLint maxTextureUnits = 31;
 - (void) bindTexture:(GPUImageTexture *)texture
 {
     if (self.currentTextureHandle != texture.handle) {
-        glActiveTexture(self.textureUnitNumber + GL_TEXTURE0);
+        [GPUImageTextureUnit activateTextureUnit:self.textureUnitNumber];
         glBindTexture(GL_TEXTURE_2D, texture.handle);
         self.currentTextureHandle = texture.handle;
     }
