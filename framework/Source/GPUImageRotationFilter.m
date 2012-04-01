@@ -12,7 +12,7 @@
     return self;
 }
 
-- (void) setRotationMode:(GPUImageRotationMode)newMode
+- (void) setRotationMode:(GPUImageOutputOrientation)newMode
 {
     if (newMode != _rotationMode) {
         _rotationMode = newMode;
@@ -25,10 +25,7 @@
     // If no explicit size has been specified, inherit in orientation-specific way
     if (!self.size.width || !self.size.height) {
         GLsize newSize = other.canvas.size;
-        if ((_rotationMode == kGPUImageRotateLeft) 
-            || (_rotationMode == kGPUImageRotateRight)
-            || (_rotationMode == kGPUImageRotateRightFlipVertical))
-        {
+        if (_rotationMode & kGPUImageOutputOrientationSwapsDimensions) {
             newSize = (GLsize){newSize.height, newSize.width};
         }
         self.size = newSize;
@@ -96,7 +93,7 @@
         case kGPUImageFlipVertical: 
             texCoords = verticalFlipTextureCoordinates;
             break;
-        case kGPUImageRotateRightFlipVertical: 
+        case kGPUImageFlip45Degrees: 
             texCoords = rotateRightVerticalFlipTextureCoordinates;
             break;
         default:

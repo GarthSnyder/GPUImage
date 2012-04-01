@@ -12,6 +12,7 @@ static GPUImageProgram *copyProgram;
 @implementation GPUImage
 
 @synthesize inputImage = _inputImage;
+@synthesize outputOrientation = _outputOrientation;
 
 - (void) setInputImage:(id <GPUImageSource>)newParent
 {
@@ -65,7 +66,7 @@ static GPUImageProgram *copyProgram;
             copyProgram = [[GPUImageProgram alloc] init];
         }
         copyProgram.inputImage = self.inputImage;
-        [copyProgram draw];
+        [copyProgram drawWithOrientation:self.outputOrientation textureCoordinates:NULL];
         copyProgram.inputImage = nil;
     } else {
         _canvas = self.inputImage.canvas;

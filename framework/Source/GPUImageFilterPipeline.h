@@ -2,7 +2,7 @@
 #import "GPUImageFilter.h"
 
 // A pipeline is a linear arrangement of one-in/one-out image filters.
-// In effect, it is a filter wrapper that acts exactly like a filter.
+// In effect, it is a filter wrapper that acts like a filter.
 
 @interface GPUImageFilterPipeline : GPUImage
 

@@ -245,6 +245,97 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 #pragma mark -
 #pragma mark Drawing
 
+- (void) draw
+{
+    [self drawWithVertices:NULL textureCoordinates:NULL];
+}
+
+- (void) drawWithOrientation:(GPUImageOutputOrientation)orientation textureCoordinates:(const GLfloat *)t
+{
+    if (orientation == kGPUImageNoRotation) {
+        [self drawWithVertices:NULL textureCoordinates:t];
+        return;
+    }
+    
+    static const GLfloat rotateLeft[] = {
+        -1.0,  1.0,
+        -1.0, -1.0,
+        1.0,  1.0,
+        1.0, -1.0,
+    };
+
+    static const GLfloat rotateRight[] = {
+        1.0, -1.0,
+        1.0, 1.0,
+        -1.0, -1.0,
+        -1.0, 1.0
+    };
+
+    static const GLfloat rotate180Degrees[] = {
+        1.0, 1.0,
+        -1.0, 1.0,
+        1.0, -1.0,
+        -1.0, -1.0
+    };
+
+    static const GLfloat flipVertical[] = {
+        -1.0, 1.0,
+        1.0, 1.0,
+        -1.0,  -1.0,
+        1.0,  -1.0,
+    };
+
+    static const GLfloat flipHorizontal[] = {
+        1.0, -1.0,
+        -1.0, -1.0,
+        1.0,  1.0,
+        -1.0,  1.0,
+    };
+
+    static const GLfloat flip45Degrees[] = {
+        1.0, 1.0,
+        1.0, -1.0,
+        -1.0, 1.0,
+        -1.0, -1.0
+    };
+
+    static const GLfloat flipMinus45Degrees[] = {
+        -1.0, -1.0,
+        -1.0, 1.0,
+        1.0, -1.0,
+        1.0, 1.0
+    };
+
+    const GLfloat *vertices;
+    switch (orientation)
+    {
+        case kGPUImageRotateLeft: 
+            vertices = rotateLeft;
+            break;
+        case kGPUImageRotateRight: 
+            vertices = rotateRight;
+            break;
+        case kGPUImageRotate180Degrees:
+            vertices = rotate180Degrees;
+            break;
+        case kGPUImageFlipHorizonal: 
+            vertices = flipHorizontal;
+            break;
+        case kGPUImageFlipVertical: 
+            vertices = flipVertical;
+            break;
+        case kGPUImageFlip45Degrees: 
+            vertices = flip45Degrees;
+            break;
+        case kGPUImageFlipMinus45Degrees: 
+            vertices = flipMinus45Degrees;
+            break;
+        default:
+            NSAssert1(NO, @"Unknown orientation: %d", (int)orientation);
+    }
+    [self drawWithVertices:vertices textureCoordinates:NULL];
+}
+
 - (void) drawWithVertices:(const GLfloat *)v textureCoordinates:(const GLfloat *)t
 {
     static const GLfloat squareVertices[] = {
@@ -283,11 +374,6 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     glEnableVertexAttribArray(itc);
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);    
-}
-
-- (void) draw
-{
-    [self drawWithVertices:NULL textureCoordinates:NULL];
 }
 
 #pragma mark -
