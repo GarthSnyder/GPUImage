@@ -28,6 +28,7 @@
 }
 
 @property (nonatomic, retain) GPUImageProgram *program;
+@property (nonatomic) GPUImageOutputOrientation outputOrientation;
 
 // These properties are defined for convenience. They will not necessarily
 // be used by all filters. Values are passed on to the OpenGL program.

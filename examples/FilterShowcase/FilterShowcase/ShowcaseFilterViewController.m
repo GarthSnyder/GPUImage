@@ -61,8 +61,6 @@ __weak GPUImageFilter *lastFilter;
 {
     videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset640x480 cameraPosition:AVCaptureDevicePositionBack];
     videoCamera.delegate = self;
-    GPUImageRotationFilter *rotationFilter = [[GPUImageRotationFilter alloc] init];
-    rotationFilter.rotationMode = kGPUImageRotateRightFlipVertical;
     numberOfFrames = -10; // Skip first 10
     totalFrameTimeDuringCapture = 0;
 
@@ -515,22 +513,19 @@ __weak GPUImageFilter *lastFilter;
         self.title = @"File Configuration";
         pipeline = [[GPUImageFilterPipeline alloc] initWithConfigurationFile:[[NSBundle mainBundle] URLForResource:@"SampleConfiguration" withExtension:@"plist"]];
         pipeline.inputImage = videoCamera;
-        [pipeline.filters insertObject:rotationFilter atIndex:0];
+        [pipeline.filters insertObject:videoCamera atIndex:0];
+        pipeline.outputOrientation = kGPUImageFlip45Degrees;
     } 
     else 
     {
-        rotationFilter.inputImage = videoCamera;
-        filter.inputImage = rotationFilter;
-        // videoCamera.runBenchmark = YES;
+        filter.inputImage = videoCamera;
+        filter.outputOrientation = kGPUImageFlip45Degrees;
         
-        if (filterType != GPUIMAGE_UNSHARPMASK)
-        {
-            // The picture is only used for two-image blend filters
-            UIImage *inputImage = [UIImage imageNamed:@"WID-small.jpg"];
-            sourcePicture = [[GPUImagePicture alloc] initWithImage:inputImage];
-            // sourcePicture.generatesMipmap = YES;
-            filter.auxilliaryImage = sourcePicture;
-        }
+        // Only used for two-image blend filters
+        UIImage *inputImage = [UIImage imageNamed:@"WID-small.jpg"];
+        sourcePicture = [[GPUImagePicture alloc] initWithImage:inputImage];
+        // sourcePicture.generatesMipmap = YES;
+        filter.auxilliaryImage = sourcePicture;
     } 
     GPUImageView *filterView = (GPUImageView *)self.view;
     filterView.inputImage = filter;

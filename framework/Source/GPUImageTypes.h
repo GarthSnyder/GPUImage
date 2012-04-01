@@ -8,6 +8,19 @@ typedef unsigned int GPUImageTimestamp;
 
 GPUImageTimestamp GPUImageGetCurrentTimestamp(void);
 
+typedef enum { 
+    kGPUImageNoRotation = 0,
+    kGPUImageRotateLeft = 1, 
+    kGPUImageRotateRight = 3,
+    kGPUImageRotate180Degrees = 2,
+    kGPUImageFlipVertical = 4, 
+    kGPUImageFlipHorizonal = 6, 
+    kGPUImageFlip45Degrees = 5,
+    kGPUImageFlipMinus45Degrees = 7,
+} GPUImageOutputOrientation;
+
+#define kGPUImageOutputOrientationSwapsDimensions 0x1
+
 // Composite types that are valid as uniforms. (Arrays of these types are
 // also valid.)
 //

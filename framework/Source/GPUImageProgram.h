@@ -52,6 +52,7 @@
 
 // Basic two-triangle drawing - includes use
 - (void) draw;
+- (void) drawWithOrientation:(GPUImageOutputOrientation)orientation textureCoordinates:(const GLfloat *)t;
 - (void) drawWithVertices:(const GLfloat *)v textureCoordinates:(const GLfloat *)t;
 
 // This is the primary interface for setting attrs/uniforms and executing.

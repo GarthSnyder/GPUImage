@@ -31,6 +31,7 @@
 }
 
 @property (nonatomic, retain) id <GPUImageSource> inputImage;
+@property (nonatomic) GPUImageOutputOrientation outputOrientation;
 
 - (void) render;
 

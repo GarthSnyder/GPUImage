@@ -5,6 +5,7 @@
 @implementation GPUImageFilter
 
 @synthesize program;
+@synthesize outputOrientation = _outputOrientation;
 @dynamic inputImage, auxilliaryImage;
 
 - (id) init
@@ -42,6 +43,21 @@
     NSAssert(!use || [self canUseRenderbuffer],
         @"This filter cannot use a renderbuffer-based canvas.");
     [super setUsesRenderbuffer:use];
+}
+
+// Support orientations that flip dimensions
+- (void) adoptParametersFrom:(id<GPUImageSource>)other
+{
+    GPUImageCanvas *obs = other.canvas;
+    
+    if (!self.size.width || !self.size.height) {
+        if (self.outputOrientation & kGPUImageOutputOrientationSwapsDimensions) {
+            self.size = (GLsize) {obs.size.height, obs.size.width};
+        } else {
+            self.size = obs.size;
+        }
+    }
+    [super adoptParametersFrom:other];
 }
 
 #pragma mark -
@@ -86,7 +102,7 @@
 
 - (void) draw
 {
-    [self.program draw];
+    [self.program drawWithOrientation:self.outputOrientation textureCoordinates:NULL];
 }
 
 - (GPUImageTimestamp) timeLastChanged
