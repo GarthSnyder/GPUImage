@@ -17,7 +17,7 @@
     return [self initWithCropRegion:CGRectMake(0.0, 0.0, 1.0, 1.0)];
 }
 
-- (void) drawWithProgram:(GPUImageProgram *)prog
+- (void) draw
 {
     GLfloat cropTextureCoordinates[] = {
         _cropRegion.origin.x, _cropRegion.origin.y,
@@ -26,7 +26,7 @@
         CGRectGetMaxX(_cropRegion), CGRectGetMaxY(_cropRegion),
     };
 
-    [self drawWithProgram:prog vertices:NULL textureCoordinates:cropTextureCoordinates];
+    [self.program drawWithVertices:NULL textureCoordinates:cropTextureCoordinates];
 }
 
 @end

@@ -92,7 +92,7 @@ NSString *const kGPUImageSobelEdgeDetectionFragmentShaderString = SHADER_STRING
 - (id) init
 {
     if (self = [super init]) {
-        self.program.fragmentShader = kGPUImageSobelEdgeDetectionVertexShaderString;
+        self.program.vertexShader = kGPUImageSobelEdgeDetectionVertexShaderString;
         self.program.fragmentShader = kGPUImageSobelEdgeDetectionFragmentShaderString;
         GPUImageGrayscaleFilter *grayFilter = [[GPUImageGrayscaleFilter alloc] init];
         self.inputImage = grayFilter;
@@ -100,7 +100,7 @@ NSString *const kGPUImageSobelEdgeDetectionFragmentShaderString = SHADER_STRING
     return self;
 }
 
-- (BOOL) render
+- (void) draw
 {
     if (![self.program valueForKey:@"imageWidthFactor"]
         || ![self.program valueForKey:@"imageHeightFactor"])
@@ -108,7 +108,7 @@ NSString *const kGPUImageSobelEdgeDetectionFragmentShaderString = SHADER_STRING
         self.imageWidthFactor = self.size.width;
         self.imageHeightFactor = self.size.height;
     }
-    return [super render];
+    [super draw];
 }
 
 // Normally we'd set this on our own program, but here, we pass it along as

@@ -35,7 +35,10 @@
 @property (nonatomic, retain) id <GPUImageSource> inputImage;
 @property (nonatomic, retain) id <GPUImageSource> auxilliaryImage;
 
-- (BOOL) render;
+// Render = bind framebuffer and draw
+- (void) render;
+- (void) draw;
+
 - (BOOL) canUseRenderbuffer;
 
 // Still image processing convenience methods

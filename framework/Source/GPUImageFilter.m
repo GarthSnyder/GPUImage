@@ -68,21 +68,25 @@
     }
     if (needsRender) {
         [self adoptParametersFrom:self.inputImage];
-        return [self render];
+        [self render];
     }
     return YES;
 }
 
-- (BOOL) render
+- (void) render
 {
     glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Render: %s (GPUImageFilter)", 
         class_getName([self class])] UTF8String]);
     [self bindAsFramebuffer];
     [self clearFramebuffer];
-    [self drawWithProgram:self.program];
+    [self draw];
     timeLastChanged = GPUImageGetCurrentTimestamp();
     glPopGroupMarkerEXT();
-    return YES;
+}
+
+- (void) draw
+{
+    [self.program draw];
 }
 
 - (GPUImageTimestamp) timeLastChanged

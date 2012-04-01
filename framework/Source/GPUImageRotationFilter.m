@@ -36,7 +36,7 @@
     [super adoptParametersFrom:other];
 }
 
-- (void) drawWithProgram:(id)prog
+- (void) draw
 {
     static const GLfloat rotationSquareVertices[] = {
         -1.0f, -1.0f,
@@ -103,7 +103,7 @@
             NSAssert1(NO, @"Bad rotation mode: %d", (int)_rotationMode);
     }
 
-    [self drawWithProgram:self.program vertices:rotationSquareVertices textureCoordinates:texCoords];
+    [self.program drawWithVertices:rotationSquareVertices textureCoordinates:texCoords];
 }
 
 @end

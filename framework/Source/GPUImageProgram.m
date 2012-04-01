@@ -48,6 +48,8 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 @implementation GPUImageProgram
 
+@synthesize delegate = _delegate;
+
 #pragma mark -
 #pragma mark Initialization and shader specification
 
@@ -238,6 +240,54 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
         glPopGroupMarkerEXT();
     }
     return status;
+}
+
+#pragma mark -
+#pragma mark Drawing
+
+- (void) drawWithVertices:(const GLfloat *)v textureCoordinates:(const GLfloat *)t
+{
+    static const GLfloat squareVertices[] = {
+        -1.0, -1.0,
+        1.0, -1.0,
+        -1.0,  1.0,
+        1.0,  1.0,
+    };
+    
+    static const GLfloat squareTextureCoordinates[] = {
+        0.0,  0.0,
+        1.0,  0.0,
+        0.0,  1.0,
+        1.0,  1.0,
+    };
+    
+    if (!v) {
+        v = squareVertices;
+    }
+    if (!t) {
+        t = squareTextureCoordinates;
+    }
+
+    if (self.delegate) {
+        [self.delegate programWillDraw:self];
+    }
+    [self use];
+    
+    GLint position = [self indexOfAttribute:@"position"];
+    GLint itc = [self indexOfAttribute:@"inputTextureCoordinate"];
+    
+    glVertexAttribPointer(position, 2, GL_FLOAT, 0, 0, v);
+    glEnableVertexAttribArray(position);
+    
+    glVertexAttribPointer(itc, 2, GL_FLOAT, 0, 0, t);
+    glEnableVertexAttribArray(itc);
+    
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);    
+}
+
+- (void) draw
+{
+    [self drawWithVertices:NULL textureCoordinates:NULL];
 }
 
 #pragma mark -

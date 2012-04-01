@@ -43,9 +43,6 @@
 - (void) clearFramebuffer;                       // Also binds
 - (void) clearFramebuffer:(vec4)backgroundColor; // Also binds
 
-- (void) drawWithProgram:(GPUImageProgram *)prog;
-- (void) drawWithProgram:(GPUImageProgram *)prog vertices:(const GLfloat *)v textureCoordinates:(const GLfloat *)t;
-
 // Adopts size and base format only, and only if receiver's are unknown
 - (void) adoptParametersFrom:(id <GPUImageSource>)other;
 

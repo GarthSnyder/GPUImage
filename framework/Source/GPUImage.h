@@ -32,6 +32,6 @@
 
 @property (nonatomic, retain) id <GPUImageSource> inputImage;
 
-- (BOOL) render;
+- (void) render;
 
 @end

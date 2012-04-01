@@ -1,6 +1,6 @@
 #import "GPUImageFilter.h"
 
-@interface GPUImageFastBlurFilter : GPUImageFilter
+@interface GPUImageFastBlurFilter : GPUImageFilter <GPUImageProgramDelegate>
 {
     GPUImageFilter *stageOne;
 }
