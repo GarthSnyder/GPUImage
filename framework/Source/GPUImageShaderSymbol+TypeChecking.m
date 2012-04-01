@@ -66,7 +66,7 @@
 // floats, whether that's an array of size 4, a struct of 4 floats, or an
 // array of 2 structs with 2 floats each.
 
-- (BOOL) valueTypeMatchesOESType
+- (BOOL) valueTypeMatchesOpenGLType
 {
     NSValue *myValue = self.value;
     NSString *objCType = [NSString stringWithCString:myValue.objCType 
@@ -75,12 +75,12 @@
     if (![self objCTypeIsHomogenous:objCType]) {
         return NO;
     }
-    NSString *oesTypeEncoding = [self flattenedObjCTypeForOESType:self.type];
-    if ([oesTypeEncoding characterAtIndex:0] != [objCType characterAtIndex:0]) {
+    NSString *openGLTypeEncoding = [self flattenedObjCTypeForOpenGLType:self.type];
+    if ([openGLTypeEncoding characterAtIndex:0] != [objCType characterAtIndex:0]) {
         return NO;
     }
-    int oesTypeLength = [oesTypeEncoding length];
-    int totalLength = oesTypeLength * self.count;
+    int openGLTypeLength = [openGLTypeEncoding length];
+    int totalLength = openGLTypeLength * self.count;
     return totalLength == [objCType length];
 }
 
@@ -99,7 +99,7 @@
     return YES;
 }
 
-- (NSString *) flattenedObjCTypeForOESType:(GLenum)type
+- (NSString *) flattenedObjCTypeForOpenGLType:(GLenum)type
 {
     switch (type) {
         case GL_FLOAT:

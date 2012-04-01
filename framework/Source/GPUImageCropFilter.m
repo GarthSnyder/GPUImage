@@ -26,7 +26,8 @@
         CGRectGetMaxX(_cropRegion), CGRectGetMaxY(_cropRegion),
     };
 
-    [self.program drawWithVertices:NULL textureCoordinates:cropTextureCoordinates];
+    [self.program drawWithOrientation:self.outputOrientation
+                   textureCoordinates:cropTextureCoordinates];
 }
 
 @end

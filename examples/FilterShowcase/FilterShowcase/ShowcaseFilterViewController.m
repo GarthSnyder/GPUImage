@@ -1,8 +1,6 @@
 #import "ShowcaseFilterViewController.h"
 #import "GPUImageProgram.h"
 
-__weak GPUImageFilter *lastFilter;
-
 @implementation ShowcaseFilterViewController
 
 #pragma mark -
@@ -45,11 +43,6 @@ __weak GPUImageFilter *lastFilter;
 {
     [super viewDidUnload];
     
-}
-
-- (void) dealloc
-{
-    NSLog(@"Showcase dealloc");
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -527,10 +520,10 @@ __weak GPUImageFilter *lastFilter;
         // sourcePicture.generatesMipmap = YES;
         filter.auxilliaryImage = sourcePicture;
     } 
+    
     GPUImageView *filterView = (GPUImageView *)self.view;
     filterView.inputImage = filter;
-    lastFilter = filter;
-    [videoCamera startCameraCapture];    
+    [videoCamera startCameraCapture];
 }
 
 - (void)videoCameraDidReceiveNewFrame:(GPUImageVideoCamera *)camera

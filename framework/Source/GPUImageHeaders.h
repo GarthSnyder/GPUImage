@@ -10,7 +10,6 @@
 
 // Filters
 #import "GPUImageFilter.h"
-#import "GPUImageRotationFilter.h"
 #import "GPUImagePixellateFilter.h"
 #import "GPUImageSepiaFilter.h"
 #import "GPUImageColorInvertFilter.h"

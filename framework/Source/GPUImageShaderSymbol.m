@@ -2,7 +2,7 @@
 #import "GPUImageShaderSymbol+TypeChecking.h"
 
 @interface GPUImageShaderSymbol ()
-- (void) setOESTextureValue;
+- (void) setOpenGLTextureValue;
 @end
 
 @implementation GPUImageShaderSymbol
@@ -13,14 +13,14 @@
 @synthesize count = _count;
 @synthesize textureUnit = _textureUnit;
 @synthesize value = _value;
-@synthesize knowsOESDetails = _knowsOESDetails;
+@synthesize knowsOpenGLDetails = _knowsOpenGLDetails;
 @synthesize dirty = _dirty;
 
 - (id) init
 {
     self = [super init];
     self.index = -1;
-    // Start dirty because OES binding isn't initially known.
+    // Start dirty because OpenGL binding isn't initially known.
     self.dirty = YES;
     return self;
 }
@@ -29,6 +29,15 @@
 {
     _value = value;
     self.dirty = YES;
+}
+
+- (BOOL) dirty 
+{
+    if (self.knowsOpenGLDetails && (self.index < 0)) {
+        // Invalid uniforms can never be dirty
+        return NO;
+    }
+    return _dirty;
 }
 
 - (GPUImageTextureUnit *) textureUnit
@@ -42,9 +51,9 @@
 
 // Retrieve uniform information from OpenGL if necessary.
 
-- (void) gatherOESDetailsForProgram:(GLint)program
+- (void) gatherOpenGLDetailsForProgram:(GLint)program
 {
-    if (self.knowsOESDetails) {
+    if (self.knowsOpenGLDetails) {
         return;
     }
     const char *name = [_name UTF8String];
@@ -52,25 +61,25 @@
     if (self.index >= 0) { // Allow unused uniforms
         glGetActiveUniform(program, self.index, 0, NULL, &_count, &_type, NULL);
     }
-    self.knowsOESDetails = YES;
+    self.knowsOpenGLDetails = YES;
 }
 
-// Communicate uniform value to OES. The relevant program context must already
+// Communicate uniform value to OpenGL. The relevant program context must already
 // be set up.
 
-- (void) setOESValue
+- (void) setOpenGLValue
 {
     if (!self.dirty || (self.index < 0)) {
         return;
     }
     if ([self.value conformsToProtocol:@protocol(GPUImageSource)]) {
-        [self setOESTextureValue];
+        [self setOpenGLTextureValue];
         return;
     }
     
     NSAssert1([self.value isKindOfClass:[NSValue class]], 
         @"Value of uniform '%@' is neither NSValue nor texture provider.", _name);
-    NSAssert1([self valueTypeMatchesOESType], 
+    NSAssert1([self valueTypeMatchesOpenGLType], 
         @"Value provided for uniform '%@' appears to be of wrong type.", _name);
 
     NSValue *value = self.value;
@@ -145,7 +154,7 @@
     self.dirty = NO;
 }
 
-- (void) setOESTextureValue
+- (void) setOpenGLTextureValue
 {
     id <GPUImageSource> tBuff = self.value;
     GPUImageTexture *texture = (GPUImageTexture *)tBuff.canvas;
@@ -157,6 +166,7 @@
         [_textureUnit bindTexture:texture];
         glUniform1i(self.index, self.textureUnit.textureUnitNumber);
     }
+    self.dirty = NO;
 }
 
 @end

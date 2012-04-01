@@ -14,7 +14,7 @@ typedef enum {
     kGPUImageRotateRight = 3,
     kGPUImageRotate180Degrees = 2,
     kGPUImageFlipVertical = 4, 
-    kGPUImageFlipHorizonal = 6, 
+    kGPUImageFlipHorizontal = 6, 
     kGPUImageFlip45Degrees = 5,
     kGPUImageFlipMinus45Degrees = 7,
 } GPUImageOutputOrientation;

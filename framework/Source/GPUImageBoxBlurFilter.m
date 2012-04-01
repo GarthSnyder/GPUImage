@@ -79,24 +79,28 @@ NSString *const kGPUImageBoxBlurFragmentShaderString = SHADER_STRING
         stageOne = [[GPUImageFilter alloc] init];
         stageOne.program.vertexShader = kGPUImageBoxBlurVertexShaderString;
         stageOne.program.fragmentShader = kGPUImageBoxBlurFragmentShaderString;
+        stageOne.program.delegate = self;
         
         self.program.vertexShader = kGPUImageBoxBlurVertexShaderString;
         self.program.fragmentShader = kGPUImageBoxBlurFragmentShaderString;
+        self.program.delegate = self;
         
         self.program.inputImage = stageOne;
     }
     return self;
 }
 
-- (BOOL) update
+// Defer setting size-related parameters as long as possible since sizes are lazy
+- (void) programWillDraw:(GPUImageProgram *)prog
 {
-    [stageOne.inputImage update];
     GLsize pSize = stageOne.inputImage.canvas.size;
-    [stageOne setValue:[NSNumber numberWithFloat:(1.0/pSize.width)] forKey:@"texelWidthOffset"];
-    [stageOne setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelHeightOffset"];
-    [self.program setValue:[NSNumber numberWithFloat:(1.0/pSize.height)] forKey:@"texelHeightOffset"];
-    [self.program setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelWidthOffset"];
-    return [super update];
+    if (prog == self.program) {
+        [prog setValue:[NSNumber numberWithFloat:(1.0/pSize.height)] forKey:@"texelHeightOffset"];
+        [prog setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelWidthOffset"];
+    } else {
+        [prog setValue:[NSNumber numberWithFloat:(1.0/pSize.width)] forKey:@"texelWidthOffset"];
+        [prog setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelHeightOffset"];
+    }
 }
      
 - (void) setInputImage:(id <GPUImageSource>)img

@@ -199,7 +199,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 {
     if (inputImage) {
         [inputImage update];
-        if (timeLastChanged < [inputImage timeLastChanged]) {
+        if (timeLastChanged <= [inputImage timeLastChanged]) {
             [self render];
         }
     }

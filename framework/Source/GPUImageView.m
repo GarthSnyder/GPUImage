@@ -81,7 +81,7 @@
     }
     glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Update: %s (GPUImageView)", 
         class_getName([self class])] UTF8String]);
-    if (timeLastChanged < self.inputImage.timeLastChanged) {
+    if (timeLastChanged <= self.inputImage.timeLastChanged) {
         [GPUImageOpenGLESContext useImageProcessingContext];
         [self.inputImage.canvas bind];
         [[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] 
