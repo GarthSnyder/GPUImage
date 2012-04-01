@@ -8,9 +8,9 @@
 
 @interface GPUImageShaderSymbol (TypeChecking)
 
-- (BOOL) valueTypeMatchesOESType;
+- (BOOL) valueTypeMatchesOpenGLType;
 - (NSString *) flattenedObjCType:(NSString *)type;
-- (NSString *) flattenedObjCTypeForOESType:(GLenum)type;
+- (NSString *) flattenedObjCTypeForOpenGLType:(GLenum)type;
 - (BOOL) objCTypeIsHomogenous:(NSString *)type;
 - (NSUInteger) sizeOfObjCType:(const char *)typeEncoding;
 

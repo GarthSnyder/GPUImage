@@ -8,12 +8,12 @@ NSString *const kGPUImageAdaptiveThresholdFragmentShaderString = SHADER_STRING
     varying highp vec2 textureCoordinate;
 
     uniform sampler2D inputImage;
-    uniform sampler2D auxilliaryImage; 
+    uniform sampler2D blurredImage; 
 
     void main()
     {
         highp vec4 textureColor = texture2D(inputImage, textureCoordinate);
-        highp float localLuminance = texture2D(auxilliaryImage, textureCoordinate).r;
+        highp float localLuminance = texture2D(blurredImage, textureCoordinate).r;
         highp float thresholdResult = step(localLuminance - 0.05, textureColor.r);
 
         gl_FragColor = vec4(vec3(thresholdResult), textureColor.w);
@@ -25,16 +25,16 @@ NSString *const kGPUImageAdaptiveThresholdFragmentShaderString = SHADER_STRING
 
 - (id) init
 {
-    if (self = [super init]) 
+    if (self = [super init])
     {
         GPUImageGrayscaleFilter *grayscaleFilter = [[GPUImageGrayscaleFilter alloc] init];
         GPUImageBoxBlurFilter *boxBlurFilter = [[GPUImageBoxBlurFilter alloc] init];
-        
-        program.fragmentShader = kGPUImageAdaptiveThresholdFragmentShaderString;
-        program.inputImage = grayscaleFilter;
-        program.auxilliaryImage = boxBlurFilter;
-                
+
+        self.program.fragmentShader = kGPUImageAdaptiveThresholdFragmentShaderString;
         boxBlurFilter.inputImage = grayscaleFilter;
+
+        self.program.inputImage = grayscaleFilter;
+        [self.program setValue:boxBlurFilter forKey:@"blurredImage"];
     }
     return self;
 }

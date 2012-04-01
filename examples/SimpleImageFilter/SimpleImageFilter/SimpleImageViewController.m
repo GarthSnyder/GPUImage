@@ -49,6 +49,7 @@
     GPUImageView *imageView = (GPUImageView *)self.view;
     
     sepiaFilter.inputImage = sourcePicture;
+    sepiaFilter.outputOrientation = kGPUImageFlipVertical;
     imageView.inputImage = sepiaFilter;
     [imageView update];
 }

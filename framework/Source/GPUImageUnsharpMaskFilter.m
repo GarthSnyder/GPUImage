@@ -6,14 +6,14 @@ NSString *const kGPUImageUnsharpMaskFragmentShaderString = SHADER_STRING
     varying highp vec2 textureCoordinate;
 
     uniform sampler2D inputImage;
-    uniform sampler2D auxilliaryImage; 
+    uniform sampler2D blurredImage; 
 
     uniform highp float intensity;
 
     void main()
     {
         lowp vec4 sharpImageColor = texture2D(inputImage, textureCoordinate);
-        lowp vec3 blurredImageColor = texture2D(auxilliaryImage, textureCoordinate).rgb;
+        lowp vec3 blurredImageColor = texture2D(blurredImage, textureCoordinate).rgb;
 
         gl_FragColor = vec4(sharpImageColor.rgb * intensity + blurredImageColor * (1.0 - intensity), sharpImageColor.a);
         //     gl_FragColor = mix(blurredImageColor, sharpImageColor, intensity);
@@ -31,7 +31,7 @@ NSString *const kGPUImageUnsharpMaskFragmentShaderString = SHADER_STRING
     {
         self.program.fragmentShader = kGPUImageUnsharpMaskFragmentShaderString;
         blurFilter = [[GPUImageGaussianBlurFilter alloc] init];
-        self.auxilliaryImage = blurFilter;
+        [self.program setValue:blurFilter forKey:@"blurredImage"];
         self.intensity = 1.0;
         self.blurSize = 1.0;
     }

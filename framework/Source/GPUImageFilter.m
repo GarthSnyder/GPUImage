@@ -75,7 +75,7 @@
         if (![source update]) {
             return NO;
         }
-        if ([source timeLastChanged] > timeLastChanged) {
+        if ([source timeLastChanged] >= timeLastChanged) {
             needsRender = YES;
         }
     }
@@ -108,11 +108,6 @@
 - (GPUImageTimestamp) timeLastChanged
 {
     return timeLastChanged;
-}
-
-- (void) dealloc
-{
-    NSLog(@"GPUImageFilter dealloc");
 }
 
 #pragma mark -

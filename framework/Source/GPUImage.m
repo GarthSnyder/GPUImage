@@ -32,7 +32,7 @@ static GPUImageProgram *copyProgram;
     if (!self.inputImage || ![self.inputImage update]) {
         return NO;
     }
-    if (self.timeLastChanged < self.inputImage.timeLastChanged) {
+    if (self.timeLastChanged <= self.inputImage.timeLastChanged) {
         [self render];
     }
     return YES;

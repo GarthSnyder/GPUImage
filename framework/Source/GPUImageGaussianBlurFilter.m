@@ -70,9 +70,11 @@ NSString *const kGPUImageGaussianBlurFragmentShaderString = SHADER_STRING
         stageOne = [[GPUImageFilter alloc] init];
         stageOne.program.vertexShader = kGPUImageGaussianBlurVertexShaderString;
         stageOne.program.fragmentShader = kGPUImageGaussianBlurFragmentShaderString;
+        stageOne.program.delegate = self;
         
         self.program.vertexShader = kGPUImageGaussianBlurVertexShaderString;
         self.program.fragmentShader = kGPUImageGaussianBlurFragmentShaderString;
+        self.program.delegate = self;
         
         self.program.inputImage = stageOne;        
         self.blurSize = 1.0;
@@ -80,15 +82,17 @@ NSString *const kGPUImageGaussianBlurFragmentShaderString = SHADER_STRING
     return self;
 }
 
-- (BOOL) update
+// Defer setting size-related parameters as long as possible since sizes are lazy
+- (void) programWillDraw:(GPUImageProgram *)prog
 {
-    [stageOne.inputImage update];
     GLsize pSize = stageOne.inputImage.canvas.size;
-    [stageOne setValue:[NSNumber numberWithFloat:(1.0/pSize.width)] forKey:@"texelWidthOffset"];
-    [stageOne setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelHeightOffset"];
-    [self.program setValue:[NSNumber numberWithFloat:(1.0/pSize.height)] forKey:@"texelHeightOffset"];
-    [self.program setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelWidthOffset"];
-    return [super update];
+    if (prog == self.program) {
+        [prog setValue:[NSNumber numberWithFloat:(1.0/pSize.height)] forKey:@"texelHeightOffset"];
+        [prog setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelWidthOffset"];
+    } else {
+        [prog setValue:[NSNumber numberWithFloat:(1.0/pSize.width)] forKey:@"texelWidthOffset"];
+        [prog setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelHeightOffset"];
+    }
 }
 
 - (void) setInputImage:(id <GPUImageSource>)img
@@ -99,9 +103,8 @@ NSString *const kGPUImageGaussianBlurFragmentShaderString = SHADER_STRING
 - (void) setBlurSize:(CGFloat)blurSize 
 {
     _blurSize = blurSize;
-    NSNumber *blurfl = [NSNumber numberWithFloat:blurSize];
-    [stageOne setValue:blurfl forKey:@"blurSize"];
-    [self.program setValue: blurfl forKey:@"blurSize"];
+    [stageOne setValue:UNIFORM(blurSize) forKey:@"blurSize"];
+    [self.program setValue:UNIFORM(blurSize) forKey:@"blurSize"];
 }
 
 @end

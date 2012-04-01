@@ -1,8 +1,6 @@
 #import "ShowcaseFilterViewController.h"
 #import "GPUImageProgram.h"
 
-__weak GPUImageFilter *lastFilter;
-
 @implementation ShowcaseFilterViewController
 
 #pragma mark -
@@ -45,11 +43,6 @@ __weak GPUImageFilter *lastFilter;
 {
     [super viewDidUnload];
     
-}
-
-- (void) dealloc
-{
-    NSLog(@"Showcase dealloc");
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

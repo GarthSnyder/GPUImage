@@ -107,7 +107,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     if (status == YES) {
         glUseProgram(programHandle);
         for (GPUImageShaderSymbol *uniform in [uniforms allValues]) {
-            [uniform setOESValue];
+            [uniform setOpenGLValue];
         }
     }
     return status;
@@ -226,13 +226,13 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
     BOOL status;
     if ((status = [self link])) {
         for (GPUImageShaderSymbol *uniform in [uniforms allValues]) {
-            if (!uniform.knowsOESDetails) {
+            if (!uniform.knowsOpenGLDetails) {
                 if (!droppedMarker) {
                     glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Validate uniforms: %s", 
                         class_getName([self class])] UTF8String]);
                     droppedMarker = YES;
                 }
-                [uniform gatherOESDetailsForProgram:programHandle];
+                [uniform gatherOpenGLDetailsForProgram:programHandle];
             }
         }
     }
@@ -257,14 +257,14 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
         return;
     }
     
-    static const GLfloat rotateLeft[] = {
+    static const GLfloat rotateRight[] = {
         -1.0,  1.0,
         -1.0, -1.0,
         1.0,  1.0,
         1.0, -1.0,
     };
 
-    static const GLfloat rotateRight[] = {
+    static const GLfloat rotateLeft[] = {
         1.0, -1.0,
         1.0, 1.0,
         -1.0, -1.0,
@@ -318,7 +318,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
         case kGPUImageRotate180Degrees:
             vertices = rotate180Degrees;
             break;
-        case kGPUImageFlipHorizonal: 
+        case kGPUImageFlipHorizontal: 
             vertices = flipHorizontal;
             break;
         case kGPUImageFlipVertical: 
@@ -333,7 +333,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
         default:
             NSAssert1(NO, @"Unknown orientation: %d", (int)orientation);
     }
-    [self drawWithVertices:vertices textureCoordinates:NULL];
+    [self drawWithVertices:vertices textureCoordinates:t];
 }
 
 - (void) drawWithVertices:(const GLfloat *)v textureCoordinates:(const GLfloat *)t
