@@ -62,7 +62,7 @@ __weak GPUImageFilter *lastFilter;
     videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset640x480 cameraPosition:AVCaptureDevicePositionBack];
     videoCamera.delegate = self;
     GPUImageRotationFilter *rotationFilter = [[GPUImageRotationFilter alloc] init];
-    rotationFilter.rotationMode = kGPUImageRotateRight;
+    rotationFilter.rotationMode = kGPUImageRotateRightFlipVertical;
     numberOfFrames = -10; // Skip first 10
     totalFrameTimeDuringCapture = 0;
 

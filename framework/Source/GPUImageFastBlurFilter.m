@@ -73,9 +73,11 @@ NSString *const kGPUImageFastBlurFragmentShaderString = SHADER_STRING
         stageOne = [[GPUImageFilter alloc] init];
         stageOne.program.vertexShader = kGPUImageFastBlurVertexShaderString;
         stageOne.program.fragmentShader = kGPUImageFastBlurFragmentShaderString;
+        stageOne.program.delegate = self;
         
         self.program.vertexShader = kGPUImageFastBlurVertexShaderString;
         self.program.fragmentShader = kGPUImageFastBlurFragmentShaderString;
+        self.program.delegate = self;
         
         self.program.inputImage = stageOne;        
         self.blurSize = 1.0;
@@ -89,15 +91,17 @@ NSString *const kGPUImageFastBlurFragmentShaderString = SHADER_STRING
     return NO;
 }
 
-- (BOOL) update
+// Defer setting size-related parameters as long as possible since sizes are lazy
+- (void) programWillDraw:(GPUImageProgram *)prog
 {
-    [stageOne.inputImage update];
     GLsize pSize = stageOne.inputImage.canvas.size;
-    [stageOne setValue:[NSNumber numberWithFloat:(1.0/pSize.width)] forKey:@"texelWidthOffset"];
-    [stageOne setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelHeightOffset"];
-    [self.program setValue:[NSNumber numberWithFloat:(1.0/pSize.height)] forKey:@"texelHeightOffset"];
-    [self.program setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelWidthOffset"];
-    return [super update];
+    if (prog == self.program) {
+        [self.program setValue:[NSNumber numberWithFloat:(1.0/pSize.height)] forKey:@"texelHeightOffset"];
+        [self.program setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelWidthOffset"];
+    } else {
+        [stageOne setValue:[NSNumber numberWithFloat:(1.0/pSize.width)] forKey:@"texelWidthOffset"];
+        [stageOne setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelHeightOffset"];
+    }
 }
 
 - (void) setInputImage:(id <GPUImageSource>)img
@@ -113,7 +117,7 @@ NSString *const kGPUImageFastBlurFragmentShaderString = SHADER_STRING
     [self.program setValue:blurfl forKey:@"blurSize"];
 }
 
-- (BOOL) render
+- (void) render
 {
     [super render];
     id <GPUImageSource> savedParent = stageOne.inputImage;
@@ -123,7 +127,6 @@ NSString *const kGPUImageFastBlurFragmentShaderString = SHADER_STRING
         [super render];
     }
     stageOne.inputImage = savedParent;
-    return YES;
 }
 
 @end

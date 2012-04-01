@@ -77,11 +77,11 @@ NSString *const kGPUImageSharpenFragmentShaderString = SHADER_STRING
     return self;
 }
 
-- (void) drawWithProgram:(GPUImageProgram *)prog
+- (void) draw
 {
     [self.program setValue:[NSNumber numberWithFloat:(1.0 / self.size.width)] forKey:@"imageWidthFactor"];
     [self.program setValue:[NSNumber numberWithFloat:(1.0 / self.size.height)] forKey:@"imageHeightFactor"];
-    [super drawWithProgram:prog];
+    [super draw];
 }
 
 @end

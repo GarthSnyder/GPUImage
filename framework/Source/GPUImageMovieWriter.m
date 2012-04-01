@@ -23,7 +23,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
 // Movie recording
 - (void) initializeMovie;
-- (BOOL) render;
+- (void) render;
 - (void) validateSize;
 - (void) processNewFrame;
 - (void) endProcessing;
@@ -200,22 +200,21 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     if (inputImage) {
         [inputImage update];
         if (timeLastChanged < [inputImage timeLastChanged]) {
-            return [self render];
+            [self render];
         }
     }
     return YES;
 }
 
-- (BOOL) render
+- (void) render
 {
     if (!self.canvas) {
         [self createCanvas];
     }
     [self.canvas bindAsFramebuffer];
-    [self drawWithProgram:colorSwizzlingProgram];
+    [colorSwizzlingProgram draw];
     [self processNewFrame];
     timeLastChanged = GPUImageGetCurrentTimestamp();
-    return YES;
 }
 
 #pragma mark -

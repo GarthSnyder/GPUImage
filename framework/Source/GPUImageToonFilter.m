@@ -80,7 +80,7 @@ NSString *const kGPUImageToonFragmentShaderString = SHADER_STRING
     return self;
 }
 
-- (BOOL) render
+- (void) draw
 {
     if (![self.program valueForKey:@"imageWidthFactor"]
         || ![self.program valueForKey:@"imageHeightFactor"])
@@ -88,7 +88,7 @@ NSString *const kGPUImageToonFragmentShaderString = SHADER_STRING
         self.imageWidthFactor = self.size.width;
         self.imageHeightFactor = self.size.height;
     }
-    return [super render];
+    [super draw];
 }
 
 @end

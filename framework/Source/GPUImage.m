@@ -32,7 +32,7 @@ static GPUImageProgram *copyProgram;
         return NO;
     }
     if (self.timeLastChanged < self.inputImage.timeLastChanged) {
-        return [self render];
+        [self render];
     }
     return YES;
 }
@@ -53,7 +53,7 @@ static GPUImageProgram *copyProgram;
 // If our parent is a texture of incompatible size or canvas, then we
 // need to do a conversion.
 
-- (BOOL) render
+- (void) render
 {
     glPushGroupMarkerEXT(0, [[NSString stringWithFormat:@"Render: %s (GPUImage)", 
         class_getName([self class])] UTF8String]);
@@ -65,7 +65,7 @@ static GPUImageProgram *copyProgram;
             copyProgram = [[GPUImageProgram alloc] init];
         }
         copyProgram.inputImage = self.inputImage;
-        [self drawWithProgram:copyProgram];
+        [copyProgram draw];
         copyProgram.inputImage = nil;
     } else {
         _canvas = self.inputImage.canvas;
@@ -77,7 +77,6 @@ static GPUImageProgram *copyProgram;
     }
     timeLastChanged = GPUImageGetCurrentTimestamp();
     glPopGroupMarkerEXT();
-    return YES;
 }
 
 // Is there anything about the parent object that makes it impossible for us

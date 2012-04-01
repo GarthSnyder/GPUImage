@@ -30,7 +30,10 @@ NSString *const kGPUImagePixellationFragmentShaderString = SHADER_STRING
     return self;
 }
 
-- (BOOL) render
+// Size can be inherited from suppliers, so defer setting size-based uniforms
+// until the last minute.
+
+- (void) draw
 {
     // Bound fractional width of a pixel
     CGFloat singlePixelSpacing;
@@ -45,7 +48,7 @@ NSString *const kGPUImagePixellationFragmentShaderString = SHADER_STRING
 
     [self.program setValue:[NSNumber numberWithFloat:_fractionalWidthOfAPixel] 
                     forKey:@"fractionalWidthOfPixel"];
-    return [super render];
+    [super draw];
 }
 
 @end

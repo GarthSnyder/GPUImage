@@ -219,51 +219,6 @@
 }
 
 #pragma mark -
-#pragma mark Drawing
-
-- (void) drawWithProgram:(GPUImageProgram *)prog vertices:(const GLfloat *)v textureCoordinates:(const GLfloat *)t
-{
-    static const GLfloat squareVertices[] = {
-        -1.0, -1.0,
-        1.0, -1.0,
-        -1.0,  1.0,
-        1.0,  1.0,
-    };
-    
-    static const GLfloat squareTextureCoordinates[] = {
-        0.0,  0.0,
-        1.0,  0.0,
-        0.0,  1.0,
-        1.0,  1.0,
-    };
-
-    if (!v) {
-        v = squareVertices;
-    }
-    if (!t) {
-        t = squareTextureCoordinates;
-    }
-    
-    [prog use];
-    
-    GLint position = [prog indexOfAttribute:@"position"];
-    GLint itc = [prog indexOfAttribute:@"inputTextureCoordinate"];
-    
-    glVertexAttribPointer(position, 2, GL_FLOAT, 0, 0, v);
-    glEnableVertexAttribArray(position);
-    
-    glVertexAttribPointer(itc, 2, GL_FLOAT, 0, 0, t);
-    glEnableVertexAttribArray(itc);
-    
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);    
-}
-
-- (void) drawWithProgram:(GPUImageProgram *)prog
-{
-    [self drawWithProgram:prog vertices:NULL textureCoordinates:NULL];
-}
-
-#pragma mark -
 #pragma mark Exporting images
 
 - (GLubyte *) copyRawContents
