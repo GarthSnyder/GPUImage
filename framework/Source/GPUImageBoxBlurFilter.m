@@ -95,11 +95,11 @@ NSString *const kGPUImageBoxBlurFragmentShaderString = SHADER_STRING
 {
     GLsize pSize = stageOne.inputImage.canvas.size;
     if (prog == self.program) {
-        [prog setValue:[NSNumber numberWithFloat:(1.0/pSize.height)] forKey:@"texelHeightOffset"];
-        [prog setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelWidthOffset"];
-    } else {
-        [prog setValue:[NSNumber numberWithFloat:(1.0/pSize.width)] forKey:@"texelWidthOffset"];
-        [prog setValue:[NSNumber numberWithFloat:0.0] forKey:@"texelHeightOffset"];
+        prog[@"texelHeightOffset"] = @(1.0f/pSize.height);
+        prog[@"texelWidthOffset"] = @0.0f;
+    } else { // stageOne's stuff
+        prog[@"texelWidthOffset"] = @(1.0f/pSize.width);
+        prog[@"texelHeightOffset"] = @0.0f;
     }
 }
      

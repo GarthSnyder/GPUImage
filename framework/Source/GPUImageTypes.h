@@ -4,7 +4,7 @@
 // A GPUImageTimestamp is a simple, guaranteed-unique, monotonically increasing
 // integer. Used to facilitate flooding of updates through a filter network.
 
-typedef unsigned int GPUImageTimestamp;
+typedef unsigned long GPUImageTimestamp;
 
 GPUImageTimestamp GPUImageGetCurrentTimestamp(void);
 

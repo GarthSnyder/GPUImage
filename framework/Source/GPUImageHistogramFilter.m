@@ -223,7 +223,7 @@ NSString *const kGPUImageHistogramAccumulationFragmentShaderString = SHADER_STRI
     {
         if (currentTarget != self.targetToIgnoreForUpdates)
         {
-            if ([GPUImageOpenGLESContext supportsFastTextureUpload] && preparedToCaptureImage)
+            if (preparedToCaptureImage)
             {
                 NSInteger indexOfObject = [targets indexOfObject:currentTarget];
                 [self setInputTextureForTarget:currentTarget atIndex:[[targetTextureIndices objectAtIndex:indexOfObject] integerValue]];

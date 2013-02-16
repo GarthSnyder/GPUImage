@@ -6,21 +6,15 @@
 #import <CoreMedia/CoreMedia.h>
 
 @interface GPUImageOpenGLESContext : NSObject
-{
-    EAGLContext *_context;
-}
 
-@property(readonly, retain) EAGLContext *context;
+@property (readonly) EAGLContext *context;
 
-+ (GPUImageOpenGLESContext *)sharedImageProcessingOpenGLESContext;
-+ (void)useImageProcessingContext;
-+ (GLint)maximumTextureSizeForThisDevice;
-+ (GLint)maximumTextureUnitsForThisDevice;
++ (GPUImageOpenGLESContext *) sharedImageProcessingOpenGLESContext;
++ (void) useImageProcessingContext;
++ (GLint) maximumTextureSizeForThisDevice;
++ (GLint) maximumTextureUnitsForThisDevice;
 
-- (void)presentBufferForDisplay;
-
-// Manage fast texture upload
-+ (BOOL)supportsFastTextureUpload;
+- (void) presentBufferForDisplay;
 
 @end
 

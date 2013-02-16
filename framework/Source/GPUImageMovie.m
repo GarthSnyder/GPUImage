@@ -4,6 +4,8 @@
 
 @interface GPUImageMovie ()
 {
+    GPUImageTimestamp timeLastChanged;
+
     BOOL audioEncodingIsFinished, videoEncodingIsFinished;
     GPUImageMovieWriter *synchronizedMovieWriter;
     CVOpenGLESTextureCacheRef coreVideoTextureCache;
@@ -14,7 +16,6 @@
 
 @interface GPUImageMovie ()
 {
-    GPUImageTimestamp timeLastChanged;
 }
 @end
 
@@ -33,18 +34,15 @@
         return nil;
     }
     
-    if ([GPUImageOpenGLESContext supportsFastTextureUpload])
+    [GPUImageOpenGLESContext useImageProcessingContext];
+    CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)[[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] context], NULL, &coreVideoTextureCache);
+    if (err) 
     {
-        [GPUImageOpenGLESContext useImageProcessingContext];
-        CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)[[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] context], NULL, &coreVideoTextureCache);
-        if (err) 
-        {
-            NSAssert(NO, @"Error at CVOpenGLESTextureCacheCreate %d");
-        }
-        
-        // Need to remove the initially created texture
-        [self deleteOutputTexture];
+        NSAssert(NO, @"Error at CVOpenGLESTextureCacheCreate %d");
     }
+    
+    // Need to remove the initially created texture
+    [self deleteOutputTexture];
 
     self.url = url;
     

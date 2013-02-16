@@ -27,17 +27,16 @@
     GPUImageProgram *program;
 }
 
-@property (nonatomic, retain) GPUImageProgram *program;
+@property (nonatomic) GPUImageProgram *program;
 @property (nonatomic) GPUImageOutputOrientation outputOrientation;
 
 // These properties are defined for convenience. They will not necessarily
 // be used by all filters. Values are passed on to the OpenGL program.
 
-@property (nonatomic, retain) id <GPUImageSource> inputImage;
-@property (nonatomic, retain) id <GPUImageSource> auxilliaryImage;
+@property (nonatomic) id <GPUImageSource> inputImage;
+@property (nonatomic) id <GPUImageSource> auxilliaryImage;
 
-// Render = bind framebuffer and draw
-- (void) render;
+- (void) render; // = bind framebuffer and draw
 - (void) draw;
 
 - (BOOL) canUseRenderbuffer;

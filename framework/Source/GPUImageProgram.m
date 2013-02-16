@@ -164,6 +164,16 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
 
 #pragma mark Management of uniform values
 
+- (id) objectForKeyedSubscript:(id)key
+{
+    return [self valueForKey:(NSString *)key];
+}
+
+- (void) setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key
+{
+    [self setValue:obj forKey:(NSString *)key];
+}
+
 // Records the value for later use; does not issue any OpenGL commands
 
 - (void) setValue:(id)obj forKey:(NSString *)key

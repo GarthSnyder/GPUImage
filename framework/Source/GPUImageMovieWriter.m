@@ -76,14 +76,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     
     [GPUImageOpenGLESContext useImageProcessingContext];
     
-    if ([GPUImageOpenGLESContext supportsFastTextureUpload])
-    {
-        colorSwizzlingProgram = [[GPUImageProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImagePassthroughFragmentShaderString];
-    }
-    else
-    {
-        colorSwizzlingProgram = [[GPUImageProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageColorSwizzlingFragmentShaderString];
-    }
+    colorSwizzlingProgram = [[GPUImageProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImagePassthroughFragmentShaderString];
     
     [colorSwizzlingProgram addAttribute:@"position"];
 	[colorSwizzlingProgram addAttribute:@"inputTextureCoordinate"];
@@ -270,44 +263,33 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     glGenFramebuffers(1, &movieFramebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, movieFramebuffer);
     
-    if ([GPUImageOpenGLESContext supportsFastTextureUpload])
+    CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)[[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] context], NULL, &coreVideoTextureCache);
+    if (err)
     {
-        CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)[[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext] context], NULL, &coreVideoTextureCache);
-        if (err) 
-        {
-            NSAssert(NO, @"Error at CVOpenGLESTextureCacheCreate %d");
-        }
-
-        // Code originally sourced from http://allmybrain.com/2011/12/08/rendering-to-a-texture-with-ios-5-texture-cache-api/
-        
-
-        CVPixelBufferPoolCreatePixelBuffer (NULL, [assetWriterPixelBufferInput pixelBufferPool], &renderTarget);
-
-        CVOpenGLESTextureCacheCreateTextureFromImage (kCFAllocatorDefault, coreVideoTextureCache, renderTarget,
-                                                      NULL, // texture attributes
-                                                      GL_TEXTURE_2D,
-                                                      GL_RGBA, // opengl format
-                                                      (int)videoSize.width,
-                                                      (int)videoSize.height,
-                                                      GL_BGRA, // native iOS format
-                                                      GL_UNSIGNED_BYTE,
-                                                      0,
-                                                      &renderTexture);
-        
-        glBindTexture(CVOpenGLESTextureGetTarget(renderTexture), CVOpenGLESTextureGetName(renderTexture));
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, CVOpenGLESTextureGetName(renderTexture), 0);
+        NSAssert(NO, @"Error at CVOpenGLESTextureCacheCreate %d");
     }
-    else
-    {
-        glGenRenderbuffers(1, &movieRenderbuffer);
-        glBindRenderbuffer(GL_RENDERBUFFER, movieRenderbuffer);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8_OES, (int)videoSize.width, (int)videoSize.height);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, movieRenderbuffer);	
-    }
+
+    // Code originally sourced from http://allmybrain.com/2011/12/08/rendering-to-a-texture-with-ios-5-texture-cache-api/
     
+
+    CVPixelBufferPoolCreatePixelBuffer (NULL, [assetWriterPixelBufferInput pixelBufferPool], &renderTarget);
+
+    CVOpenGLESTextureCacheCreateTextureFromImage (kCFAllocatorDefault, coreVideoTextureCache, renderTarget,
+                                                  NULL, // texture attributes
+                                                  GL_TEXTURE_2D,
+                                                  GL_RGBA, // opengl format
+                                                  (int)videoSize.width,
+                                                  (int)videoSize.height,
+                                                  GL_BGRA, // native iOS format
+                                                  GL_UNSIGNED_BYTE,
+                                                  0,
+                                                  &renderTexture);
+    
+    glBindTexture(CVOpenGLESTextureGetTarget(renderTexture), CVOpenGLESTextureGetName(renderTexture));
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, CVOpenGLESTextureGetName(renderTexture), 0);
 	
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     
@@ -328,22 +310,18 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 		movieRenderbuffer = 0;
 	}	
     
-    if ([GPUImageOpenGLESContext supportsFastTextureUpload])
+    if (coreVideoTextureCache)
     {
-        if (coreVideoTextureCache)
-        {
-            CFRelease(coreVideoTextureCache);
-        }
+        CFRelease(coreVideoTextureCache);
+    }
 
-        if (renderTexture)
-        {
-            CFRelease(renderTexture);
-        }
-        if (renderTarget)
-        {
-            CVPixelBufferRelease(renderTarget);
-        }
-
+    if (renderTexture)
+    {
+        CFRelease(renderTexture);
+    }
+    if (renderTarget)
+    {
+        CVPixelBufferRelease(renderTarget);
     }
 }
 
@@ -436,27 +414,9 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
     CVPixelBufferRef pixel_buffer = NULL;
 
-    if ([GPUImageOpenGLESContext supportsFastTextureUpload])
-    {
-        pixel_buffer = renderTarget; 
-        CVPixelBufferLockBaseAddress(pixel_buffer, 0);
-    }
-    else
-    {
-        CVReturn status = CVPixelBufferPoolCreatePixelBuffer (NULL, [assetWriterPixelBufferInput pixelBufferPool], &pixel_buffer);
-        if ((pixel_buffer == NULL) || (status != kCVReturnSuccess))
-        {
-            return;
-        }
-        else
-        {
-            CVPixelBufferLockBaseAddress(pixel_buffer, 0);
-            
-            GLubyte *pixelBufferData = (GLubyte *)CVPixelBufferGetBaseAddress(pixel_buffer);
-            glReadPixels(0, 0, videoSize.width, videoSize.height, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData);
-        }
-    }
-        
+    pixel_buffer = renderTarget; 
+    CVPixelBufferLockBaseAddress(pixel_buffer, 0);
+    
 //    if(![assetWriterPixelBufferInput appendPixelBuffer:pixel_buffer withPresentationTime:CMTimeSubtract(frameTime, startTime)]) 
     if(![assetWriterPixelBufferInput appendPixelBuffer:pixel_buffer withPresentationTime:frameTime]) 
     {
@@ -470,10 +430,6 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     
     previousFrameTime = frameTime;
     
-    if (![GPUImageOpenGLESContext supportsFastTextureUpload])
-    {
-        CVPixelBufferRelease(pixel_buffer);
-    }
 }
 
 - (NSInteger)nextAvailableTextureIndex;

@@ -7,6 +7,7 @@
 @synthesize context = _context;
 
 // Based on Colin Wheeler's example here: http://cocoasamurai.blogspot.com/2011/04/singletons-your-doing-them-wrong.html
+
 + (GPUImageOpenGLESContext *)sharedImageProcessingOpenGLESContext;
 {
     static dispatch_once_t pred;
@@ -40,14 +41,6 @@
 - (void)presentBufferForDisplay;
 {
     [_context presentRenderbuffer:GL_RENDERBUFFER];
-}
-
-#pragma mark -
-#pragma mark Manage fast texture upload
-
-+ (BOOL)supportsFastTextureUpload;
-{
-    return (CVOpenGLESTextureCacheCreate != NULL);
 }
 
 #pragma mark -

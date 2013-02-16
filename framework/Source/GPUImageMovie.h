@@ -12,14 +12,15 @@
 
 @interface GPUImageMovie : GPUImageBase <GPUImageSource> 
 {
-  CVPixelBufferRef _currentBuffer;
+    CVPixelBufferRef _currentBuffer;
 }
 
-@property (nonatomic, assign) id <GPUImageMovieDelegate> delegate;
-@property (readwrite, retain) NSURL *url;
+@property (nonatomic, weak) id <GPUImageMovieDelegate> delegate;
+@property (readwrite, copy) NSURL *url;
 
--(id)initWithURL:(NSURL *)url;
--(void)startProcessing;
--(void)endProcessing;
+- (id) initWithURL:(NSURL *)url;
+
+- (void) startProcessing;
+- (void) endProcessing;
 
 @end

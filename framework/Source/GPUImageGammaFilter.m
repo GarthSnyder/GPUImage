@@ -5,7 +5,7 @@ NSString *const kGPUImageGammaFragmentShaderString = SHADER_STRING
     varying highp vec2 textureCoordinate;
 
     uniform sampler2D inputImage;
-    uniform lowp float gamma;
+    uniform highp float gamma;
 
     void main()
     {

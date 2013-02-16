@@ -12,7 +12,7 @@
 
 // Call this to switch to a scratch texture unit and clear the texture 
 // binding cache. Use this before calling iOS methods (such as the 
-// OpenGLES texture cache calls) that may monkey with texture bindings.
+// OpenGLES texture cache calls) that may change texture bindings.
 // You don't want those bindings to stick to whatever texture unit happens
 // to have been used last.
 

@@ -2,7 +2,6 @@
 
 @interface GPUImageGammaFilter : GPUImageFilter
 
-// Gamma ranges from 0.0 to 3.0, with 1.0 as the normal level
-@property (nonatomic) CGFloat gamma; 
+@property (nonatomic) CGFloat gamma;  // Range 0.0 to 3.0, 1 = normal
 
 @end

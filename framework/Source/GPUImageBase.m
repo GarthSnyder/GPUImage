@@ -146,7 +146,7 @@
 - (void) createCanvas
 {
     NSAssert(self.layer || (self.size.width && self.size.height && self.baseFormat),
-             @"Cannot bindAsFramebuffer without at least size and base format.");
+             @"Cannot create a canvas without at least a size and base format.");
     if (self.usesRenderbuffer) {
         if (self.layer) {
             _canvas = [[GPUImageRenderbuffer alloc] initWithLayer:self.layer];

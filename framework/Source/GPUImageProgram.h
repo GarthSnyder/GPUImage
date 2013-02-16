@@ -5,6 +5,10 @@
 //
 //     [program setValue:[NSNumber numberWithFloat:3.0] forKey:@"gamma"]
 //
+// Or:
+//
+//     program[@"gamma"] = @3.0f;
+//
 // The values are lazily propagated to OpenGL at the point of use. Furthermore,
 // they are dirtiness-tracked so that values are not actually written out
 // unless they need to be. 
@@ -81,10 +85,13 @@
 
 // This method is used only for determining the handles for vertex
 // attributes for use in drawing. For uniforms, the general GPUImageProgram
-// KVC system should be used, e.g.:
-//
-//     [program setValue:[NSNumber numberWithFloat:3.0] forKey:@"gamma"]
+// KVC system should be used, e.g. program[@"gamma"] = @3.0f
 
 - (GLint) indexOfAttribute:(NSString *)name;
+
+// For syntactic sugar compatibility
+
+- (id) objectForKeyedSubscript:(id)key;
+- (void) setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key;
 
 @end

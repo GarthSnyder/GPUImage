@@ -45,12 +45,10 @@
     self.baseFormat = GL_RGBA;
     
     [GPUImageOpenGLESContext useImageProcessingContext];
-    if ([GPUImageOpenGLESContext supportsFastTextureUpload]) {
-        CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, 
-            (__bridge void *)[[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext]
-            context], NULL, &coreVideoTextureCache);
-        NSAssert(!err, @"Error at CVOpenGLESTextureCacheCreate %d");
-    }
+    CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, 
+        (__bridge void *)[[GPUImageOpenGLESContext sharedImageProcessingOpenGLESContext]
+        context], NULL, &coreVideoTextureCache);
+    NSAssert(!err, @"Error at CVOpenGLESTextureCacheCreate %d");
 
     // Grab the back-facing or front-facing camera
     _inputCamera = nil;
@@ -214,40 +212,28 @@
     [GPUImageOpenGLESContext useImageProcessingContext];
     CVPixelBufferLockBaseAddress(imgBuff, 0);
     
-    if ([GPUImageOpenGLESContext supportsFastTextureUpload])
-    {
-        CVOpenGLESTextureRef texture = NULL;
-        [GPUImageTexture protectTextureContext];
-        CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-            coreVideoTextureCache, imgBuff, NULL, GL_TEXTURE_2D, GL_RGBA, 
-            buffSize.width, buffSize.height, GL_BGRA, GL_UNSIGNED_BYTE, 0, &texture);
-                
-        if (!texture || err) {
-            NSLog(@"Camera CVOpenGLESTextureCacheCreateTextureFromImage failed (error: %d)", err);
-            return;
-        }
-        
-        GLint outputTexture = CVOpenGLESTextureGetName(texture);
-        if (_canvas.handle != outputTexture) {
-            _canvas = [[GPUImageTexture alloc] initWithTexture:outputTexture
-            size:buffSize format:GL_RGBA];
-        }
-        [self setTextureParameters];
-        
-        // Flush the CVOpenGLESTexture cache and release the texture
-        CVOpenGLESTextureCacheFlush(coreVideoTextureCache, 0);
-        CFRelease(texture);
+    CVOpenGLESTextureRef texture = NULL;
+    [GPUImageTexture protectTextureContext];
+    CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
+        coreVideoTextureCache, imgBuff, NULL, GL_TEXTURE_2D, GL_RGBA, 
+        buffSize.width, buffSize.height, GL_BGRA, GL_UNSIGNED_BYTE, 0, &texture);
+            
+    if (!texture || err) {
+        NSLog(@"Camera CVOpenGLESTextureCacheCreateTextureFromImage failed (error: %d)", err);
+        return;
     }
-    else  
-    {
-        if (!self.canvas) {
-            [self createCanvas];
-        }
-        [self.canvas bind];
-        // Using BGRA extension to pull in video frame data directly
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, buffSize.width, buffSize.height, 0, 
-            GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(imgBuff));
-    }    
+    
+    GLint outputTexture = CVOpenGLESTextureGetName(texture);
+    if (_canvas.handle != outputTexture) {
+        _canvas = [[GPUImageTexture alloc] initWithTexture:outputTexture
+        size:buffSize format:GL_RGBA];
+    }
+    [self setTextureParameters];
+    
+    // Flush the CVOpenGLESTexture cache and release the texture
+    CVOpenGLESTextureCacheFlush(coreVideoTextureCache, 0);
+    CFRelease(texture);
+
     CVPixelBufferUnlockBaseAddress(imgBuff, 0);
     timeLastChanged = GPUImageGetCurrentTimestamp();
 
