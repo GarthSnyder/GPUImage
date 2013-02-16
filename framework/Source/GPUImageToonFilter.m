@@ -70,18 +70,17 @@ NSString *const kGPUImageToonFragmentShaderString = SHADER_STRING
 @implementation GPUImageToonFilter
 
 @dynamic imageHeightFactor, imageWidthFactor;
+@dynamic threshold, quantizationLevels;
 
 - (id) init
 {
     if (self = [super init]) {
-        self.program.fragmentShader = kGPUImageSobelEdgeDetectionVertexShaderString;
-        self.program.fragmentShader = kGPUImageToonFragmentShaderString;
+        program.fragmentShader = kGPUImageSobelEdgeDetectionVertexShaderString;
+        program.fragmentShader = kGPUImageToonFragmentShaderString;
     }
     
-    hasOverriddenImageSizeFactor = NO;
     
-    imageWidthFactorUniform = [filterProgram uniformIndex:@"imageWidthFactor"];
-    imageHeightFactorUniform = [filterProgram uniformIndex:@"imageHeightFactor"];
+    hasOverriddenImageSizeFactor = NO;
     
     return self;
 }

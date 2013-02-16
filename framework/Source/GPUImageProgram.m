@@ -316,7 +316,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
         1.0, 1.0
     };
 
-    const GLfloat *vertices;
+    const GLfloat *vertices = NULL;
     switch (orientation)
     {
         case kGPUImageRotateLeft: 
@@ -331,7 +331,7 @@ NSString *const kGPUImageDefaultFragmentShader = SHADER_STRING
         case kGPUImageFlipHorizontal: 
             vertices = flipHorizontal;
             break;
-        case kGPUImageFlipVertical: 
+        case kGPUImageFlipVertical:
             vertices = flipVertical;
             break;
         case kGPUImageFlip45Degrees: 
